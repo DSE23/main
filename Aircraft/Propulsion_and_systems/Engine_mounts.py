@@ -1,16 +1,20 @@
-from pint import UnitRegistry
+## See tutorial/pint example with subfolders why this needs to be here!
+import sys
+sys.path.append('../')
 
-unit = UnitRegistry()
+
+from Misc import ureg, Q_
 
 def initialise_enginemass(inp):
     global enginedrymass
     enginedrymass = inp
 
 enginedrymass = 446
-enginedrymass *= unit.pounds
+enginedrymass *= ureg.pounds
 
 def initialise_engineIxg(inp):
     global engineIxg
     engineIxg = inp
 
-engineIxg = unit("84.4 inch*lb*s**2")
+engineIxg = Q_("84.4 inch*lbf*s**2")
+print(engineIxg.to(ureg("kg*m**2")))
