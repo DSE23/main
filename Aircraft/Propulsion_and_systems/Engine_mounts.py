@@ -4,9 +4,10 @@ Department: Propulsion and Aircraft Systems
 Last updated: 05/06/2018 16:52 by Ties
 """
 
-from pint import UnitRegistry
+import sys
+sys.path.append('../') # This makes sure the parent directory gets added to the system path
 
-unit = UnitRegistry()
+from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
 
 def initialise_enginemass(inp):
@@ -45,20 +46,20 @@ def initialise_engineheight(inp):
 
 
 # Engine dry mass as provided by Lycoming
-enginedrymass = unit('446 lbs')
+enginedrymass = Q_('446 lbs')
 # Assume factor of 10% to achieve wet mass
 enginewetmass = 1.1*enginedrymass
 
 # Mass moments of inertia
 # About the axis parallel to the crankshaft centerline
-engineIxg = unit("84.4 inch*lbf*s**2")
+engineIxg = Q_("84.4 inch*lbf*s**2")
 # About the vertical axis
-engineIyg = unit('93.5 inch*lbf*s**2')
+engineIyg = Q_('93.5 inch*lbf*s**2')
 # About the axis parallel to the centerline
-engineIzg = unit('145.8 inch*lbf*s**2')
+engineIzg = Q_('145.8 inch*lbf*s**2')
 
 #Engine dimensions
-enginelength = unit('39.34 in')
-enginewidth = unit('34.25 in')
-engineheight = unit('26.46 in')
+enginelength = Q_('39.34 in')
+enginewidth = Q_('34.25 in')
+engineheight = Q_('26.46 in')
 
