@@ -4,12 +4,28 @@ Department: Propulsion and Aircraft Systems
 Last updated: 05/06/2018 16:52 by Ties
 """
 
+"""
+This file calculates the maximum forces experienced by the engine mounts, 
+for use by the structures department
+"""
+
 import sys
-sys.path.append('../') # This makes sure the parent directory gets added to the system path
+sys.path.append('../')
+# This makes sure the parent directory gets added to the system path
 
-from Misc import ureg, Q_ # Imports the unit registry from the Misc folder
+from Misc import ureg, Q_
+# Imports the unit registry from the Misc folder
 
+# Coordinate system:
+# Origin is in propeller attachment to engine
+# X axis: parallel to the crankshaft centerline, backwards
+# Y axis: up
+# Z axis: left
+
+# Start defining global variables for easy editing from elsewhere
 # For explanations of the variables defined here, see below, where they are given values
+
+
 def initialise_enginemass(inp):
     global enginedrymass
     enginedrymass = inp
@@ -44,25 +60,43 @@ def initialise_engineheight(inp):
     global engineheight
     engineheight = inp
 
-# Coordinate system:
-# Origin is in propeller attachment to engine
-# X axis: parallel to the crankshaft centerline, backwards
-# Y axis: up
-# Z axis: left
 
+def initialise_engine_xcg(inp):
+    global engine_xcg
+    engine_xcg = inp
+
+
+def initialise_engine_ycg(inp):
+    global engine_ycg
+    engine_ycg = inp
+
+
+def initialise_engine_zcg(inp):
+    global engine_zcg
+    engine_zcg = inp
+
+
+# End defining global variables
+
+# Start assigning values to variables
 # Engine dry mass as provided by Lycoming
-enginedrymass = Q_('446 lbs')
+enginedrymass = Q_("446 lbs")
 # Assume factor of 10% to achieve wet mass
 enginewetmass = 1.1*enginedrymass
 
 # Engine mass moments of inertia about engine cg
 engine_ixg = Q_("84.4 inch*lbf*s**2")
-engine_iyg = Q_('93.5 inch*lbf*s**2')
-engine_izg = Q_('145.8 inch*lbf*s**2')
+engine_iyg = Q_("93.5 inch*lbf*s**2")
+engine_izg = Q_("145.8 inch*lbf*s**2")
 
 # Engine dimensions
-enginelength = Q_('39.34 in')
-enginewidth = Q_('34.25 in')
-engineheight = Q_('26.46 in')
+enginelength = Q_("39.34 in")
+enginewidth = Q_("34.25 in")
+engineheight = Q_("26.46 in")
 
-# Distance from engine cg to origin
+# Engine cg location
+# Assumed cg is on crankshaft & in the middle of the engine length
+engine_xcg = enginelength/2
+engine_ycg = 0
+engine_zcg = 0
+
