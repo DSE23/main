@@ -36,7 +36,7 @@ airfoilinterpolant = sp.interpolate.interp1d(
 def airfoilordinate(x):
     return airfoilinterpolant(x)
 
-TR = CtoR*ChordR                            #max thickness root in m
+TR = airfoilordinate(0.15)*ChordR                            #max thickness root in m
 TT = TR*t                                   #max thickness tip in m
 
 
@@ -48,6 +48,6 @@ ChSpar2 = Spar2R + (Spar2T-Spar2R)*(z/s)    #Chord position of
 
 ## Here comes the function from Sam that relates chord to height
 
-HSpar1= airfoilordinate(ChSpar1)*2
-HSpar2= airfoilordinate(ChSpar2)*2
+HSpar1= airfoilordinate(ChSpar1)*2*ChordR*(1-0.6*(z/s))         #height of spar 1 depending on chord and spanwise location
+HSpar2= airfoilordinate(ChSpar2)*2*ChordR*(1-0.6*(z/s))         #height of spar 2 depending on chord and spanwise location
 
