@@ -8,8 +8,9 @@ sys.path.append('../') # This makes sure the parent directory gets added to the 
 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
-from Geometry.Wing import * # Import all wing geometry variables
+from Geometry import Wing # Import all wing geometry variables
 
+print(Wing.h_str)
 
 def calc_stringer_Inertia(h_str, w_str, t_str):
     
@@ -27,7 +28,7 @@ def calc_stringer_Inertia(h_str, w_str, t_str):
     I_yy = (w_str**3*t_str)/3 # Iyy Inertia of horizontal part referenced to bottom-left corner
     I_yy += 0 # Iyy of vertical part is negligible (thin-walled approximation)
     
-    #I_xy = t_str*h_str*t_str*0.5*h_str/2
+    I_xy = A_1*
     #I_xy = 
     
     return((I_xx, I_yy))
