@@ -26,6 +26,11 @@ ThSpar1 = Q_('5.0 mm')          #Thickness of Spar 1
 ThSpar2 = Q_('5.0 mm')          #Thickness of Spar 2
 ThSkin = Q_('3.0 mm')           #Thickness of the skin
 
+##Stringers                     # C stringer dimentions
+h_str = Q_('25.0 mm')            # height of the stringer
+w_str = Q_('25.0 mm')            #width of the stringer
+t_str = Q_('3.0 mm')            #thickness of the stringer
+
 
 z = Q_('0 m')                                       #spanwise posotion in meters
 c = 0                                               #Chord wise postion in ratio
