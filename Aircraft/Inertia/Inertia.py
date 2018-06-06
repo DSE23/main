@@ -32,3 +32,12 @@ def calc_stringer_Inertia(h_str, w_str, t_str):
     #I_xy = 
     
     return((I_xx, I_yy))
+
+def Calc_spar_inertia(HSpar,TSpar,Centroid,ChSpar,zs):           #Input height spar (m), thickness spar (m), location centroid w.r.t. chord and chordwise location (-) spar respectively (-)
+    Ixx = (1/12)*TSpar*(HSpar**3)             #Calculation of Ixx
+    Iyy = (1/12)*HSpar*(TSpar**3)               #Caclulation of Iyy w/o steiner term
+    Iyysteiner = TSpar*HSpar*(abs((Centroid*length_chord(zs))-(ChSpar*length_chord(zs)))**2)      #Calculation of steiner term Iyy
+    Iyy = Iyy + Iyysteiner                              #Adding both Iyy moments of inertia together
+    return Ixx, Iyy                              #Output Ixx and Iyy, Ixx is with respect of the line of symetry
+
+print(Calc_spar_inertia(HSpar1,ThSpar1,centroid,ChSpar1,z))
