@@ -10,6 +10,7 @@ for use by the structures department
 """
 
 import sys
+import scipy as sp
 sys.path.append('../')
 # This makes sure the parent directory gets added to the system path
 
@@ -28,5 +29,20 @@ import Propeller
 # Z axis: left
 
 # Load case
+# Max load factor (defined from requirements):
+loadfactor = 20
+# Gravitational acceleration
+gravity = Q_("9.81 m/s**2")
 
-F_y_eng = Engine.enginemass
+# Determine max engine vertical force (in Newtons)
+Engine.mass.ito(ureg.kg)
+F_y_eng = Engine.mass * gravity * loadfactor
+F_y_eng.ito(ureg.newton)
+
+# Determine max prop vertical force (in Newtons)
+Propeller.mass.ito(ureg.kg)
+F_y_prop = Propeller.mass * gravity * loadfactor
+F_y_prop.ito(ureg.newton)
+
+print("F_y_eng = {}".format(F_y_eng))
+print("F_y_prop = {}".format(F_y_prop))
