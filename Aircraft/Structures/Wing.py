@@ -6,8 +6,10 @@ Last updated: 05/06/2018 12:45 by Boris
 # Midas is een held
 # Import packages
 
-from pint import UnitRegistry
-ureg = UnitRegistry()
+import sys
+sys.path.append('../') # This makes sure the parent directory gets added to the system path
+
+from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
 ## Defining variables
 
