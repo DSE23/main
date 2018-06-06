@@ -31,3 +31,7 @@ def calc_stringer_Inertia(h_str, w_str, t_str):
     #I_xy = 
     
     return((I_xx, I_yy))
+    
+    
+calc_stringer_Inertia(50,20,2)
+
