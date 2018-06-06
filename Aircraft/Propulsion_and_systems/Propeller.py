@@ -33,8 +33,9 @@ def initialise_propxcg(inp):
 
 # End defining global variables
 
+# Start assigning values to variables
 # Propeller mass
-mass = Q_("10000 kg") #DUMMY VALUE, NOT KNOWN YET
+mass = Q_("50 kg")  # DUMMY VALUE, NOT KNOWN YET
 
 # Propeller CG
-xcg = Q_("-1000 cm") #DUMMY VALUE, NOT KNOWN YET
+xcg = Q_("-20 cm")  # DUMMY VALUE, NOT KNOWN YET
