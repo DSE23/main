@@ -26,6 +26,13 @@ ThSpar1 = Q_('5.0 mm')          #Thickness of Spar 1
 ThSpar2 = Q_('5.0 mm')          #Thickness of Spar 2
 ThSkin = Q_('3.0 mm')           #Thickness of the skin
 
+
+z = Q_('0 m')                                       #spanwise posotion in meters
+c = 0                                               #Chord wise postion in ratio
+
+
+
+##Ratio of height with respect to chord, airfoil coordinates
 airfoilcoordinates = np.genfromtxt("Airfoil.dat")    #Load coordinates
 numberofcoordinates = np.size(airfoilcoordinates,0)  #Count total number of coordinates
 airfoilinterpolant = sp.interpolate.interp1d(
@@ -36,18 +43,26 @@ airfoilinterpolant = sp.interpolate.interp1d(
 def airfoilordinate(x):
     return airfoilinterpolant(x)
 
-TR = CtoR*ChordR                            #max thickness root in m
+TR = airfoilordinate(0.15)*ChordR                            #max thickness root in m
 TT = TR*t                                   #max thickness tip in m
-
-
-z = 0                                       #spanwise postion in meters
-c = 0                                       #Chord wise postion in ratio
 
 ChSpar1 = Spar1R + (Spar1T-Spar1R)*(z/s)    #Chord position of spar 1 with respect to
 ChSpar2 = Spar2R + (Spar2T-Spar2R)*(z/s)    #Chord position of
 
 ## Here comes the function from Sam that relates chord to height
 
-HSpar1= airfoilordinate(ChSpar1)*2
-HSpar2= airfoilordinate(ChSpar2)*2
+def H_in_m(x,zs):                             #input chord and span respectively
+    HSpar= airfoilordinate(x)*ChordR*(1-(1-t)*(zs/s))         #Function to calculate the height in m measured from the line symmetry depending on the chord and span
+    return HSpar
+
+HSpar1 = H_in_m(ChSpar1,z)*2
+HSpar2 = H_in_m(ChSpar2,z)*2
+
+print(HSpar1)
+print(HSpar2)
+
+
+
+
+
 
