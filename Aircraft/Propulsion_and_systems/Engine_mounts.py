@@ -16,7 +16,10 @@ sys.path.append('../')
 from Misc import ureg, Q_
 # Imports the unit registry from the Misc folder
 
+# Import data
 import Geometry
+import Engine
+import Propeller
 
 # Coordinate system:
 # Origin is in propeller attachment to engine
@@ -24,26 +27,3 @@ import Geometry
 # Y axis: up
 # Z axis: left
 
-# Start defining global variables for easy editing from elsewhere
-# For explanations of the variables defined here, see below, where they are given values
-
-
-def initialise_propmass(inp):
-    global propmass
-    propmass = inp
-
-
-def initialise_propcg(inp):
-    global propcg
-    propcg = inp
-
-
-# End defining global variables
-
-# Propeller mass
-propmass = Q_("10000 kg") #DUMMY VALUE, NOT KNOWN YET
-
-# Propeller CG
-propcg = Q_("-1000 cm") #DUMMY VALUE, NOT KNOWN YET
-
-# Import aircraft cg location from geometry
