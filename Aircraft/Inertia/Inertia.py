@@ -13,12 +13,14 @@ from Geometry.Wing import * # Import all wing geometry variables
 
 def calc_stringer_Inertia(h_str, w_str, t_str):
     
-    # Calculating 
+    # Calculating Area's of stringer components
     A_1 = h_str*t_str
     A_2 = (w_str-t_str)*t_str
     
+    # Calculating Centroid of stringer w.r.t. bottom left corner
     y_bar = (A_1*h_str/2 + A_2*(h_str-0.5*t_str))/(A_1+A_2)
     x_bar = (A_1*0.5*t_str + A_2*(w_str/2 + t_str))/(A_1+A_2)
+    
     I_xx = (t_str*h_str**3)/3 # Ixx inertia of vertical part of the stringer, referenced to the bottom
     I_xx += t_str*w_str*h_str**2 # Ixx inertia of horizontal part with thin walled approximation
     
