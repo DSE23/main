@@ -21,20 +21,20 @@ from Misc import ureg, Q_
 # For explanations of the variables defined here, see below, where they are given values
 
 
-def initialise_propmass(inp):
-    global propmass
-    propmass = inp
+def initialise_mass(inp):
+    global mass
+    mass = inp
 
 
-def initialise_propcg(inp):
-    global propcg
-    propcg = inp
+def initialise_propxcg(inp):
+    global xcg
+    xcg = inp
 
 
 # End defining global variables
 
 # Propeller mass
-propmass = Q_("10000 kg") #DUMMY VALUE, NOT KNOWN YET
+mass = Q_("10000 kg") #DUMMY VALUE, NOT KNOWN YET
 
 # Propeller CG
-propcg = Q_("-1000 cm") #DUMMY VALUE, NOT KNOWN YET
+xcg = Q_("-1000 cm") #DUMMY VALUE, NOT KNOWN YET
