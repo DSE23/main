@@ -38,7 +38,7 @@ c = 0                                               #Chord wise postion in ratio
 
 
 ##Ratio of height with respect to chord, airfoil coordinates
-airfoilcoordinates = np.genfromtxt("Airfoil.dat")    #Load coordinates
+airfoilcoordinates = np.genfromtxt("../Airfoil.dat")    #Load coordinates
 numberofcoordinates = np.size(airfoilcoordinates,0)  #Count total number of coordinates
 airfoilinterpolant = sp.interpolate.interp1d(
     airfoilcoordinates[0:int(numberofcoordinates/2)+1,0],
