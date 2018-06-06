@@ -11,86 +11,75 @@ sys.path.append('../')
 from Misc import ureg, Q_
 # Imports the unit registry from the Misc folder
 
-# Coordinate system:
-# Origin is in propeller attachment to engine
-# X axis: parallel to the crankshaft centerline, backwards
-# Y axis: up
-# Z axis: left
-
-# Start defining global variables for easy editing from elsewhere
-# For explanations of the variables defined here, see below, where they are given values
+def initialise_mass(inp):
+    global mass
+    mass = inp
 
 
-def initialise_enginemass(inp):
-    global enginedrymass
-    enginedrymass = inp
+def initialise_ixg(inp):
+    global ixg
+    ixg = inp
 
 
-def initialise_engine_ixg(inp):
-    global engine_ixg
-    engine_ixg = inp
+def initialise_izg(inp):
+    global izg
+    izg = inp
 
 
-def initialise_engine_izg(inp):
-    global engine_izg
-    engine_izg = inp
+def initialise_iyg(inp):
+    global iyg
+    iyg = inp
 
 
-def initialise_engine_iyg(inp):
-    global engine_iyg
-    engine_iyg = inp
+def initialise_length(inp):
+    global length
+    length = inp
 
 
-def initialise_enginelength(inp):
-    global enginelength
-    enginelength = inp
+def initialise_width(inp):
+    global width
+    width = inp
 
 
-def initialise_enginewidth(inp):
-    global enginewidth
-    enginewidth = inp
+def initialise_height(inp):
+    global height
+    height = inp
 
 
-def initialise_engineheight(inp):
-    global engineheight
-    engineheight = inp
+def initialise_xcg(inp):
+    global xcg
+    xcg = inp
 
 
-def initialise_engine_xcg(inp):
-    global engine_xcg
-    engine_xcg = inp
+def initialise_ycg(inp):
+    global ycg
+    ycg = inp
 
 
-def initialise_engine_ycg(inp):
-    global engine_ycg
-    engine_ycg = inp
-
-
-def initialise_engine_zcg(inp):
-    global engine_zcg
-    engine_zcg = inp
-
+def initialise_zcg(inp):
+    global zcg
+    zcg = inp
 
 # End defining global variables
 
 # Start assigning values to variables
 # Engine dry mass as provided by Lycoming
-enginedrymass = Q_("446 lbs")
+drymass = Q_("446 lbs")
 # Assume factor of 10% to achieve wet mass
-enginewetmass = 1.1*enginedrymass
+mass = 1.1*drymass
 
 # Engine mass moments of inertia about engine cg
-engine_ixg = Q_("84.4 inch*lbf*s**2")
-engine_iyg = Q_("93.5 inch*lbf*s**2")
-engine_izg = Q_("145.8 inch*lbf*s**2")
+ixg = Q_("84.4 inch*lbf*s**2")
+iyg = Q_("93.5 inch*lbf*s**2")
+izg = Q_("145.8 inch*lbf*s**2")
 
 # Engine dimensions
-enginelength = Q_("39.34 in")
-enginewidth = Q_("34.25 in")
-engineheight = Q_("26.46 in")
+length = Q_("39.34 in")
+width = Q_("34.25 in")
+height = Q_("26.46 in")
 
 # Engine cg location
 # Assumed cg is on crankshaft & in the middle of the engine length
-engine_xcg = enginelength/2
-engine_ycg = 0
-engine_zcg = 0
+xcg = length/2
+ycg = 0
+zcg = 0

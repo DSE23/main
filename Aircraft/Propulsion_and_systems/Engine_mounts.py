@@ -27,3 +27,6 @@ import Propeller
 # Y axis: up
 # Z axis: left
 
+# Load case
+
+F_y_eng = Engine.enginemass
