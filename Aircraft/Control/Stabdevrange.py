@@ -27,13 +27,19 @@ V_a = IP.V_man
 rho = IP.rho0
 g0 = IP.g0
 Oswald_e = IP.Oswald_e
-CNH_alpha = 4
+CNH_alpha = IP.CN_h_alpha
+dE_dalpha = IP.Downwash
+Vh_V = IP.Vh_V
+Cbar = IP.MAC
+I_yy = IP.I_yy
+g = IP.g0
+CNW_alpha = IP.CN_w_alpha
 # specific parameters (only check if either Lambda or A changes)
 
 
-#Iteration values
+# Iteration values
 S_h = 2.629
-
+l_h = 5.2
 # Calculated values
 C_L = MTOW/(0.5*rho*V_a**2*S_wing)
 
