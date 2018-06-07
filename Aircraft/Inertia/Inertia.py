@@ -54,10 +54,10 @@ def calc_stringer_inertia(h_str, w_str, t_str):
 
     return ((I_xx, I_yy, I_xy), (I_xx_centroid, I_yy_centroid, I_xy_centroid))
 
-def Calc_spar_inertia(HSpar,TSpar,Centroid,ChSpar,zs):           #Input height spar (m), thickness spar (m), location centroid w.r.t. chord and chordwise location (-) spar respectively (-)
+def Calc_spar_inertia(HSpar,TSpar,ChSpar,zs):           #Input height spar (m), thickness spar (m), location centroid w.r.t. chord and chordwise location (-) spar respectively (-)
     Ixx = (1/12)*TSpar*(HSpar**3)             #Calculation of Ixx
     Iyy = (1/12)*HSpar*(TSpar**3)               #Caclulation of Iyy w/o steiner term
-    Iyysteiner = TSpar*HSpar*(abs((Centroid*length_chord(zs))-(ChSpar*length_chord(zs)))**2)      #Calculation of steiner term Iyy
+    Iyysteiner = TSpar*HSpar*(abs((Wing.centroid*Wing.length_chord(zs))-(ChSpar*Wing.length_chord(zs)))**2)      #Calculation of steiner term Iyy
     Iyy = Iyy + Iyysteiner                              #Adding both Iyy moments of inertia together
     return Ixx, Iyy
 
@@ -74,6 +74,7 @@ def Calc_skin_inertia_Ixx(Spar1, Spar2):
         length = np.sqrt(dxlength**2+dy**2)
         dIxx = length*Wing.ThSkin*(y**2)
         Ixx = Ixx+dIxx
+    Ixx = Ixx*2
     return Ixx
 
 def Calc_skin_inertia_Iyy(Spar1, Spar2):
@@ -90,7 +91,7 @@ def Calc_skin_inertia_Iyy(Spar1, Spar2):
         length = np.sqrt(dxlength ** 2 + dy ** 2)
         dIyy = length * Wing.ThSkin*((abs(xlength-(Wing.centroid*Wing.Chordlength)))**2)
         Iyy = Iyy + dIyy
-
+    Iyy = Iyy*2
     return Iyy
 
 
