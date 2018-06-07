@@ -92,6 +92,39 @@ def Calc_skin_inertia_Iyy(Spar1, Spar2):
 
     return Iyy
 
+
+
+
+# returns stiffener x,y locations and rotation
+# return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 x,y,rot)] m,m,rad
+def stif_loc(z, t_sk, n_st):
+    total_perimeter = integrate.quad(Wing.airfoilordinate(x), Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), Wing.Chord_loc_Spar(z,Wing.Spar2R,Wing.Spar2T)) #m
+
+    spacing = total_perimeter / ((n_st + 1) / 2)
+    x_y_angle_coords = []
+    for i in xrange(6):
+        local_spacing = i * spacing
+        if local_spacing < circle_perim:
+            angle = (local_spacing / circle_perim) * radians(90)
+            x_coordinate = -1 * (0.5 * h - (0.5 * h - t_sk + cos(angle) * (0.5 * h - t_sk)))
+            y_coordinate = sin(angle) * (0.5 * h - t_sk)
+            rot_angle = angle + radians(90)
+
+        else:
+            rot_angle = atan(0.5 * h / (C_a - 0.5 * h)) - radians(180)
+            x_coordinate = (-1) * (local_spacing - circle_perim) * cos(atan(0.5 * h / (C_a - 0.5 * h)))
+            y_coordinate = h / 2 - (local_spacing - circle_perim) * sin(atan(0.5 * h / (C_a - 0.5 * h)))
+
+        apnd_itm = (x_coordinate, y_coordinate, rot_angle)
+        x_y_angle_coords.append(apnd_itm)
+        if i > 0:
+            apnd_itm = (x_coordinate, -y_coordinate, -rot_angle)
+            x_y_angle_coords.append(apnd_itm)
+
+        # print "Stif.", i, "\t x:", x_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
+
+    return x_y_angle_coords  # [(stringer0 x,y,rot),(stringer1 x,y,rot), ...]
+
 print('this is', Calc_skin_inertia_Ixx(Wing.ChSpar1,Wing.ChSpar2))
 print('this is', Calc_skin_inertia_Iyy(Wing.ChSpar1,Wing.ChSpar2))
 #print(calc_stringer_Inertia(Q_("50 mm"),Q_("20 mm"),Q_("2 mm")))
