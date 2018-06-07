@@ -9,6 +9,7 @@ sys.path.append('../') # This makes sure the parent directory gets added to the 
 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import numpy as np
+import scipy as sp
 
 from Geometry import Wing # Import all wing geometry variables
 
@@ -97,29 +98,22 @@ def Calc_skin_inertia_Iyy(Spar1, Spar2):
 
 # returns stiffener x,y locations and rotation
 # return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 x,y,rot)] m,m,rad
-def stif_loc(z, t_sk, n_st):
-    total_perimeter = integrate.quad(Wing.airfoilordinate(x), Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), Wing.Chord_loc_Spar(z,Wing.Spar2R,Wing.Spar2T)) #m
+def stif_loc(z, t_sk, n_st, x):
+    total_perimeter = sp.integrate.quad(Wing.airfoilordinate(x), Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), Wing.Chord_loc_Spar(z,Wing.Spar2R,Wing.Spar2T)) #m
 
     spacing = total_perimeter / ((n_st + 1) / 2)
     x_y_angle_coords = []
-    for i in xrange(6):
+    for i in range(n_st):
         local_spacing = i * spacing
-        if local_spacing < circle_perim:
-            angle = (local_spacing / circle_perim) * radians(90)
-            x_coordinate = -1 * (0.5 * h - (0.5 * h - t_sk + cos(angle) * (0.5 * h - t_sk)))
-            y_coordinate = sin(angle) * (0.5 * h - t_sk)
-            rot_angle = angle + radians(90)
-
-        else:
-            rot_angle = atan(0.5 * h / (C_a - 0.5 * h)) - radians(180)
-            x_coordinate = (-1) * (local_spacing - circle_perim) * cos(atan(0.5 * h / (C_a - 0.5 * h)))
-            y_coordinate = h / 2 - (local_spacing - circle_perim) * sin(atan(0.5 * h / (C_a - 0.5 * h)))
-
+        rot_angle = Wing.Angle(x) + radians(180)
+        x_coordinate = Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T) + sp.integrate.quad(math.cos(Wing.angle(x)),Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), localspacing) 
+        #x_coordinate = (-1) * (local_spacing - circle_perim) * cos(atan(0.5 * h / (C_a - 0.5 * h)))
+        y_coordinate = Wing.airfoilordinate(Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T)+local_spacing)-sp.integrate.quad(math.sin(Wing.angle(x)),Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), localspacing)
+        
         apnd_itm = (x_coordinate, y_coordinate, rot_angle)
         x_y_angle_coords.append(apnd_itm)
-        if i > 0:
-            apnd_itm = (x_coordinate, -y_coordinate, -rot_angle)
-            x_y_angle_coords.append(apnd_itm)
+        apnd_itm = (x_coordinate, -y_coordinate, -rot_angle)
+        x_y_angle_coords.append(apnd_itm)
 
         # print "Stif.", i, "\t x:", x_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
 
