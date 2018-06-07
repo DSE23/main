@@ -21,10 +21,11 @@ from Misc import ureg, Q_
 import Geometry
 import Engine
 import Propeller
+import Firewall
 
 # Coordinate system:
 # Origin is in propeller attachment to engine
-# X axis: parallel to the crankshaft centerline, backwards
+# X axis: parallel to the crankshaft centerline, pointing towards tail
 # Y axis: up
 # Z axis: left
 
@@ -47,20 +48,34 @@ def initialise_length(inp):
     length = inp
 
 
-# Test
+def initialise_mass(inp):
+    global mass
+    mass = inp
+
+
+def initialise_xcg(inp):
+    global xcg
+    xcg = inp
+
 
 # End defining global variables
 
 # Start assigning values to variables
 # Vertical distance between engine mount attachment points to firewall
-v_dist = Q_("10 m")  # DUMMY
+v_dist = Q_("1 m")  # DUMMY, can be chosen
 v_dist.ito(ureg.m)
 # Horizontal distance between engine mount attachment points to firewall
-h_dist = Q_("10 m")  # DUMMY
+h_dist = Q_("1 m")  # DUMMY, can be chosen
 h_dist.ito(ureg.m)
 # Distance between engine mounts and firewall
-length = Q_("10 m")  # DUMMY
+length = Firewall.eng_clearance  # From Firewall file
 length.ito(ureg.m)
+# Engine mounts mass
+mass = Q_("5 kg")  # DUMMY
+# Engine mounts cg, assumed at end of engine (engine attachments are not at the end of the engine)
+xcg = Engine.length
+
+# Start calculations
 
 # Load case
 # Max load factor (defined from requirements):
@@ -76,13 +91,20 @@ f_y_eng.ito(ureg.newton)
 f_y_prop = Propeller.mass * gravity * loadfactor
 f_y_prop.ito(ureg.newton)
 
-# Calculate x-distance from engine cg to firewall
-d_eng_firewall = firewall_xcg - Engine.xcg
+# Determine max mount vertical force (in Newtons)
+f_y_mount = mass * gravity * loadfactor
+f_y_mount.ito(ureg.newton)
 
 # Determine reaction forces
-# Sum of forces in y-direction, R_y is engine mount reaction force
+# Sum of forces in y-direction, r_y is engine mount reaction force
 r_y_total = f_y_prop+f_y_eng
 
+# Moments
+# Component moments about axis parallel to Z-axis through bottom engine mount
+m_z_eng = f_y_eng * (Firewall.xcg - Engine.xcg)
+m_z_prop = f_y_prop * (Firewall.xcg - Propeller.xcg)
+m_z_mount = f_y_mount * (Firewall.xcg - xcg)
 # Sum of moments about axis parallel to Z-axis through bottom engine mount
-r_x_1 = (f_y_eng * (Engine.length-Engine.xcg) + f_y_prop * (Engine.length-Propeller.xcg)) / v_dist
-print(r_x_1)
+r_x_1 = (m_z_eng + m_z_prop) / v_dist
+# Sum of forces in x-direction
+r_x_2 = -r_x_1
