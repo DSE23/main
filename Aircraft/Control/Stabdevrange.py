@@ -8,6 +8,8 @@ Stability derivatives range for level 1 flying qualities
 """
 
 import sys
+import math as m
+import numpy as np
 sys.path.append('../')
 
 from Misc import Init_parm as IP
@@ -17,7 +19,7 @@ from Geometry import Wing
 # Xlemac, S_h and S_v in which StefX will havel level 1 flying qualities
 
 # Input parameters
-
+gamma_0 = 0                 # Assuming level flight
 A = Wing.A
 CL_alpha = IP.CL_alpha
 MTOW = IP.MTOW
@@ -46,6 +48,7 @@ C_L = MTOW/(0.5*rho*V_a**2*S_wing)
 
 # Stability Derivatives
 
-
-
+CX0 = (MTOW * g)/(0.5 * rho * V_a**2 * S_wing) * m.sin(gamma_0)
+CXu = -2 * C_L * m.tan(gamma_0)
+CX_alpha = C_L * (1-(2*CL_alpha))/(Oswald_e*A*m.pi)
 
