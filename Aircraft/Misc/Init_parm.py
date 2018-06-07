@@ -19,15 +19,16 @@ from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
 
 CLmax = 2.52                   # CLmax with HLD, should be from aero
+CL_alpha = 4.6531              # CL_alpha 1/rad
 S_wing = 11.74               # Wing surface
-W = 822                      # MTOW, updates from structure
+MTOW = 822                      # MTOW, updates from structure
 rho0 = 1.225                    # Density at sea level
 g0 = 9.80665
-V_stall = m.sqrt((2*W*g0)/(rho0*S_wing*CLmax))
+V_stall = m.sqrt((2*MTOW*g0)/(rho0*S_wing*CLmax))
 n_max = 10                      # Max load factor
 V_man = V_stall*m.sqrt(n_max)
 
-d_delta_a= 60 / 180 *m.pi #rad delta aileron form minus to plus
+d_delta_a= 60 / 180 * m.pi #rad delta aileron form minus to plus
 d_s_a= 0.41 #m      stick deflection
 Sa= 2.33401 #m2     aileron surface area
 ca= 0.359227 #m     aileron cord

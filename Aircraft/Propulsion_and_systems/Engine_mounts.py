@@ -82,6 +82,8 @@ xcg = Engine.length
 loadfactor = 20
 # Gravitational acceleration
 gravity = Q_("9.81 m/s**2")
+# Roll acceleration, assumed about crankshaft
+roll_acc = Q_("1 rad/s**2")  # DUMMY
 
 # Determine max engine vertical force (in Newtons)
 f_y_eng = Engine.mass * gravity * loadfactor
@@ -108,3 +110,7 @@ m_z_mount = f_y_mount * (Firewall.xcg - xcg)
 r_x_1 = (m_z_eng + m_z_prop) / v_dist
 # Sum of forces in x-direction
 r_x_2 = -r_x_1
+
+print("Vertical shear force per mount: {}".format(r_y_total/4))
+print("Normal force per top mount: {}".format(r_x_1/2))
+print("Normal force per bottom mount: {}".format(r_x_2/2))

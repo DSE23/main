@@ -139,6 +139,16 @@ def Area_Skin_x_c(Spar1, Spar2):                            #Input deminsionless
     Areaxc = Areaxc * 2                                         #Area times chord for both sides of the airfoil (therefore times 2)
     return Areaxc
 
+## Controid calculation
+
+# Centroid of wing skin
+C_Skin = Area_Skin_x_c(ChSpar1,ChSpar2)/Area_Skin(ChSpar1,ChSpar2)
+
+# Centroid spars
+C_Spar1 = AreaSpar1xc/AreaSpar1
+C_Spar2 = AreaSpar2xc/AreaSpar2
+
+
 
 
 

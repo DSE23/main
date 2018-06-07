@@ -35,7 +35,7 @@ def initialise_propxcg(inp):
 
 # Start assigning values to variables
 # Propeller mass
-mass = Q_("50 kg")  # DUMMY VALUE, NOT KNOWN YET
+mass = Q_("30 kg")  # DUMMY VALUE, NOT KNOWN YET
 
 # Propeller CG
 xcg = Q_("-20 cm")  # DUMMY VALUE, NOT KNOWN YET, negative because in front of datum
