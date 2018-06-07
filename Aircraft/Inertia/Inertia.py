@@ -1,12 +1,13 @@
 """                  
 Name: Inertia
 Department: Inertia
-Last updated: 05/06/2018 12:41 by Midas
+Last updated: 06/06/2018 12:41 by Midas
 """
 import sys
 sys.path.append('../') # This makes sure the parent directory gets added to the system path
 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
+import numpy as np
 
 from Geometry import Wing # Import all wing geometry variables
 
@@ -43,7 +44,7 @@ def calc_stringer_inertia(h_str, w_str, t_str):
     I_xy += A_2 * ((h_str - 0.5 * t_str) - 0) * ((t_str + 0.5 * w_str) - 0)
     I_xy.ito("m**4")
 
-    return ((I_xx, I_yy, I_xy))
+    return I_xx, I_yy, I_xy
 
 def Calc_spar_inertia(HSpar,TSpar,Centroid,ChSpar,zs):           #Input height spar (m), thickness spar (m), location centroid w.r.t. chord and chordwise location (-) spar respectively (-)
     Ixx = (1/12)*TSpar*(HSpar**3)             #Calculation of Ixx
@@ -52,4 +53,20 @@ def Calc_spar_inertia(HSpar,TSpar,Centroid,ChSpar,zs):           #Input height s
     Iyy = Iyy + Iyysteiner                              #Adding both Iyy moments of inertia together
     return Ixx, Iyy
 
-print(calc_stringer_Inertia(Q_("50 mm"),Q_("20 mm"),Q_("2 mm")))
+def Calc_skin_inertia(Spar1, Spar2):
+    n = 100 #number of sections
+    dx = ((Spar2-Spar1)/n)
+    x = Spar1
+    Ixx = 0
+    for i in range(n):
+        x = x + dx
+        dxlength=dx*Wing.Chordlength
+        y = ((Wing.airfoilordinate(x-dx)+Wing.airfoilordinate(x))/2)*Wing.Chordlength
+        dy = abs(Wing.airfoilordinate(x-dx)-Wing.airfoilordinate(x))*Wing.Chordlength
+        length = np.sqrt(dxlength**2+dy**2)
+        dIxx = length*Wing.ThSkin*(y**2)
+        Ixx = Ixx+dIxx
+    return Ixx
+
+print('this is', Calc_skin_inertia(Wing.ChSpar1,Wing.ChSpar2))
+#print(calc_stringer_Inertia(Q_("50 mm"),Q_("20 mm"),Q_("2 mm")))
