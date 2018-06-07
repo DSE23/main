@@ -9,7 +9,7 @@ sys.path.append('../') # This makes sure the parent directory gets added to the 
 import numpy as np
 import scipy as sp
 from scipy import interpolate
-from math import *
+from math import m
 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
@@ -87,7 +87,7 @@ def Angle(cs):                          #input chord ratio
     n = 100  # number of sections
     dx = 1/n
     dy=airfoilordinate(cs+dx)-airfoilordinate(cs)
-    angle = tan(dy/dx)
+    angle = m.tan(dy/dx)
     angle *= Q_('rad')
     return angle
 
@@ -114,7 +114,6 @@ def Area_Skin(Spar1, Spar2):                            #Input deminsionless cho
     return Area
 
 #Area of the Stringers
-
 
 A_1 = h_str*t_str
 A_2 = (w_str-t_str)*t_str
@@ -143,13 +142,6 @@ def Area_Skin_x_c(Spar1, Spar2):                            #Input deminsionless
     Areaxc = Areaxc * 2                                         #Area times chord for both sides of the airfoil (therefore times 2)
     return Areaxc
 
-
-def area_stringers(n_st):
-    A_1 = h_str*t_str
-    A_2 = (w_str-t_str)*t_str
-    A_stringer = A_1 + A_2
-    A_tot_stringer = A_stinger * n_st
-    return A_tot_stringer
 
 # returns stiffener x,y locations and rotation
 # return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 x,y,rot)] m,m,rad
