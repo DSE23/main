@@ -28,13 +28,14 @@ def local_chord(z):  # Calculates the chord at location z(distance from center)
 n_of_disc = 20                  # Number of parts wing is discretized
 bloc = b/n_of_disc              # Span of each piece
 half_b = b/2
-<<<<<<< HEAD
+
+
 #V_inf = IP.V_inf
 lst = []
-=======
+
 V_inf = IP.V_man
 
->>>>>>> dfe1a1eef6e0b7038e9bd9fbbc85e9dfbd915bd5
+
 for i in range(n_of_disc):
     b1 = bloc*i - half_b        # Z boundary left
     b2 = bloc*(i+1) - half_b    # Z boundary right
@@ -43,5 +44,3 @@ for i in range(n_of_disc):
     c2 = local_chord(abs(b2))   # Right chord
     Sloc = ((c1+c2)/2)*(b2-b1)  # Surface area of piece
     lst.append(Sloc)
-
-Wing.
