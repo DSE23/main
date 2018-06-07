@@ -28,7 +28,7 @@ def local_chord(z):  # Calculates the chord at location z(distance from center)
 n_of_disc = 20                  # Number of parts wing is discretized
 bloc = b/n_of_disc              # Span of each piece
 half_b = b/2
-V_inf = IP.V_inf
+V_inf = IP.V_man
 
 for i in range(n_of_disc):
     b1 = bloc*i - half_b        # Z boundary left
