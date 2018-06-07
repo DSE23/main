@@ -19,7 +19,9 @@ airfoil_co = np.genfromtxt("../airfoil.dat")
 
 c_flap = 0.3# chord percentage covered by leading edge flap
 c_hinge = 0.25# chord percentage of location hinge of leading edge flap
-delta_flap = 25# [°] flap deflection in degrees
+delta_flap = 20# [°] flap deflection in degrees
+margin = 0.02 #tweak this to smoothen bottom part of airfoil
+knuckle_smooth = 0.06929 #♠ tweak to smoothen knuckle, value set at 0.06929
 
 
 #Transforming data to SI units
@@ -34,15 +36,19 @@ for coordinate in airfoil_co[:,0]:
         #Euler transformation
         x_new =  c_hinge + (m.cos(delta_flap_rad) * x  -  m.sin(delta_flap_rad) * y)
         y_new = m.sin(delta_flap_rad) * x  +  m.cos(delta_flap_rad) * y
-        if x_new < c_flap:
+        if x_new < c_flap - margin :
             airfoil_co[counter,0] = x_new
             airfoil_co[counter,1] = y_new
-        elif x_new >= c_flap:
-            print('Deleted stuff')
-            np.delete(airfoil_co, (counter), axis=0)
-           # np.delete(airfoil_co,( counter), axis=1)
+        elif x_new >= c_flap - margin:
+            print('------------Deleted stuff')
+            airfoil_co = np.delete(airfoil_co, (counter), axis=0)
+            counter = counter - 1
+        if y_new > knuckle_smooth:
+            print('smoothening knuckle')
+            airfoil_co[counter,1] = knuckle_smooth
     else:
         print('Do nothing')
+    print('counter', counter)
     counter = counter + 1
         
         
