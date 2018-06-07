@@ -14,7 +14,7 @@ from math import *
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
 A = 5.5                         #Estimate aspect ratio
-t = 0.4                         #Estimate taper
+t = 0.45                         #Estimate taper
 s = Q_("8.03 m")                #Estimate span (m)
 Lambda25 = 0                    #Quarter chord sweep
 CtoT = 0.15                     #Max Chord to thickness ratio
@@ -63,8 +63,8 @@ def Chord_loc_Spar(zs,SparR,SparT):             #input spanwise location in m an
 ChSpar1 = Chord_loc_Spar(z,Spar1R,Spar1T)
 ChSpar2 = Chord_loc_Spar(z,Spar2R,Spar2T)
 
-print(ChSpar1)
-print(ChSpar2)
+# print(ChSpar1)
+# print(ChSpar2)
 
 def length_chord(zs):             #length of chord with respect to the spanwise postion
     lengthchord = ChordR*(1-((1-t)*(zs/s)))
@@ -81,8 +81,8 @@ def H_in_m(x,zs):                             #input chord and span respectively
 HSpar1 = H_in_m(ChSpar1, z)*2        #height of spar 1
 HSpar2 = H_in_m(ChSpar2, z)*2        #height of spar 2
 
-print(HSpar1)
-print(HSpar2)
+# print(HSpar1)
+# print(HSpar2)
 
 def Angle(cs):                          #input chord ratio
     n = 100  # number of sections
@@ -181,6 +181,10 @@ def stif_loc(z, n_st, cs):
     return x_y_angle_coords  # [(stringer0 x,y,rot),(stringer1 x,y,rot), ...]
 
 
+<<<<<<< HEAD
+=======
+#Print("je moeder") 
+>>>>>>> 8e8b5245becff119178ad9d285225047afe4547d
 
 
 
