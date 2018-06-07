@@ -83,6 +83,8 @@ HSpar2 = H_in_m(ChSpar2, z)*2        #height of spar 2
 print(HSpar1)
 print(HSpar2)
 
+def Angle(cs):
+
 
 
 
