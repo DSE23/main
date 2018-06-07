@@ -9,7 +9,7 @@ sys.path.append('../') # This makes sure the parent directory gets added to the 
 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import numpy as np
-import scipy as sp
+from scipy import integrate
 
 from Geometry import Wing # Import all wing geometry variables
 
@@ -99,17 +99,27 @@ def Calc_skin_inertia_Iyy(Spar1, Spar2):
 
 # returns stiffener x,y locations and rotation
 # return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 x,y,rot)] m,m,rad
-def stif_loc(z, t_sk, n_st, x):
-    total_perimeter = sp.integrate.quad(Wing.airfoilordinate(x), Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), Wing.Chord_loc_Spar(z,Wing.Spar2R,Wing.Spar2T)) #m
-
+def stif_loc(z, n_st, cs):
+    n = 100 #number of sections
+    dx = ((Spar2-Spar1)/n)
+    x = Spar1
+    total_perimeter = 0
+    for i in range(n):
+        x = x + dx
+        dxlength = dx * Chordlength
+        dylength = abs(airfoilordinate(x - dx) - airfoilordinate(x)) * Chordlength
+        dlength = np.sqrt(dxlength**2+dylength**2)
+        total_perimeter += dlenght
+    #total_perimeter = sp.integrate.quad(Wing.airfoilordinate(x), Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), Wing.Chord_loc_Spar(z,Wing.Spar2R,Wing.Spar2T)) #m
     spacing = total_perimeter / ((n_st + 1) / 2)
     x_y_angle_coords = []
     for i in range(n_st):
         local_spacing = i * spacing
-        rot_angle = Wing.Angle(x) + radians(180)
-        x_coordinate = Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T) + sp.integrate.quad(math.cos(Wing.angle(x)),Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), localspacing) 
+        rot_angle = Wing.Angle(cs) + radians(180)
+        x_coordinate = Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T)
+        x_coordinate += local_spacing    
         #x_coordinate = (-1) * (local_spacing - circle_perim) * cos(atan(0.5 * h / (C_a - 0.5 * h)))
-        y_coordinate = Wing.airfoilordinate(Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T)+local_spacing)-sp.integrate.quad(math.sin(Wing.angle(x)),Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), localspacing)
+        y_coordinate = airfoilordinate(x_coordinate)
         
         apnd_itm = (x_coordinate, y_coordinate, rot_angle)
         x_y_angle_coords.append(apnd_itm)

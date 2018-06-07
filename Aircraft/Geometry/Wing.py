@@ -8,8 +8,8 @@ sys.path.append('../') # This makes sure the parent directory gets added to the 
 
 import numpy as np
 import scipy as sp
-import scipy.interpolate
-from math import *
+from scipy import interpolate
+from math import m
 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
@@ -26,14 +26,13 @@ ChordR = Q_("2.015 m")         #Length of root (m)
 ThSpar1 = Q_('0.005 m')          #Thickness of Spar 1
 ThSpar2 = Q_('0.005 m')          #Thickness of Spar 2
 ThSkin = Q_('0.003 m')           #Thickness of the skin
+N_stringers = 16                  #Number of stringers
 
-##Assumption
-centroid = 0.5
 
 ##Stringers                     # C stringer dimentions
 h_str = Q_('0.025 m')            # height of the stringer
 w_str = Q_('0.025 m')            #width of the stringer
-t_str = Q_('3.0 mm')            #thickness of the stringer
+t_str = Q_('0.003 m')            #thickness of the stringer
 
 
 z = Q_('0 m')                                       #spanwise posotion in meters
@@ -88,7 +87,7 @@ def Angle(cs):                          #input chord ratio
     n = 100  # number of sections
     dx = 1/n
     dy=airfoilordinate(cs+dx)-airfoilordinate(cs)
-    angle = tan(dy/dx)
+    angle = m.tan(dy/dx)
     angle *= Q_('rad')
     return angle
 
@@ -116,6 +115,10 @@ def Area_Skin(Spar1, Spar2):                            #Input deminsionless cho
 
 #Area of the Stringers
 
+A_1 = h_str*t_str
+A_2 = (w_str-t_str)*t_str
+A_stringer = A_1 + A_2                                  #Area of one stringer
+AreaStringers = A_stringer * N_stringers                #total area of stringer
 
 ## Area multiplied with the distance from the reference point (leading edge c=0)
 
@@ -140,24 +143,29 @@ def Area_Skin_x_c(Spar1, Spar2):                            #Input deminsionless
     return Areaxc
 
 
-def area_stringers(n_st):
-    A_1 = h_str*t_str
-    A_2 = (w_str-t_str)*t_str
-    A_stringer = A_1 + A_2
-    A_tot_stringer = A_stinger * n_st
-    return A_tot_stringer
-
-def stif_loc(z, t_sk, n_st, x):
-    total_perimeter = sp.integrate.quad(Wing.airfoilordinate(x), Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), Wing.Chord_loc_Spar(z,Wing.Spar2R,Wing.Spar2T)) #m
-
+# returns stiffener x,y locations and rotation
+# return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 x,y,rot)] m,m,rad
+def stif_loc(z, n_st, cs):
+    n = 100 #number of sections
+    dx = ((Spar2-Spar1)/n)
+    x = Spar1
+    total_perimeter = 0
+    for i in range(n):
+        x = x + dx
+        dxlength = dx * Chordlength
+        dylength = abs(airfoilordinate(x - dx) - airfoilordinate(x)) * Chordlength
+        dlength = np.sqrt(dxlength**2+dylength**2)
+        total_perimeter += dlenght
+    #total_perimeter = sp.integrate.quad(Wing.airfoilordinate(x), Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), Wing.Chord_loc_Spar(z,Wing.Spar2R,Wing.Spar2T)) #m
     spacing = total_perimeter / ((n_st + 1) / 2)
     x_y_angle_coords = []
     for i in range(n_st):
         local_spacing = i * spacing
-        rot_angle = Wing.Angle(x) + radians(180)
-        x_coordinate = Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T) + sp.integrate.quad(math.cos(Wing.angle(x)),Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), localspacing) 
+        rot_angle = Wing.Angle(cs) + radians(180)
+        x_coordinate = Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T)
+        x_coordinate += local_spacing
         #x_coordinate = (-1) * (local_spacing - circle_perim) * cos(atan(0.5 * h / (C_a - 0.5 * h)))
-        y_coordinate = Wing.airfoilordinate(Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T)+local_spacing)-sp.integrate.quad(math.sin(Wing.angle(x)),Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), localspacing)
+        y_coordinate = airfoilordinate(x_coordinate)
         
         apnd_itm = (x_coordinate, y_coordinate, rot_angle)
         x_y_angle_coords.append(apnd_itm)
@@ -169,7 +177,24 @@ def stif_loc(z, t_sk, n_st, x):
     return x_y_angle_coords  # [(stringer0 x,y,rot),(stringer1 x,y,rot), ...]
 
 
-#Print("je moeder") 
+# For the stringers (placeholder)
+spacingstringers = ((ChSpar2-ChSpar1)/((N_stringers/2)+1)*Chordlength)
+beginspacing = ChSpar1*Chordlength
+A_stringer_x_c=0
+i=1
+while i < int(((N_stringers/2)+1)):
+    dA_stringer_x_c = (i * spacingstringers + beginspacing) * A_stringer
+    A_stringer_x_c = A_stringer_x_c + dA_stringer_x_c
+    i = i + 1
+
+Area_x_c = AreaSpar1xc + AreaSpar2xc + Area_Skin_x_c(ChSpar1, ChSpar2) + A_stringer_x_c
+Area = AreaSpar1 + AreaSpar2 + Area_Skin(ChSpar1, ChSpar2)+A_stringer + A_stringer
+
+centroid = (Area_x_c/Area)/Chordlength
+centroidlength = Area_x_c/Area
+
+print(centroid)
+
 
 
 
