@@ -65,21 +65,30 @@ def initialise_zcg(inp):
 # Start assigning values to variables
 # Engine dry mass as provided by Lycoming
 drymass = Q_("446 lbs")
+drymass.ito(ureg.kg)
 # Assume factor of 10% to achieve wet mass
 mass = 1.1*drymass
 
-# Engine mass moments of inertia about engine cg
+# Engine mass moments of inertia about engine cg, as provided by Lycoming
 ixg = Q_("84.4 inch*lbf*s**2")
 iyg = Q_("93.5 inch*lbf*s**2")
 izg = Q_("145.8 inch*lbf*s**2")
+# Transfer to SI units
+ixg.ito(ureg("kg*m**2"))
+iyg.ito(ureg("kg*m**2"))
+izg.ito(ureg("kg*m**2"))
 
 # Engine dimensions
 length = Q_("39.34 in")
 width = Q_("34.25 in")
 height = Q_("26.46 in")
+# Transfer to SI units
+length.ito(ureg.m)
+width.ito(ureg.m)
+height.ito(ureg.m)
 
 # Engine cg location
 # Assumed cg is on crankshaft & in the middle of the engine length
 xcg = length/2
-ycg = 0
-zcg = 0
+ycg = Q_("0 m")
+zcg = Q_("0 m")

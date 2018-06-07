@@ -10,7 +10,9 @@ import sys
 sys.path.append('../') # This makes sure the parent directory gets added to the system path
 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
-from Geometry.Wing import * # Import all wing geometry variables
+from Geometry import Wing # Import all wing geometry variables
 ## Defining variables
+
+
 
 
