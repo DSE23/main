@@ -63,6 +63,8 @@ def H_in_m(x,zs):                             #input chord and span respectively
 HSpar1 = H_in_m(ChSpar1,z)*2
 HSpar2 = H_in_m(ChSpar2,z)*2
 
+
+
 print(HSpar1)
 print(HSpar2)
 
