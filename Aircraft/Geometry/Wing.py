@@ -169,7 +169,7 @@ def stif_loc(z, t_sk, n_st, x):
     return x_y_angle_coords  # [(stringer0 x,y,rot),(stringer1 x,y,rot), ...]
 
 
-Print("je moeder") 
+#Print("je moeder") 
 
 
 

@@ -27,6 +27,7 @@ V_a = IP.V_man
 rho = IP.rho0
 g0 = IP.g0
 Oswald_e = IP.Oswald_e
+CNH_alpha = 4
 # specific parameters (only check if either Lambda or A changes)
 
 

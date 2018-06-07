@@ -28,7 +28,11 @@ V_stall = m.sqrt((2*MTOW*g0)/(rho0*S_wing*CLmax))
 n_max = 10                      # Max load factor
 V_man = V_stall*m.sqrt(n_max)   #Manoeuvre speed @Sea level
 Oswald_e = 0.79                 #Oswald efficiency factor
-
+CN_h_alpha = 3.238969           #From aero guys
+Downwash = 0.7957               #depsilon/dalpha from aero guys
+Vh_V = 0.93                     # Vh over V also from aero
+I_yy = 1565                     # MMoI from structures
+CN_w_alpha = 4.653              # From aero again
 
 d_delta_a= 60 / 180 * m.pi #rad delta aileron form minus to plus
 d_s_a= 0.41 #m      stick deflection
