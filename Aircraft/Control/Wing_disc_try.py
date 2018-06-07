@@ -16,8 +16,8 @@ from Misc import Init_parm as IP
 
 b = Wing.s                      # import Span
 c_r = Wing.ChordR               # import Root Chord
-taper = Wing.t                  # import Tip Chord
-c_t = c_r*taper
+taper = Wing.t                  # import Taper
+c_t = c_r*taper                 # calculate Tip Chord
 
 
 def local_chord(z):  # Calculates the chord at location z(distance from center)
@@ -28,7 +28,13 @@ def local_chord(z):  # Calculates the chord at location z(distance from center)
 n_of_disc = 20                  # Number of parts wing is discretized
 bloc = b/n_of_disc              # Span of each piece
 half_b = b/2
+
+
+#V_inf = IP.V_inf
+lst = []
+
 V_inf = IP.V_man
+
 
 for i in range(n_of_disc):
     b1 = bloc*i - half_b        # Z boundary left
@@ -36,5 +42,5 @@ for i in range(n_of_disc):
     b_centre = (b1+b2)/2        # Z centre of piece
     c1 = local_chord(abs(b1))   # Left chord
     c2 = local_chord(abs(b2))   # Right chord
-    Sloc = ((c1+c2)/2)*(b2-b1)
-
+    Sloc = ((c1+c2)/2)*(b2-b1)  # Surface area of piece
+    lst.append(Sloc)
