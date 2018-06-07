@@ -1,7 +1,7 @@
 """
-Name: Propeller
+Name: Firewall
 Department: Propulsion and Aircraft Systems
-Last updated: 06/06/2018 10:25 by Ties
+Last updated: 07/06/2018 12:55 by Ties
 """
 
 import sys
@@ -10,6 +10,7 @@ sys.path.append('../')
 
 from Misc import ureg, Q_
 # Imports the unit registry from the Misc folder
+
 
 # Coordinate system:
 # Origin is in propeller attachment to engine
@@ -21,12 +22,12 @@ from Misc import ureg, Q_
 # For explanations of the variables defined here, see below, where they are given values
 
 
-def initialise_mass(inp):
-    global mass
-    mass = inp
+def initialise_eng_clearance(inp):
+    global eng_clearance
+    eng_clearance = inp
 
 
-def initialise_propxcg(inp):
+def initialise_xcg(inp):
     global xcg
     xcg = inp
 
@@ -34,8 +35,7 @@ def initialise_propxcg(inp):
 # End defining global variables
 
 # Start assigning values to variables
-# Propeller mass
-mass = Q_("50 kg")  # DUMMY VALUE, NOT KNOWN YET
-
-# Propeller CG
-xcg = Q_("-20 cm")  # DUMMY VALUE, NOT KNOWN YET, negative because in front of datum
+# Distance between engine and firewall, assumed to be 10cm
+eng_clearance = Q_("10 cm")
+# Position behind datum
+xcg = Engine.length + eng_clearance
