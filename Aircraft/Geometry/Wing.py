@@ -92,6 +92,54 @@ def Angle(cs):                          #input chord ratio
     angle *= Q_('rad')
     return angle
 
+## Calculation of centriod
+
+#Area of Spars
+AreaSpar1 = HSpar1 * ThSpar1
+AreaSpar2 = HSpar2 * ThSpar2
+
+#Area of Skin
+def Area_Skin(Spar1, Spar2):                            #Input deminsionless chordwise location of spar 1 and spar 2
+    n = 100 #number of sections
+    dx = ((Spar2-Spar1)/n)
+    x = Spar1
+    Area = 0
+    for i in range(n):
+        x = x + dx
+        dxlength = dx * Chordlength
+        dylength = abs(airfoilordinate(x - dx) - airfoilordinate(x)) * Chordlength
+        dlength = np.sqrt(dxlength**2+dylength**2)
+        dArea = dlength * ThSkin
+        Area = Area + dArea
+    Area = Area * 2                                 # Area of both sides of the airfoil
+    return Area
+
+#Area of the Stringers
+
+
+## Area multiplied with the distance from the reference point (leading edge c=0)
+
+#For the spars
+AreaSpar1xc = AreaSpar1 * ChSpar1 * Chordlength
+AreaSpar2xc = AreaSpar2 * ChSpar2 * Chordlength
+
+def Area_Skin_x_c(Spar1, Spar2):                            #Input deminsionless chordwise location of spar 1 and spar 2
+    n = 100 #number of sections
+    dx = ((Spar2-Spar1)/n)
+    x = Spar1
+    Areaxc = 0
+    for i in range(n):
+        x = x + dx
+        dxlength = dx * Chordlength
+        dylength = abs(airfoilordinate(x - dx) - airfoilordinate(x)) * Chordlength
+        dlength = np.sqrt(dxlength**2+dylength**2)
+        dArea = dlength * ThSkin
+        dAreaxc = dArea * x * Chordlength
+        Areaxc = Areaxc + dAreaxc
+    Areaxc = Areaxc * 2                                         #Area times chord for both sides of the airfoil (therefore times 2)
+    return Areaxc
+
+
 
 
 
