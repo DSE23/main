@@ -14,7 +14,7 @@ from Misc import ureg, Q_
 
 # Coordinate system:
 # Origin is in propeller attachment to engine
-# X axis: parallel to the crankshaft centerline, backwards
+# X axis: parallel to the crankshaft centerline, pointing towards tail
 # Y axis: up
 # Z axis: left
 
@@ -77,8 +77,8 @@ def initialise_zcg(inp):
 # Engine dry mass as provided by Lycoming
 drymass = Q_("446 lbs")
 drymass.ito(ureg.kg)
-# Assume additional 20% to include fluids, hoses and engine mount
-mass = 1.2*drymass
+# Assume additional 10% to include fluids, hoses and cables
+mass = 1.1*drymass
 
 # Engine mass moments of inertia about engine cg, as provided by Lycoming
 ixg = Q_("84.4 inch*lbf*s**2")
