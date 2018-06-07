@@ -32,6 +32,6 @@ h_a = 600                       # [m] Manouevring height
 rho_a = ISA.isacal(h_a)[2]      # [kg/m^3] Manouevring density
 S_wing = Wing.S                 # Wing span for next calc.
 g0 = 9.80665
-V_a_hld = m.sqrt((2*g0*mtow)/(cl_max_hld*rho_a*S_wing))   #Man. Veloc. at with HLD
-V_a_clean = m.sqrt((2*g0*mtow)/(cl_max_clean*rho_a*S_wing))   #Man. Veloc. clean
+V_a_hld = m.sqrt((2*g0*mtow)/(cl_max_hld*rho_a*S_wing))   # Man. Veloc. at with HLD
+V_a_clean = m.sqrt((2*g0*mtow)/(cl_max_clean*rho_a*S_wing))   # Man. Veloc. clean
 
