@@ -12,8 +12,9 @@ from Geometry import Wing # Import all wing geometry variables
 
 print(Wing.h_str)
 
-def calc_stringer_Inertia(h_str, w_str, t_str):
-    
+
+def calc_stringer_inertia(h_str, w_str, t_str):
+
     # Calculating Area's of stringer components
     A_1 = h_str*t_str
     A_2 = (w_str-t_str)*t_str
@@ -32,8 +33,8 @@ def calc_stringer_Inertia(h_str, w_str, t_str):
     I_xx.ito("m**4")
     
     I_yy = (((w_str-t_str)**3) * t_str)/12 + A_2 * (0.5*(w_str))**2
-    #I_yy = ((w_str-t_str)**3 * t_str)/3 # Iyy Inertia of horizontal part referenced to bottom-left corner
-    #I_yy += A_1*(0.5*t_str)**2 # Iyy of vertical part is negligible (thin-walled approximation)
+    # I_yy = ((w_str-t_str)**3 * t_str)/3 # Iyy Inertia of horizontal part referenced to bottom-left corner
+    # I_yy += A_1*(0.5*t_str)**2 # Iyy of vertical part is negligible (thin-walled approximation)
 
 
     I_yy.ito("m**4")
