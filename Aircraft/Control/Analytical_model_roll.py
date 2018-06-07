@@ -32,26 +32,28 @@ dt = 0.01
 V_list = []
 p_list = []
 
-for V in np.arange(V_stall, V_a, 2.):
+for V in np.arange(V_stall, V_a, 0.5):
     t = 0
     p = 0
 
     while t < 1:
-        delta_alpha_a = p * 0.5 * b / V  # delta angle of attack at the tip
+        delta_alpha_a = (p * 0.5 * b / V) #min(p * 0.5 * b / V, 10)  # delta angle of attack at the tip
         delta_aileron_force = (Fa / (
                     -d_delta_a / d_s_a * 0.5 * rho * V ** 2 * Sa * ca) - C_h_alpha * delta_alpha_a) * 2 / C_h_delta  # aileron deflection for force, hingemoment and speed
         aileron_deflection = min(abs(maxdefl_aileron), abs(delta_aileron_force))
 
         p = - C_l_delta_a / C_l_p * aileron_deflection * 2 * V / b
         t = t + dt
-
+    #print (aileron_deflection/m.pi*180)
+    print (delta_alpha_a/m.pi*180)
     p_list.append(p)
     V_list.append(V)
 
-plt.figure(2)
+plt.figure(1)
 plt.plot(V_list, p_list)
-plt.ylabel('roll rate [rad/sec]')
+plt.ylabel('Roll rate [rad/sec]')
 plt.xlabel('Speed [m/s] ')
+plt.axhline(y=7.86, color='r')
 
 plt.show()
 
