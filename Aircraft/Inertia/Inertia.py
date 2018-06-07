@@ -14,7 +14,9 @@ import scipy as sp
 from Geometry import Wing # Import all wing geometry variables
 
 #print(Wing.h_str)
-
+Iyy_aircraft = Q_("1492.8 kg/m/m")
+Ixx_aircraft = Q_("1016.9 kg/m/m")
+Izz_aircraft = Q_("2447.2 kg/m/m")
 def calc_stringer_inertia(h_str, w_str, t_str):
 
     # Calculating Area's of stringer components
