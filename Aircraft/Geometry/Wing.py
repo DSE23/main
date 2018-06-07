@@ -139,18 +139,37 @@ def Area_Skin_x_c(Spar1, Spar2):                            #Input deminsionless
     Areaxc = Areaxc * 2                                         #Area times chord for both sides of the airfoil (therefore times 2)
     return Areaxc
 
-## Controid calculation
 
-# Centroid of wing skin
-C_Skin = Area_Skin_x_c(ChSpar1,ChSpar2)/Area_Skin(ChSpar1,ChSpar2)
+def area_stringers(n_st):
+    A_1 = h_str*t_str
+    A_2 = (w_str-t_str)*t_str
+    A_stringer = A_1 + A_2
+    A_tot_stringer = A_stinger * n_st
+    return A_tot_stringer
 
-# Centroid spars
-C_Spar1 = AreaSpar1xc/AreaSpar1
-C_Spar2 = AreaSpar2xc/AreaSpar2
+def stif_loc(z, t_sk, n_st, x):
+    total_perimeter = sp.integrate.quad(Wing.airfoilordinate(x), Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), Wing.Chord_loc_Spar(z,Wing.Spar2R,Wing.Spar2T)) #m
+
+    spacing = total_perimeter / ((n_st + 1) / 2)
+    x_y_angle_coords = []
+    for i in range(n_st):
+        local_spacing = i * spacing
+        rot_angle = Wing.Angle(x) + radians(180)
+        x_coordinate = Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T) + sp.integrate.quad(math.cos(Wing.angle(x)),Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), localspacing) 
+        #x_coordinate = (-1) * (local_spacing - circle_perim) * cos(atan(0.5 * h / (C_a - 0.5 * h)))
+        y_coordinate = Wing.airfoilordinate(Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T)+local_spacing)-sp.integrate.quad(math.sin(Wing.angle(x)),Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), localspacing)
+        
+        apnd_itm = (x_coordinate, y_coordinate, rot_angle)
+        x_y_angle_coords.append(apnd_itm)
+        apnd_itm = (x_coordinate, -y_coordinate, -rot_angle)
+        x_y_angle_coords.append(apnd_itm)
+
+        # print "Stif.", i, "\t x:", x_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
+
+    return x_y_angle_coords  # [(stringer0 x,y,rot),(stringer1 x,y,rot), ...]
 
 
-
-
+Print("je moeder") 
 
 
 
