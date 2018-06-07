@@ -19,14 +19,17 @@ from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
 
 CLmax = 2.52                   # CLmax with HLD, should be from aero
+CLmax_clean = 1.3154           # From aero guys
 CL_alpha = 4.6531              # CL_alpha 1/rad
 S_wing = 11.74               # Wing surface
 MTOW = 889                      # MTOW, updates from structure
 rho0 = 1.225                    # Density at sea level
 g0 = 9.80665
-V_stall = m.sqrt((2*MTOW*g0)/(rho0*S_wing*CLmax))
+V_stall = m.sqrt((2*MTOW*g0)/(rho0*S_wing*CLmax)) #Stall speed not clean condition
+V_stall_clean = m.sqrt((2*MTOW*g0)/(rho0*S_wing*CLmax_clean)) #Stall speed clean condition
 n_max = 10                      # Max load factor
 V_man = V_stall*m.sqrt(n_max)   # Manoeuvre speed @Sea level
+V_a_clean = V_stall_clean*m.sqrt(n_max) #Manoeuvre speed clean condition
 Oswald_e = 0.79                 # Oswald efficiency factor
 CN_h_alpha = 3.238969           # From aero guys
 Downwash = 0.7957               # depsilon/dalpha from aero guys
