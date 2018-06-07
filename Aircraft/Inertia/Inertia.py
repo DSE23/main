@@ -58,7 +58,6 @@ def Calc_skin_inertia_Ixx(Spar1, Spar2):
     x = Spar1
     Ixx = 0
     for i in range(n):
-        print(i)
         x = x + dx
         dxlength=dx*Wing.Chordlength
         y = ((Wing.airfoilordinate(x-dx)+Wing.airfoilordinate(x))/2)*Wing.Chordlength
@@ -72,19 +71,19 @@ def Calc_skin_inertia_Iyy(Spar1, Spar2):
     n = 100  # number of sections
     dx = ((Spar2 - Spar1) / n)
     x = Spar1
-    Ixx = 0
+    Iyy = 0
     for i in range(n):
-        print(i)
         x = x + dx
         xlength = x * Wing.Chordlength
         dxlength = dx * Wing.Chordlength
         y = ((Wing.airfoilordinate(x - dx) + Wing.airfoilordinate(x)) / 2) * Wing.Chordlength
         dy = abs(Wing.airfoilordinate(x - dx) - Wing.airfoilordinate(x)) * Wing.Chordlength
         length = np.sqrt(dxlength ** 2 + dy ** 2)
-        dIyy = length * Wing.ThSkin*((abs(xlength-Wing.centroid))**2)
+        dIyy = length * Wing.ThSkin*((abs(xlength-(Wing.centroid*Wing.Chordlength)))**2)
         Iyy = Iyy + dIyy
 
-    return Ixx
+    return Iyy
 
 print('this is', Calc_skin_inertia_Ixx(Wing.ChSpar1,Wing.ChSpar2))
+print('this is', Calc_skin_inertia_Iyy(Wing.ChSpar1,Wing.ChSpar2))
 #print(calc_stringer_Inertia(Q_("50 mm"),Q_("20 mm"),Q_("2 mm")))
