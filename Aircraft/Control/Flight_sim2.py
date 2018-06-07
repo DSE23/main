@@ -75,15 +75,15 @@ cg    = 0.14                    # [m] Centre of gravity location (1.453765363m f
 
 
 
-Cybeta= -0.14                   # [1/rad]
+Cybeta= -0.16                   # [1/rad]
 Cydr  = 5.57                    # [1/rad]           REALLY HIGH
 Clbeta= 71*10**(-5)             # [1/rad]
-Clp   = -0.63                   # [1/rad]
-Clr   = 0.0383                  # [1/rad]
+Clp   = -0.53                   # [1/rad]
+Clr   = 0.0344                  # [1/rad]
 Clda  = 3.92                    # [1/rad]
 Cldr  = 0.0147##                  # [1/rad]
-Cm0   = 0.                      # [1/rad]           CHECK!
-Cma   = -0.88                   # [1/rad]
+Cm0   = 0.                      # [1/rad]           Should be zero if stable at initial condition!
+Cma   = -0.78                   # [1/rad]
 Cmadot= -3.14                   # [1/rad]
 Cmq   = -4.28                   # [1/rad]
 Cmde  = -1.28##                   # [1/rad]
