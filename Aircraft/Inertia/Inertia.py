@@ -12,7 +12,7 @@ import numpy as np
 
 from Geometry import Wing # Import all wing geometry variables
 
-print(Wing.h_str)
+#print(Wing.h_str)
 
 def calc_stringer_inertia(h_str, w_str, t_str):
 
