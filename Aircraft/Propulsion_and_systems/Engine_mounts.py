@@ -41,17 +41,26 @@ def initialise_h_dist(inp):
     global h_dist
     h_dist = inp
 
+
+def initialise_length(inp):
+    global length
+    length = inp
+
+
 # Test
 
 # End defining global variables
 
 # Start assigning values to variables
-# Vertical distance between engine mounts
-v_dist = Q_("20 in")  # DUMMY
+# Vertical distance between engine mount attachment points to firewall
+v_dist = Q_("10 m")  # DUMMY
 v_dist.ito(ureg.m)
-# Horizontal distance between engine mounts
-h_dist = Q_("10000000 m")  # DUMMY
+# Horizontal distance between engine mount attachment points to firewall
+h_dist = Q_("10 m")  # DUMMY
 h_dist.ito(ureg.m)
+# Distance between engine mounts and firewall
+length = Q_("10 m")  # DUMMY
+length.ito(ureg.m)
 
 # Load case
 # Max load factor (defined from requirements):
@@ -60,21 +69,20 @@ loadfactor = 20
 gravity = Q_("9.81 m/s**2")
 
 # Determine max engine vertical force (in Newtons)
-F_y_eng = Engine.mass * gravity * loadfactor
-F_y_eng.ito(ureg.newton)
+f_y_eng = Engine.mass * gravity * loadfactor
+f_y_eng.ito(ureg.newton)
 
 # Determine max prop vertical force (in Newtons)
-F_y_prop = Propeller.mass * gravity * loadfactor
-F_y_prop.ito(ureg.newton)
+f_y_prop = Propeller.mass * gravity * loadfactor
+f_y_prop.ito(ureg.newton)
 
-# Determine moment about Z axis at mounts
-# M_z_eng = F_y_eng * (Engine.length-Engine.xcg)
-# M_z_prop = F_y_prop * (Engine.length-Propeller.xcg)
+# Calculate x-distance from engine cg to firewall
+d_eng_firewall = firewall_xcg - Engine.xcg
 
 # Determine reaction forces
 # Sum of forces in y-direction, R_y is engine mount reaction force
-R_y_total = F_y_prop+F_y_eng
+r_y_total = f_y_prop+f_y_eng
 
 # Sum of moments about axis parallel to Z-axis through bottom engine mount
-R_x_1 = (F_y_eng * (Engine.length-Engine.xcg) + F_y_prop * (Engine.length-Propeller.xcg)) / v_dist
-print(R_x_1)
+r_x_1 = (f_y_eng * (Engine.length-Engine.xcg) + f_y_prop * (Engine.length-Propeller.xcg)) / v_dist
+print(r_x_1)
