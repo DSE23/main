@@ -26,7 +26,9 @@ rho0 = 1.225                    # Density at sea level
 g0 = 9.80665
 V_stall = m.sqrt((2*MTOW*g0)/(rho0*S_wing*CLmax))
 n_max = 10                      # Max load factor
-V_man = V_stall*m.sqrt(n_max)
+V_man = V_stall*m.sqrt(n_max)   #Manoeuvre speed @Sea level
+Oswald_e = 0.79                 #Oswald efficiency factor
+
 
 d_delta_a= 60 / 180 * m.pi #rad delta aileron form minus to plus
 d_s_a= 0.41 #m      stick deflection

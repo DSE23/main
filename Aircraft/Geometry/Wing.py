@@ -63,8 +63,8 @@ def Chord_loc_Spar(zs,SparR,SparT):             #input spanwise location in m an
 ChSpar1 = Chord_loc_Spar(z,Spar1R,Spar1T)
 ChSpar2 = Chord_loc_Spar(z,Spar2R,Spar2T)
 
-print(ChSpar1)
-print(ChSpar2)
+# print(ChSpar1)
+# print(ChSpar2)
 
 def length_chord(zs):             #length of chord with respect to the spanwise postion
     lengthchord = ChordR*(1-((1-t)*(zs/s)))
@@ -81,8 +81,8 @@ def H_in_m(x,zs):                             #input chord and span respectively
 HSpar1 = H_in_m(ChSpar1, z)*2        #height of spar 1
 HSpar2 = H_in_m(ChSpar2, z)*2        #height of spar 2
 
-print(HSpar1)
-print(HSpar2)
+# print(HSpar1)
+# print(HSpar2)
 
 def Angle(cs):                          #input chord ratio
     n = 100  # number of sections

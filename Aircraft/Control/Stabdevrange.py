@@ -16,15 +16,28 @@ from Geometry import Wing
 # This file will calculate the ranges for l_h,
 # Xlemac, S_h and S_v in which StefX will havel level 1 flying qualities
 
-#Input parameters
+# Input parameters
 
 A = Wing.A
 CL_alpha = IP.CL_alpha
 MTOW = IP.MTOW
-#specific parameters (only check if either Lambda or A changes)
+S_wing = IP.S_wing
+B = Wing.s
+V_a = IP.V_man
+rho = IP.rho0
+g0 = IP.g0
+Oswald_e = IP.Oswald_e
+# specific parameters (only check if either Lambda or A changes)
 
 
-#Stability Derivatives
+#Iteration values
+S_h = 2.629
+
+# Calculated values
+C_L = MTOW/(0.5*rho*V_a**2*S_wing)
+
+
+# Stability Derivatives
 
 
 
