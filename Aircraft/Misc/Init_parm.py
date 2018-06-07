@@ -21,12 +21,33 @@ from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 CLmax = 2.52                   # CLmax with HLD, should be from aero
 CL_alpha = 4.6531              # CL_alpha 1/rad
 S_wing = 11.74               # Wing surface
-MTOW = 822                      # MTOW, updates from structure
+MTOW = 889                      # MTOW, updates from structure
 rho0 = 1.225                    # Density at sea level
 g0 = 9.80665
 V_stall = m.sqrt((2*MTOW*g0)/(rho0*S_wing*CLmax))
 n_max = 10                      # Max load factor
-V_man = V_stall*m.sqrt(n_max)
+V_man = V_stall*m.sqrt(n_max)   # Manoeuvre speed @Sea level
+Oswald_e = 0.79                 # Oswald efficiency factor
+CN_h_alpha = 3.238969           # From aero guys
+Downwash = 0.7957               # depsilon/dalpha from aero guys
+Vh_V = 0.93                     # Vh over V also from aero
+I_yy = 1565                     # MMoI from structures
+CN_w_alpha = 4.653              # From aero again
+MAC = 1.53                      # Mean Aerodynamic chord
+S_h = 2.629                     # Horizontal tail surface
+X_htail = 5.27                  # Distance 0.25c Htail to nose
+X_cg_body_group = 0             # !!!Can somebody calculate this
+W_body_group = 612              # kg from structures
+W_wing = 121                    # kg from structures
+X_cg_wing = 0.5 * MAC           # Distance from Xlemac
+W_pilot = 100                   # kg 
+W_fuel = 57                     # kg
+X_cg_pilot = 2.24               # !!!Please check!!! Distance from nose
+X_cg_fuel = 1.18                  # From nose
+Xlemac = 1.24                   # Will be iterated for, distance from nose
+
+
+
 
 d_delta_a= 60 / 180 * m.pi #rad delta aileron form minus to plus
 d_s_a= 0.41 #m      stick deflection

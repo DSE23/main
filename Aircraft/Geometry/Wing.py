@@ -8,13 +8,13 @@ sys.path.append('../') # This makes sure the parent directory gets added to the 
 
 import numpy as np
 import scipy as sp
-import scipy.interpolate
+from scipy import integrate
 from math import *
 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
 A = 5.5                         #Estimate aspect ratio
-t = 0.4                         #Estimate taper
+t = 0.45                         #Estimate taper
 s = Q_("8.03 m")                #Estimate span (m)
 Lambda25 = 0                    #Quarter chord sweep
 CtoT = 0.15                     #Max Chord to thickness ratio
@@ -62,8 +62,8 @@ def Chord_loc_Spar(zs,SparR,SparT):             #input spanwise location in m an
 ChSpar1 = Chord_loc_Spar(z,Spar1R,Spar1T)
 ChSpar2 = Chord_loc_Spar(z,Spar2R,Spar2T)
 
-print(ChSpar1)
-print(ChSpar2)
+# print(ChSpar1)
+# print(ChSpar2)
 
 def length_chord(zs):             #length of chord with respect to the spanwise postion
     lengthchord = ChordR*(1-((1-t)*(zs/s)))
@@ -80,8 +80,8 @@ def H_in_m(x,zs):                             #input chord and span respectively
 HSpar1 = H_in_m(ChSpar1, z)*2        #height of spar 1
 HSpar2 = H_in_m(ChSpar2, z)*2        #height of spar 2
 
-print(HSpar1)
-print(HSpar2)
+# print(HSpar1)
+# print(HSpar2)
 
 def Angle(cs):                          #input chord ratio
     n = 100  # number of sections
@@ -144,17 +144,36 @@ def Area_Skin_x_c(Spar1, Spar2):                            #Input deminsionless
     return Areaxc
 
 
-def stif_loc(z, n_st, x):                         #Z is spanwise location (m), n_st is number of stringers, x = c haha
-    total_perimeter = sp.integrate.quad(Wing.airfoilordinate(x), Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), Wing.Chord_loc_Spar(z,Wing.Spar2R,Wing.Spar2T)) #m
+def area_stringers(n_st):
+    A_1 = h_str*t_str
+    A_2 = (w_str-t_str)*t_str
+    A_stringer = A_1 + A_2
+    A_tot_stringer = A_stinger * n_st
+    return A_tot_stringer
 
-    spacing = total_perimeter / ((n_st) / 2)
+# returns stiffener x,y locations and rotation
+# return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 x,y,rot)] m,m,rad
+def stif_loc(z, n_st, cs):
+    n = 100 #number of sections
+    dx = ((Spar2-Spar1)/n)
+    x = Spar1
+    total_perimeter = 0
+    for i in range(n):
+        x = x + dx
+        dxlength = dx * Chordlength
+        dylength = abs(airfoilordinate(x - dx) - airfoilordinate(x)) * Chordlength
+        dlength = np.sqrt(dxlength**2+dylength**2)
+        total_perimeter += dlenght
+    #total_perimeter = sp.integrate.quad(Wing.airfoilordinate(x), Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), Wing.Chord_loc_Spar(z,Wing.Spar2R,Wing.Spar2T)) #m
+    spacing = total_perimeter / ((n_st + 1) / 2)
     x_y_angle_coords = []
     for i in range(n_st):
         local_spacing = i * spacing
-        rot_angle = Wing.Angle(x) + radians(180)
-        x_coordinate = Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T) + sp.integrate.quad(math.cos(Wing.angle(x)),Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), localspacing) 
+        rot_angle = Wing.Angle(cs) + radians(180)
+        x_coordinate = Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T)
+        x_coordinate += local_spacing
         #x_coordinate = (-1) * (local_spacing - circle_perim) * cos(atan(0.5 * h / (C_a - 0.5 * h)))
-        y_coordinate = Wing.airfoilordinate(Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T)+local_spacing)-sp.integrate.quad(math.sin(Wing.angle(x)),Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), localspacing)
+        y_coordinate = airfoilordinate(x_coordinate)
         
         apnd_itm = (x_coordinate, y_coordinate, rot_angle)
         x_y_angle_coords.append(apnd_itm)
