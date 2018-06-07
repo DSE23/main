@@ -11,6 +11,17 @@ sys.path.append('../')
 from Misc import ureg, Q_
 # Imports the unit registry from the Misc folder
 
+
+# Coordinate system:
+# Origin is in propeller attachment to engine
+# X axis: parallel to the crankshaft centerline, backwards
+# Y axis: up
+# Z axis: left
+
+# Start defining global variables for easy editing from elsewhere
+# For explanations of the variables defined here, see below, where they are given values
+
+
 def initialise_mass(inp):
     global mass
     mass = inp
@@ -66,8 +77,8 @@ def initialise_zcg(inp):
 # Engine dry mass as provided by Lycoming
 drymass = Q_("446 lbs")
 drymass.ito(ureg.kg)
-# Assume factor of 10% to achieve wet mass
-mass = 1.1*drymass
+# Assume additional 20% to include fluids, hoses and engine mount
+mass = 1.2*drymass
 
 # Engine mass moments of inertia about engine cg, as provided by Lycoming
 ixg = Q_("84.4 inch*lbf*s**2")
