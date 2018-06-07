@@ -8,7 +8,7 @@ sys.path.append('../') # This makes sure the parent directory gets added to the 
 
 import numpy as np
 import scipy as sp
-from scipy import integrate
+from scipy import interpolate
 from math import *
 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
@@ -187,12 +187,12 @@ def stif_loc(z, n_st, cs):
 
 # For the stringers (placeholder)
 spacingstringers = ((ChSpar2-ChSpar1)/((N_stringers/2)+1)*Chordlength)
+beginspacing = ChSpar1*Chordlength
 A_stringer_x_c=0
 i=1
 while i < int(((N_stringers/2)+1)):
-    dA_stringer_x_c = i * spacingstringers * A_stringer
+    dA_stringer_x_c = (i * spacingstringers + beginspacing) * A_stringer
     A_stringer_x_c = A_stringer_x_c + dA_stringer_x_c
-    print(dA_stringer_x_c)
     i = i + 1
 
 Area_x_c = AreaSpar1xc + AreaSpar2xc + Area_Skin_x_c(ChSpar1, ChSpar2) + A_stringer_x_c
