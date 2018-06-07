@@ -14,7 +14,7 @@ from math import *
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
 A = 5.5                         #Estimate aspect ratio
-t = 0.4                         #Estimate taper
+t = 0.45                         #Estimate taper
 s = Q_("8.03 m")                #Estimate span (m)
 Lambda25 = 0                    #Quarter chord sweep
 CtoT = 0.15                     #Max Chord to thickness ratio
