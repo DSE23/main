@@ -9,6 +9,7 @@ sys.path.append('../') # This makes sure the parent directory gets added to the 
 import numpy as np
 import scipy as sp
 import scipy.interpolate
+from math import *
 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
@@ -16,7 +17,7 @@ A = 5.5                         #Estimate aspect ratio
 t = 0.4                         #Estimate taper
 s = Q_("8.03 m")                #Estimate span (m)
 Lambda25 = 0                    #Quarter chord sweep
-CtoT = 0.15                     #Chord to thickness ratio
+CtoT = 0.15                     #Max Chord to thickness ratio
 Spar2R = 1-0.18                      #Chordwise location of second spar at the root
 Spar2T = 1-0.33                     #Chordwise location of second spar at the tip
 Spar1R = 0.15                   #Chordwise location of first spar at the root
@@ -82,6 +83,15 @@ HSpar2 = H_in_m(ChSpar2, z)*2        #height of spar 2
 
 print(HSpar1)
 print(HSpar2)
+
+def Angle(cs):                          #input chord ratio
+    n = 100  # number of sections
+    dx = 1/n
+    dy=airfoilordinate(cs+dx)-airfoilordinate(cs)
+    angle = tan(dy/dx)
+    angle *= Q_('rad')
+    return angle
+
 
 
 
