@@ -1,9 +1,0 @@
-diff a/Aircraft/Inertia/Inertia.py b/Aircraft/Inertia/Inertia.py	(rejected hunks)
-@@ -97,6 +97,7 @@
- 
- 
- 
-+# returns stiffener x,y locations and rotation
- # return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 x,y,rot)] m,m,rad
- def stif_loc(z, t_sk, n_st):
-     total_perimeter = integrate.quad(Wing.airfoilordinate(x), Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), Wing.Chord_loc_Spar(z,Wing.Spar2R,Wing.Spar2T)) #m

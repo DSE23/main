@@ -9,10 +9,9 @@ import sys
 sys.path.append('../') # This makes sure the parent directory gets added to the system path
 
 import numpy as np
-import scipy as sp
 from scipy import interpolate
 import math as m
-import Geometry
+from Geometry import Geometry
 import Structures
 from Structures import Inertia
 
