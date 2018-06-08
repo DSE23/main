@@ -14,7 +14,7 @@ Example on how to use this file:
 import sys
 sys.path.append('../') # This makes sure the parent directory gets added to the system path
 
-from Misc import ureg, Q_ # Imports the unit registry from the Misc folder
+from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import math as m
 import numpy as np
 
@@ -26,6 +26,7 @@ class Wing(object):
     taper = 0.45                # Taper ratio
     c_r = Q_("2.015 m")                 # Root chord
     c_t = c_r * taper           # Tip chord
+    c_avg = (c_r + c_t)/2       #Average chord
     Sweep_25 = 0                # [deg] Quarter chord sweep
     Sweep_25 *= Q_('deg')
     Sweep_50 = m.degrees(m.atan(m.tan(m.radians(Sweep_25))-(4/A) *
