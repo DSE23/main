@@ -16,3 +16,4 @@ import numpy as np
 
 I_yy = Q_("1594 kg m**2")
 I_xx = Q_("1089 kg m**2")
+I_zz = Q_("2629 kg m**2")

@@ -18,6 +18,7 @@ from Aerodynamics import Wing as Aero_wing
 from Aerodynamics import HT as Aero_HT
 from Aerodynamics import VT as Aero_VT
 from Aerodynamic import General as Aero_gen
+from Inertia import Inertia
 from Performance import Performance
 
 
@@ -39,7 +40,8 @@ CNH_alpha = Aero_HT.C_Nh_alpha
 dE_dalpha = Aero_wing.de_da
 Vh_V = Aero_HT.Vh_v
 Cbar = Geometry.Wing.MAC
-I_yy = 
+I_yy = Inertia.I_yy
+K_yy = (I_yy/MTOW)/(b**2)
 g = IP.g0
 CNW_alpha = IP.CN_w_alpha
 # specific parameters (only check if either Lambda or A changes)
@@ -63,4 +65,4 @@ CZ_alpha = -CL_alpha
 CZ_alphadot = -CNH_alpha * Vh_V**2 * dE_dalpha * S_h * l_h / (S_wing * Cbar)
 CZq = -2 * Vh_V**2 * S_h * l_h / (S_wing * Cbar)
 Cmu = 0
-Cm_alpha =  CNW_alpha * 
+Cm_alpha =  CNW_alpha * 1
