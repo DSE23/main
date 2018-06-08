@@ -44,3 +44,5 @@ def Normal_stress_due_to_bending(zs, cs, y): # Normal stress due to bending
     inertia_term_2 = (Inertia.Ixx*cs-Inertia.Ixy*y)/denominator_inertia_term
     sigma_zs = Mx*inertia_term_1 + My*inertia_term_2
     return sigma_zs #Gives the normal stress function for a given span zs, and x- and y- coordinate
+
+
