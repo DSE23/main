@@ -50,7 +50,7 @@ def computeloads():
     quit\n")
     command_file.close()
 
-    run_xfoil_command = 'xfoil < ' + 'commands.in'
+    run_xfoil_command = '..\\xfoil < ' + 'commands.in'
     subprocess.call(run_xfoil_command, stdout=FNULL, shell = True)
 
     data = np.genfromtxt(Datafile+'_results.dat',skip_header=12)
@@ -94,7 +94,7 @@ def computeloads():
     quit\n")
     command_file.close()
 
-    run_xfoil_command = 'xfoil < ' + 'commands.in'
+    run_xfoil_command = '..\\xfoil < ' + 'commands.in'
     subprocess.call(run_xfoil_command, stdout= False, shell = True)
 
     pressures = np.genfromtxt('cp.dat',skip_header=3,skip_footer=1)
