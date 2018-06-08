@@ -8,9 +8,10 @@ sys.path.append('../') # This makes sure the parent directory gets added to the 
 
 import numpy as np
 import scipy as sp
+from scipy import optimize
 from scipy import interpolate
 import math as m
-import Geometry
+from Geometry import Geometry
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
 A = Geometry.Wing.A                         #Estimate aspect ratio
@@ -50,6 +51,19 @@ airfoilinterpolant = sp.interpolate.interp1d(
 # Find the ordinate of the airfoil at an arbitrary position x, with 0 =< x =< 1
 def airfoilordinate(x):
     return airfoilinterpolant(x)
+
+def airfoilordinateroot(x,y):
+    return airfoilordinate(x) - y
+
+def airfoilinverse(y,location = 'TE'):
+    airfoilrootinterpolant = sp.interpolate.interp1d(
+        airfoilcoordinates[0:int(numberofcoordinates / 2) + 1, 0],
+        airfoilcoordinates[0:int(numberofcoordinates / 2) + 1, 1]-y,kind = 'cubic')  # Interpolate
+    if location == 'LE':
+        x = 0.15-m.sqrt(0.15**2-y**2)
+    elif location == 'TE':
+        x = 0.999- 0.8/0.075*y
+    return sp.optimize.newton(airfoilrootinterpolant,x)
 
 TR = airfoilordinate(0.15)*ChordR                            #max thickness root in m
 TT = TR*t                                   #max thickness tip in m
