@@ -9,9 +9,7 @@ StefX Flight performance parameters
 import sys
 import math as m
 sys.path.append('../')
-from Geometry import Wing
 from Control import Calc_ISA_100km as ISA
-from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
 mtow = 889.8                    # [kg] Max. Take-off weight
 cl_max_hld = 2.522              # [-] CL max with HLD's deployed
