@@ -12,23 +12,31 @@ import numpy as np
 from scipy import interpolate
 import math as m
 from Geometry import Geometry
-import Structures
+import Wing
 from Structures import Inertia
+#from Aerodynamics import Wing as AWing
+from Performance import Performance
 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
 
-cl = 1
+cl_max = 1 #AWing.CL_max
+
 cd = 0.05
 cm = 0.05
 b = Geometry.Wing.b         #Wing span
-z = Structures.Wing.z      #Span wise postion of the wing in m
+z = Wing.z      #Span wise postion of the wing in m
 ChordR = Geometry.Wing.c_r      #root chord in m
+rho = Performance.rho_c
+V = Performance.V_cruise
 
 av_chord = (Wing.length_chord(z)+Wing.length_chord(b))/2        #average chord right from the crossection (m)
 spanleft = b - z
-print(av_chord)
-print(spanleft)
+Arealeft = spanleft*av_chord
+L = cl_max * 0.5 * rho * (V**2) * Arealeft
+
+print(L)
+
 
 def Normal_stress_due_to_bending(zs, cs, y): # Normal stress due to bending
     denominator_inertia_term = Inertia.Ixx*Inertia.Iyy-Inertia.Ixy**2

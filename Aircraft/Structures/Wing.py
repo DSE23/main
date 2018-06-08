@@ -12,6 +12,7 @@ from scipy import optimize
 from scipy import interpolate
 import math as m
 from Geometry import Geometry
+
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
 A = Geometry.Wing.A                         #Estimate aspect ratio
@@ -23,7 +24,7 @@ Spar2R = 1-0.18                      #Chordwise location of second spar at the r
 Spar2T = 1-0.33                     #Chordwise location of second spar at the tip
 Spar1R = 0.15                   #Chordwise location of first spar at the root
 Spar1T = 0.15                   #Chordwise location of first spar at the tip
-ChordR = Q_("2.015 m")         #Length of root (m)
+ChordR = Geometry.Wing.c_r         #Length of root (m)
 ThSpar1 = Q_('0.005 m')          #Thickness of Spar 1
 ThSpar2 = Q_('0.005 m')          #Thickness of Spar 2
 ThSkin = Q_('0.003 m')           #Thickness of the skin
@@ -208,3 +209,4 @@ centroid = (Area_x_c/Area)/Chordlength
 centroidlength = Area_x_c/Area
 
 print(centroid)
+
