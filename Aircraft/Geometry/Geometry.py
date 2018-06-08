@@ -12,7 +12,7 @@ class Wing(object):
     A = 5.5                     # Aspect Ratio
     b = np.sqrt(S*A)             # [m] Wing Span
     taper = 0.45                # Taper ratio
-    c_r = 2.015                 # Root chord
+    c_r = Q_("2.015 m")                 # Root chord
     c_t = c_r * taper           # Tip chord
     Sweep_25 = 0                # [deg] Quarter chord sweep
     Sweep_25 *= Q_('deg')
@@ -82,3 +82,31 @@ class Landing_gear(object):
     
     lg_wheel_d = Q_("0.4445 m")                     # [m] Landing gear wheel diameter
     lg_wheel_w = Q_("0.16 m")                       # [m] Lg wheel width
+
+
+class Masses(object):
+    W_wing = Q_("121 kg")                # [kg] Mass of the wing
+    W_htail = Q_("18 kg")                # [kg] Mass of H_tail
+    W_vtail = Q_("6 kg")                 # [kg] Mass of V_tail
+    W_fus = Q_("82 kg")                  # [kg] Mass of Fuselage
+    W_gear = Q_("58 kg")                 # [kg] Mass of landing gear
+    W_engine = Q_("324 kg")              # [kg] Mass of engine
+    W_prop = Q_("0 kg")                  # [kg] Mass of propellor
+    W_fuelsys = Q_("10 kg")              # [kg] Mass of fuel system
+    W_hydraulic = Q_("1 kg")             # [kg] Mass of hydraulics
+    W_flightcontrol = Q_("20 kg")        # [kg] Mass of flight control
+    W_avionics = Q_("17 kg")             # [kg] Mass of Avionics
+    W_elecsys = Q_("46 kg")              # [kg] Mass of electronic systems
+    W_lehld = Q_("16 kg")                # [kg] Mass of LE HLD's
+    W_flaperons = Q_("14 kg")            # [kg] Mass of flaperons
+    W_OEW = W_wing + W_htail + W_vtail + W_fus + W_gear + W_engine +\
+            W_prop + W_fuelsys + W_hydraulic + W_flightcontrol +\
+            W_avionics + W_elecsys + W_lehld + W_flaperons
+    W_pilot = Q_("100 kg")              # [kg] Mass of pilot
+    W_fuel = Q_("57 kg")                # [kg] Mass of fuel
+
+class CG(object):
+    CG_wing_mac = 0.5                   # CG location of wing as percentage of MAC
+    XLEMAC = Q_("1.24 m")               # LEMAC position
+    CG_wing = CG_wing_mac*Wing.MAC + XLEMAC # Wing CG position
+    
