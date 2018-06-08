@@ -58,8 +58,6 @@ def computeloads():
 
     subprocess.call('del ' + Datafile + '_results.dat', shell = True)
 
-    print(alphaClmax)
-
     command_file = open("commands.in", "w")
     command_file.write('load ' + "../" + Datafile + ".dat\n\
     panel\n\
@@ -116,8 +114,6 @@ def computeloads():
         Cm += Cxi * (yref-pressures[i,2]) - Cyi * (xref-pressures[i,1])
 
     return Cy, Cx, Cm
-
-print(computeloads())
 
 #airfoil = np.genfromtxt(Datafile+'.dat')
 #
