@@ -17,11 +17,11 @@ sys.path.append('../') # This makes sure the parent directory gets added to the 
 airfoil_co = np.genfromtxt("../airfoil.dat")
 #Variables to be defined by user
 
-c_flap = 0.3# chord percentage covered by leading edge flap
-c_hinge = 0.25# chord percentage of location hinge of leading edge flap
-delta_flap = 20# [°] flap deflection in degrees
+c_flap = 0.25# chord percentage covered by leading edge flap
+c_hinge = 0.2# chord percentage of location hinge of leading edge flap
+delta_flap = 15# [°] flap deflection in degrees
 margin = 0.02 #tweak this to smoothen bottom part of airfoil
-knuckle_smooth = 0.06929 #♠ tweak to smoothen knuckle, value set at 0.06929
+knuckle_smooth = 0.0735 #♠ tweak to smoothen knuckle, based on y-loc before flap
 
 
 #Transforming data to SI units
