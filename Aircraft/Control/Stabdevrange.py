@@ -19,7 +19,6 @@ from Aerodynamics import HT as Aero_HT
 from Inertia import Inertia
 from Performance import Performance
 
-
 # This file will calculate the ranges for l_h,
 # Xlemac, S_h and S_v in which StefX will havel level 1 flying qualities
 
@@ -30,7 +29,7 @@ CL_alpha = Aero_wing.CL_alpha
 MTOW = Geometry.Masses.W_MTOW
 S_wing = Geometry.Wing.S
 b = Geometry.Wing.b
-V_a = Performance.V_a_clean.magnitude
+V_a = (Performance.V_a_clean).magnitude
 V_a *= Q_("1 m/s")
 rho_a = Performance.rho_a.magnitude
 rho_a *= Q_("1 kg/m**3")
@@ -79,7 +78,22 @@ Cmq = -1.1 * CNH_alpha * Vh_V**2 * (S_h*l_h**2)/(S_wing * Cbar**2)
 A_sp = -2 * mu_c * K_yy * (CZ_alphadot - 2 * mu_c)          # A for the Short period
 B_sp = -CX_alpha * 2 * mu_c * K_yy + Cmq * (CZ_alphadot -2 * mu_c)\
         - CZq * Cm_alphadot -2 * mu_c * Cm_alpha
-C_sp = CZ_alpha * Cmq - CZq * Cm_alpha -2 * mu_c * Cm_alpha
+C_sp = CZ_alpha * Cmq - CZq * Cm_alpha - 2 * mu_c * Cm_alpha
 Det_sp = B_sp**2 - 4 * A_sp * B_sp
 Re_sp = -B_sp/(2*A_sp)
 Img_sp = m.sqrt(abs(Det_sp))/(2*A_sp)
+Eigen_abs_sp = m.sqrt(Re_sp**2+Img_sp**2)
+omega_0 = Eigen_abs_sp * (V_a/Cbar)
+n_alpha = (CL_alpha * 0.5 * rho_a * V_a**2 * S_wing)/(MTOW * g0)
+CAP = (omega_0**2)/n_alpha
+
+
+# Phugoid
+
+A_ph = 2 * mu_c * (CZ_alpha*CZq-2 * mu_c * Cm_alpha)
+B_ph = 2 * mu_c * (CXu * Cm_alpha - Cmu * CX_alpha) + Cmq * \
+       (CZu * CX_alpha - CXu * CZ_alpha)
+C_ph = - CZ0 * (Cmu * CZ_alpha - CZu * Cm_alpha)
+Det_ph = B_ph**2 - 4 * A_ph * B_ph
+Re_sp = -B_ph/(2 * A_ph)
+Img_sp = m.sqrt(abs(Det_ph))/(2*A_ph)
