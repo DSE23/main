@@ -14,7 +14,7 @@ Example on how to use this file:
 import sys
 sys.path.append('../') # This makes sure the parent directory gets added to the system path
 
-from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
+from Misc import ureg, Q_ # Imports the unit registry from the Misc folder
 import math as m
 import numpy as np
 

@@ -53,15 +53,15 @@ mu_c = MTOW/(rho_a*Cbar*S_wing)
 S_h = Geometry.H_tail.S
 l_h = Geometry.H_tail.X_h - X_cg
 # Calculated values
-C_L = MTOW/(0.5*rho*V_a**2*S_wing)
+C_L = MTOW/(0.5*rho_a*V_a**2*S_wing)
 
 
 # Stability Derivatives (Longitudinal)
 
-CX0 = (MTOW * g)/(0.5 * rho * V_a**2 * S_wing) * m.sin(gamma_0)
+CX0 = (MTOW * g)/(0.5 * rho_a * V_a**2 * S_wing) * m.sin(gamma_0)
 CXu = -2 * C_L * m.tan(gamma_0)
 CX_alpha = C_L * (1-(2*CL_alpha))/(Oswald_e*A*m.pi)
-CZ0 = -(MTOW * g)/(0.5*rho*V_a**2*S_wing)*m.cos(gamma_0)
+CZ0 = -(MTOW * g)/(0.5*rho_a*V_a**2*S_wing)*m.cos(gamma_0)
 CZu = -2*C_L
 CZ_alpha = -CL_alpha
 CZ_alphadot = -CNH_alpha * Vh_V**2 * dE_dalpha * S_h * l_h / (S_wing * Cbar)

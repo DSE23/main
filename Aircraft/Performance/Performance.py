@@ -10,7 +10,6 @@ import sys
 import math as m
 import numpy as np
 sys.path.append('../')
-from Geometry import Wing
 from Misc import Q_, ureg
 from Geometry import Geometry
 from Control import Calc_ISA_100km as ISA
