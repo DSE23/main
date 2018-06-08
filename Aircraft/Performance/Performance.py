@@ -9,6 +9,7 @@ StefX Flight performance parameters
 import sys
 import math as m
 sys.path.append('../')
+from geometry import Wing
 from Control import Calc_ISA_100km as ISA
 
 mtow = 889.8                    # [kg] Max. Take-off weight
