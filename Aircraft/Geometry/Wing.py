@@ -1,7 +1,7 @@
 """                  
 Name: Wing
 Department: Geometry
-Last updated: 06/06/2018 12:38 by Boris 
+Last updated: 08/06/2018 09:18 by Midas
 """
 import sys
 sys.path.append('../') # This makes sure the parent directory gets added to the system path
@@ -9,7 +9,7 @@ sys.path.append('../') # This makes sure the parent directory gets added to the 
 import numpy as np
 import scipy as sp
 from scipy import interpolate
-from math import m
+import math as m
 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
