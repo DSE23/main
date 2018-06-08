@@ -11,8 +11,7 @@ sys.path.append('../') # This makes sure the parent directory gets added to the 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import numpy as np
 from scipy import integrate
-
-import Geometry
+from Structures import Wing
 
 # print(Wing.h_str)
 Iyy_aircraft = Q_("1492.8 kg/m/m")
