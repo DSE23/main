@@ -12,17 +12,20 @@ load ../Airfoil.dat
     30
     x
     
+    ppar
+    N
+    200
+    
+    
+    psav flappedairfoil.dat
     oper
     visc 8000000
     M 0.3128
     type 1
-    pacc
-Airfoil_results.dat
-    
-    iter
- 100 
+    iter 1000 
     seqp
-    aseq 0 25 0.5 
+    a 11.5
+    cpwr cp.dat
     
     
     quit

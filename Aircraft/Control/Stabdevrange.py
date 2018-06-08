@@ -12,7 +12,7 @@ import math as m
 import numpy as np
 sys.path.append('../')
 
-from Misc import Init_parm as IP
+from Misc import Q_
 from Geometry import Geometry
 from Aerodynamics import Wing as Aero_wing
 from Aerodynamics import HT as Aero_HT
@@ -29,10 +29,13 @@ A = Geometry.Wing.A
 CL_alpha = Aero_wing.CL_alpha
 MTOW = Geometry.Masses.W_MTOW
 S_wing = Geometry.Wing.S
-b = Geometry.Wing.S
-V_a = Performance.V_a_clean
-rho_a = Performance.rho_a
-g0 = Performance.g0
+b = Geometry.Wing.b
+V_a = Performance.V_a_clean.magnitude
+V_a *= Q_("1 m/s")
+rho_a = Performance.rho_a.magnitude
+rho_a *= Q_("1 kg/m**3")
+g0 = Performance.g0.magnitude
+g0 *= Q_("1 m/s**2 ")
 Oswald_e = Aero_wing.Oswald_e
 CNH_alpha = Aero_HT.C_Nh_alpha
 dE_dalpha = Aero_wing.de_da
@@ -52,7 +55,7 @@ mu_c = MTOW/(rho_a*Cbar*S_wing)
 S_h = Geometry.H_tail.S
 l_h = Geometry.H_tail.X_h - X_cg
 # Calculated values
-C_L = MTOW/(0.5*rho_a*V_a**2*S_wing)
+C_L = (MTOW*g0)/(0.5*rho_a*V_a**2*S_wing)
 
 
 # Stability Derivatives (Longitudinal)

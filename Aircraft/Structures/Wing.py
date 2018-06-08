@@ -157,6 +157,17 @@ def Area_Skin_x_c(Spar1, Spar2):                            #Input deminsionless
     Areaxc = Areaxc * 2                                         #Area times chord for both sides of the airfoil (therefore times 2)
     return Areaxc
 
+## Area of cell enclosed by the wing skin and the stringers
+def Area_cell():
+    n = 100 #number of sections
+    dx = ((Spar2-Spar1)/n)
+    area_cell = 0
+    for i in range(n):
+        x = x + dx
+        dxlength = dx * Chordlength
+        area_cell = dxlength*airfoilordinate(x)
+        area_cell = area_cell*2
+    return area_cell
 
 # returns stiffener x,y locations and rotation
 # return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 x,y,rot)] m,m,rad
