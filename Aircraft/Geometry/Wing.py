@@ -19,7 +19,7 @@ from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
 S = Q_('11.74 m**2')                   # [m^2] Wing Surface
 A = 5.5                     # Aspect Ratio
-b = m.sqrt(S*A)             # [m] Wing Span
+b = np.sqrt(S*A)             # [m] Wing Span
 taper = 0.45                # Taper ratio
 c_r = Q_('2.015 m')                 # Root chord
 c_t = c_r * taper           # Tip chord

@@ -14,13 +14,13 @@ import math as m
 from Geometry import Geometry
 import Wing
 from Structures import Inertia
-from Aerodynamics import Wing as AWing
+#from Aerodynamics import Wing as AWing
 from Performance import Performance
 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
 
-cl_max = AWing.CL_max
+cl_max = 1 #AWing.CL_max
 
 cd = 0.05
 cm = 0.05
