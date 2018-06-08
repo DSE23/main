@@ -1,4 +1,16 @@
-# -*- coding: utf-8 -*-
+"""
+Name: Geometry
+Department: Geometry
+Last updated: 08/06/2018 13:45 by Midas
+
+In this file all of the geometric parameters of StefX should be present.
+No other file should have these dimensions hard coded so all values are up to date
+
+Example on how to use this file:
+    from Geometry import Geometry
+
+    S = Geometry.Wing.S
+"""
 import sys
 sys.path.append('../') # This makes sure the parent directory gets added to the system path
 
