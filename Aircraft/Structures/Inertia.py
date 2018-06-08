@@ -12,8 +12,6 @@ from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import numpy as np
 from scipy import integrate
 
-import Geometry
-
 # print(Wing.h_str)
 Iyy_aircraft = Q_("1492.8 kg/m/m")
 Ixx_aircraft = Q_("1016.9 kg/m/m")
@@ -185,5 +183,5 @@ class InertiaTestCase(unittest.TestCase):
                                msg="Verification of I_xy for stringer with SolidWorks FAILED")
 
 
-if __name__ == '__main__':
-    unittest.main()
+#if __name__ == '__main__':
+#    unittest.main()

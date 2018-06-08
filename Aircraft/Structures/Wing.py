@@ -192,3 +192,5 @@ Area = AreaSpar1 + AreaSpar2 + Area_Skin(ChSpar1, ChSpar2)+A_stringer + A_string
 
 centroid = (Area_x_c/Area)/Chordlength
 centroidlength = Area_x_c/Area
+
+print(centroid)
