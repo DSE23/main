@@ -10,9 +10,8 @@ import sys
 import math as m
 import numpy as np
 sys.path.append('../')
-from Geometry import Wing
-from Misc import Q_, ureg
 from Geometry import Geometry
+from Misc import Q_, ureg
 from Control import Calc_ISA_100km as ISA
 from Aerodynamics import Wing as Aero_wing
 
@@ -36,7 +35,7 @@ V_sust = Q_("67.135 m/s")                # [m/s] Sustained turn velocity
 n_sust = 4.16                   # [-] Sustained turn load factor
 h_a = Q_("600 m")                      # [m] Manouevring height
 rho_a = ISA.isacal(h_a.magnitude)[2]       # [kg/m^3] Manouevring density
-rho_a *= ureg("kg/(m**3)")
+rho_a *= Q_(" 1 kg/m**3")
 S_wing = Geometry.Wing.S                 # Wing span for next calc.
 g0 = Q_("9.80665 m/s**2")
 V_a_hld = np.sqrt((2*g0*mtow)/(cl_max_hld*rho_a*S_wing))   # Man. Veloc. at with HLD
