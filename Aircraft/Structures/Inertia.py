@@ -5,7 +5,7 @@ Department: Inertia
 Last updated: 06/06/2018 12:41 by Midas
 """
 import sys
-import unittest
+#import unittest
 sys.path.append('../') # This makes sure the parent directory gets added to the system path
 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
@@ -161,28 +161,28 @@ def axis_transformation(I_zz, I_yy, I_zy, rot_angle):
 
 
 # VERIFICATION TESTS
-class InertiaTestCase(unittest.TestCase):
-    def setUp(self):
-        self.Inertias = calc_stringer_inertia(Q_("50 mm"), Q_("20 mm"), Q_("2 mm"))
-        self.I_xx_centr = self.Inertias[1][0]
-        self.I_xx_centr.ito(ureg("mm**4"))
-        self.I_yy_centr = self.Inertias[1][1]
-        self.I_yy_centr.ito(ureg("mm**4"))
-        self.I_xy_centr = self.Inertias[1][2]
-        self.I_xy_centr.ito(ureg("mm**4"))
-
-    def test_Ixx_centroid(self):
-        self.assertAlmostEqual(self.I_xx_centr.magnitude, 36092.39, 1,
-                               msg="Verification of I_xx for stringer with SolidWorks FAILED")
-
-    def test_Iyy_centroid(self):
-        self.assertAlmostEqual(self.I_yy_centr.magnitude, 3652.39, 1,
-                               msg="Verification of I_yy for stringer with SolidWorks FAILED")
-
-    def test_Ixy_centroid(self):
-        self.assertAlmostEqual(self.I_xy_centr.magnitude, 6352.94, 1,
-                               msg="Verification of I_xy for stringer with SolidWorks FAILED")
-
-
-if __name__ == '__main__':
-    unittest.main()
+#class InertiaTestCase(unittest.TestCase):
+#    def setUp(self):
+#        self.Inertias = calc_stringer_inertia(Q_("50 mm"), Q_("20 mm"), Q_("2 mm"))
+#        self.I_xx_centr = self.Inertias[1][0]
+#        self.I_xx_centr.ito(ureg("mm**4"))
+#        self.I_yy_centr = self.Inertias[1][1]
+#        self.I_yy_centr.ito(ureg("mm**4"))
+#        self.I_xy_centr = self.Inertias[1][2]
+#        self.I_xy_centr.ito(ureg("mm**4"))
+#
+#    def test_Ixx_centroid(self):
+#        self.assertAlmostEqual(self.I_xx_centr.magnitude, 36092.39, 1,
+#                               msg="Verification of I_xx for stringer with SolidWorks FAILED")
+#
+#    def test_Iyy_centroid(self):
+#        self.assertAlmostEqual(self.I_yy_centr.magnitude, 3652.39, 1,
+#                               msg="Verification of I_yy for stringer with SolidWorks FAILED")
+#
+#    def test_Ixy_centroid(self):
+#        self.assertAlmostEqual(self.I_xy_centr.magnitude, 6352.94, 1,
+#                               msg="Verification of I_xy for stringer with SolidWorks FAILED")
+#
+#
+#if __name__ == '__main__':
+#    unittest.main()
