@@ -1,0 +1,28 @@
+load ../Airfoil.dat
+    panel
+    panel
+    plop
+    g f
+    
+    gdes
+    f
+    0.75
+    999
+    0.5
+    30
+    x
+    
+    oper
+    visc 8000000
+    M 0.3128
+    type 1
+    pacc
+Airfoil_results.dat
+    
+    iter
+ 100 
+    seqp
+    aseq 0 25 0.5 
+    
+    
+    quit
