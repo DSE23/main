@@ -1,0 +1,31 @@
+load ../Airfoil.dat
+    panel
+    panel
+    plop
+    g f
+    
+    gdes
+    f
+    0.75
+    999
+    0.5
+    30
+    x
+    
+    ppar
+    N
+    200
+    
+    
+    psav flappedairfoil.dat
+    oper
+    visc 8000000
+    M 0.3128
+    type 1
+    iter 1000 
+    seqp
+    a 11.5
+    cpwr cp.dat
+    
+    
+    quit

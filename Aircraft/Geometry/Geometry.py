@@ -26,6 +26,7 @@ class Wing(object):
     taper = 0.45                # Taper ratio
     c_r = Q_("2.015 m")                 # Root chord
     c_t = c_r * taper           # Tip chord
+    c_avg = (c_r + c_t)/2       #Average chord
     Sweep_25 = 0                # [deg] Quarter chord sweep
     Sweep_25 *= Q_('deg')
     Sweep_50 = m.degrees(m.atan(m.tan(m.radians(Sweep_25))-(4/A) *
@@ -54,7 +55,7 @@ class Fuselage(object):
     h_f = Q_("1.1 m")                   # [m] Fuselage height
     front_A = Q_("0.98 m**2")              # [m^2] Frontal area
     S_wet_f= Q_("14.94 m**2")              # [m^2] Fuselage wetted area
-    
+
 class H_tail(object):
     
     S = Q_("2.629 m**2")                 # [m^2] Horizontal tail surface
@@ -138,3 +139,15 @@ class CG(object):
     CG_flaperons = XLEMAC + Wing.MAC           # CG Flaperons
     CG_pilot = Q_("2.235 m")                   # CG Pilot relative to nose
     CG_fuel = Q_("1.18 m")                     # CG fuel
+    CG_OEW = (Masses.W_wing * CG_wing + Masses.W_htail * CG_htail + Masses.W_vtail\
+              * CG_vtail + Masses.W_fus * CG_fus + Masses.W_gear * CG_lgear\
+              + Masses.W_engine * CG_engine + Masses.W_prop * CG_prop\
+              + Masses.W_fuelsys * CG_fuelsys + Masses.W_hydraulic * CG_hydraulics\
+              + Masses.W_elecsys * CG_elecsys + Masses.W_flightcontrol *\
+              CG_flightcon + Masses.W_avionics * CG_avionics + Masses.W_lehld *\
+              CG_lehld + Masses.W_flaperons * CG_flaperons)/Masses.W_OEW
+    CG_wpilot = (CG_OEW * Masses.W_OEW + Masses.W_pilot * CG_pilot)/\
+                (Masses.W_OEW+ Masses.W_pilot)
+    CG_mtow = (CG_wpilot*(Masses.W_OEW+ Masses.W_pilot)+CG_fuel * Masses.W_fuel)\
+              /(Masses.W_MTOW)
+              
