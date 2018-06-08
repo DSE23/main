@@ -52,6 +52,9 @@ airfoilinterpolant = sp.interpolate.interp1d(
 def airfoilordinate(x):
     return airfoilinterpolant(x)
 
+
+
+
 TR = airfoilordinate(0.15)*ChordR                            #max thickness root in m
 TT = TR*t                                   #max thickness tip in m
 
