@@ -40,9 +40,8 @@ Vh_V = Aero_HT.Vh_v
 Cbar = Geometry.Wing.MAC
 I_yy = Inertia.I_yy
 K_yy = (I_yy/MTOW)/(b**2)
-g = IP.g0
 CNW_alpha = Aero_wing.C_Nw_alpha
-X_w = Geometry.CG.XLEMAC + 0.25* Geometry.Wing.MAC      # CoP of main wing
+X_w = Geometry.CG.XLEMAC + 0.25 * Geometry.Wing.MAC      # CoP of main wing
 X_cg = Geometry.CG.CG_mtow
 mu_c = MTOW/(rho_a*Cbar*S_wing)
 
@@ -58,10 +57,10 @@ C_L = MTOW/(0.5*rho_a*V_a**2*S_wing)
 
 # Stability Derivatives (Longitudinal)
 
-CX0 = (MTOW * g)/(0.5 * rho_a * V_a**2 * S_wing) * m.sin(gamma_0)
+CX0 = (MTOW * g0)/(0.5 * rho_a * V_a**2 * S_wing) * m.sin(gamma_0)
 CXu = -2 * C_L * m.tan(gamma_0)
 CX_alpha = C_L * (1-(2*CL_alpha))/(Oswald_e*A*m.pi)
-CZ0 = -(MTOW * g)/(0.5*rho_a*V_a**2*S_wing)*m.cos(gamma_0)
+CZ0 = -(MTOW * g0)/(0.5*rho_a*V_a**2*S_wing)*m.cos(gamma_0)
 CZu = -2*C_L
 CZ_alpha = -CL_alpha
 CZ_alphadot = -CNH_alpha * Vh_V**2 * dE_dalpha * S_h * l_h / (S_wing * Cbar)
@@ -70,9 +69,9 @@ Cmu = 0
 Cm_alpha = CNW_alpha * (X_cg - X_w) / Cbar - CNH_alpha * (1-dE_dalpha)*Vh_V**2\
             * S_h * l_h / (S_wing * Cbar)
 Cm_alphadot = - CNH_alpha*(Vh_V)**2*S_h*l_h**2/(S_wing*Cbar**2)*dE_dalpha
-Cmq = -1.1 * CNH_alpha * Vh_V**2 * (S_h*l_h**2)/(S * Cbar**2)
+Cmq = -1.1 * CNH_alpha * Vh_V**2 * (S_h*l_h**2)/(S_wing * Cbar**2)
 
-#CAP
+# CAP
 
 A_sp = -2 * mu_c * K_yy * (CZ_alphadot - 2 * mu_c)          # A for the Short period
 B_sp = -CX_alpha * 2 * mu_c * K_yy + Cmq * (CZ_alphadot -2 * mu_c)\
