@@ -3,7 +3,7 @@ Created on Wed May 18 12:15:59 2016
 
 @author: Jordy
 """
-import math
+import math as m  
 import time
 import Calc_ISA_100km
 import cl_cd
@@ -115,16 +115,16 @@ while running:
     df = 0.
     
     # 2) Compute the angles of attack
-    Vc = math.sqrt(u*u + v*v + w*w)
+    Vc = m.sqrt(u*u + v*v + w*w)
     
-    aoa = math.atan2(w,u)
-    aoa_dot = (u*w_dot - w*u_dot) / math.sqrt(u*u + w*w)
+    aoa = m.atan2(w,u)
+    aoa_dot = (u*w_dot - w*u_dot) / m.sqrt(u*u + w*w)
 
-    beta = (v_dot * math.sqrt(u*u + w*w) - v*(u*u_dot + w*w_dot))/(math.sqrt(u*u+w*w) * (u*u + v*v +w*w))
+    beta = (v_dot * m.sqrt(u*u + w*w) - v*(u*u_dot + w*w_dot))/(m.sqrt(u*u+w*w) * (u*u + v*v +w*w))
     
     # 3) Coefficients of aerodynamic forces
-    Cl = cl_cd.nonlinear(math.degrees(aoa))[0]
-    Cd = cl_cd.nonlinear(math.degrees(aoa))[1]
+    Cl = cl_cd.nonlinear(m.degrees(aoa))[0]
+    Cd = cl_cd.nonlinear(m.degrees(aoa))[1]
     
     # 4) Coefficients of aerodynamic moments in pitch
     # 5) Coefficients of aerodynamic moments in roll
@@ -139,9 +139,9 @@ while running:
     # 8) Engine forces and moments
     # 9) Gear forces and moments
     # 10) Resolve body frame forces
-    Fx = Lift * math.sin(aoa) - Drag * math.cos(aoa) - m*g * math.sin(theta) + Thrust
-    Fy = m*g*math.sin(phi)*math.cos(theta)
-    Fz = - Lift * math.cos(aoa) - Drag * math.sin(aoa) + m*g * math.cos(theta) * math.cos(phi)
+    Fx = Lift * m.sin(aoa) - Drag * m.cos(aoa) - m*g * m.sin(theta) + Thrust
+    Fy = m*g*m.sin(phi)*m.cos(theta)
+    Fz = - Lift * m.cos(aoa) - Drag * m.sin(aoa) + m*g * m.cos(theta) * m.cos(phi)
     
     # 11) Body frame accelerations
     u_dot = Fx/m
@@ -163,7 +163,7 @@ while running:
     
     # 16) Latitude and Longitude rates
     labda_dot = Vn/(Rearth+h)
-    mu_dot    = Ve/(math.cos(math.radians(labda)) * (Rearth+h))
+    mu_dot    = Ve/(m.cos(m.radians(labda)) * (Rearth+h))
     h_dot     = -Vd
     
     # 17) Aircraft position
@@ -172,18 +172,18 @@ while running:
     h     = h  + h_dot * dt
     
     # 18) Body rates in stability axis
-    p_stab = p * math.cos(aoa) + r * math.sin(aoa)
-    r_stab = r * math.cos(aoa) - p * math.sin(aoa)
+    p_stab = p * m.cos(aoa) + r * m.sin(aoa)
+    r_stab = r * m.cos(aoa) - p * m.sin(aoa)
     
     # 19) Body frame moments in stability axis
-    Mstab = 0.5 * Calc_ISA_100km.isacal(h)[2] * Vc*Vc * S * c*(Cm0 + Cma*aoa + Cmde*math.radians(de)) + 0.25 * Calc_ISA_100km.isacal(h)[2] * Vc * S * c*c * (Cmq*q + Cmadot * aoa_dot)
-    Lstab = 0.5 * Calc_ISA_100km.isacal(h)[2] * Vc*Vc * S * b*(Clbeta*beta + Clda*math.radians(da) + Cldr*math.radians(dr)) + 0.25 * Calc_ISA_100km.isacal(h)[2] * Vc * S * b*b*(Clp*p_stab + Clr*r_stab)
-    Rstab = 0.5 * Calc_ISA_100km.isacal(h)[2] * Vc*Vc * S * b*(Cnbeta*beta + Cnda*math.radians(da) + Cndr*math.radians(dr)) + 0.25 * Calc_ISA_100km.isacal(h)[2] * Vc * S * b*b*(Cnp*p_stab + Cnr*r_stab)
+    Mstab = 0.5 * Calc_ISA_100km.isacal(h)[2] * Vc*Vc * S * c*(Cm0 + Cma*aoa + Cmde*m.radians(de)) + 0.25 * Calc_ISA_100km.isacal(h)[2] * Vc * S * c*c * (Cmq*q + Cmadot * aoa_dot)
+    Lstab = 0.5 * Calc_ISA_100km.isacal(h)[2] * Vc*Vc * S * b*(Clbeta*beta + Clda*m.radians(da) + Cldr*m.radians(dr)) + 0.25 * Calc_ISA_100km.isacal(h)[2] * Vc * S * b*b*(Clp*p_stab + Clr*r_stab)
+    Rstab = 0.5 * Calc_ISA_100km.isacal(h)[2] * Vc*Vc * S * b*(Cnbeta*beta + Cnda*m.radians(da) + Cndr*m.radians(dr)) + 0.25 * Calc_ISA_100km.isacal(h)[2] * Vc * S * b*b*(Cnp*p_stab + Cnr*r_stab)
     
     # 20) Body frame moments in body frame axis
-    M = Mstab + Lift*(cg-0.25)*c*math.cos(aoa) + Drag*(cg-0.25)*c*math.sin(aoa)
-    L = Lstab*math.cos(aoa) - Rstab*math.cos(aoa) 
-    R = Rstab*math.cos(aoa) + Lstab*math.sin(aoa) - sideforce*(cg-0.25)*c 
+    M = Mstab + Lift*(cg-0.25)*c*m.cos(aoa) + Drag*(cg-0.25)*c*m.sin(aoa)
+    L = Lstab*m.cos(aoa) - Rstab*m.cos(aoa) 
+    R = Rstab*m.cos(aoa) + Lstab*m.sin(aoa) - sideforce*(cg-0.25)*c 
     
     # 21) Body frame angular accelerations
     p_dot = (L + (Iyy-Izz)*q*r + Ixz*(r_dot*p + p*q))/Ixx
@@ -221,21 +221,20 @@ while running:
     
     
     # 25) Euler angles
-    theta = math.asin(-a31)
-    phi   = math.atan2(a32,a33)
-    psy   = math.atan2(a21,a11)
+    theta = m.asin(-a31)
+    phi   = m.atan2(a32,a33)
+    psy   = m.atan2(a21,a11)
     
     
     if trunning > 1:
         running = False
         
     print ('Fx:',Fx)
-    print ('Theta:',math.degrees(theta))
-    print ("Lift Value:",Lift * math.sin(aoa))
-    print ("Drag Value:",- Drag * math.cos(aoa))
-    print ("Mass Value:",- m*g * math.sin(theta))
+    print ('Theta:',m.degrees(theta))
+    print ("Lift Value:",Lift * m.sin(aoa))
+    print ("Drag Value:",- Drag * m.cos(aoa))
+    print ("Mass Value:",- m*g * m.sin(theta))
     print ("")
     Thrust = 2600.
-
 
 print("Ready")
