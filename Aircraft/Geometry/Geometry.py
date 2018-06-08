@@ -84,7 +84,7 @@ class Landing_gear(object):
     lg_wheel_w = Q_("0.16 m")                       # [m] Lg wheel width
 
 
-class Masses(object):
+class Masses(object):                    # !!!Structures should watch this!!!
     W_wing = Q_("121 kg")                # [kg] Mass of the wing
     W_htail = Q_("18 kg")                # [kg] Mass of H_tail
     W_vtail = Q_("6 kg")                 # [kg] Mass of V_tail
@@ -104,9 +104,25 @@ class Masses(object):
             W_avionics + W_elecsys + W_lehld + W_flaperons
     W_pilot = Q_("100 kg")              # [kg] Mass of pilot
     W_fuel = Q_("57 kg")                # [kg] Mass of fuel
+    W_MTOW = W_OEW + W_pilot + W_fuel
+
 
 class CG(object):
     CG_wing_mac = 0.5                   # CG location of wing as percentage of MAC
     XLEMAC = Q_("1.24 m")               # LEMAC position
-    CG_wing = CG_wing_mac*Wing.MAC + XLEMAC # Wing CG position
-    
+    CG_wing = CG_wing_mac*Wing.MAC + XLEMAC     # Wing CG position relative to nose
+    CG_htail = H_tail.X_h + H_tail.MAC * 0.5    # H-tail cg relative to nose
+    CG_vtail = V_tail.X_v + V_tail.b * 0.5      # V-tail cg relative to nose
+    CG_fus = Q_("2.88 m")                      # CG fuselage relative to nose !!!update!!!
+    CG_lgear = 0.23 * Fuselage.l_f      # CG LG relative to nose !!!update!!!
+    CG_engine = 0.474 * Q_("1.1 m")            # CG of the engine relative to nose
+    CG_prop = Q_("-0.1 m")                     # CG propellor !!!update!!!    
+    CG_fuelsys = Q_("1.18 m")                  # CG fuel system !!!update!!!
+    CG_hydraulics = Q_("1.115 m")              # CG hydraulics !!!update!!!
+    CG_flightcon = Q_("2.035 m")               # CG flight controls !!!update!!!
+    CG_avionics = Q_("2.035 m")                # CG Avionics !!!update!!!
+    CG_elecsys = Q_("1.935 m")                 # CG electronic system !!!update!!!
+    CG_lehld = XLEMAC                          # CG leading edge HLD's
+    CG_flaperons = XLEMAC + Wing.MAC           # CG Flaperons
+    CG_pilot = Q_("2.235 m")                   # CG Pilot relative to nose
+    CG_fuel = Q_("1.18 m")                     # CG fuel
