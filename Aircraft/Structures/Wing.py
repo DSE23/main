@@ -11,6 +11,7 @@ import scipy as sp
 from scipy import interpolate
 import math as m
 from Geometry import Geometry
+
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
 A = Geometry.Wing.A                         #Estimate aspect ratio
