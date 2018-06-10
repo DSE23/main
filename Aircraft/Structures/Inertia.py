@@ -21,7 +21,7 @@ Ixx_aircraft = Q_("1016.9 kg/m/m")
 Izz_aircraft = Q_("2447.2 kg/m/m")
 
 
-def get_perim_from_x(x_coor, dat_file_name="../airfoil.dat"):
+def get_perim_from_x(x_coor, dat_file_name="../Airfoil.dat"):
     """
     This function returns the perimeter value from the LE until the specified x-coordinate
 
@@ -48,7 +48,7 @@ def get_perim_from_x(x_coor, dat_file_name="../airfoil.dat"):
     return perim
 
 
-def get_coord_from_perim(n_st, start_x, end_x, dat_file_name="../airfoil.dat"):
+def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../Airfoil.dat"):
     """
     This function returns list of coordinate values where a stiffener is placed
     based on the spar locations and number of stiffeners. The stiffeners will
@@ -62,6 +62,7 @@ def get_coord_from_perim(n_st, start_x, end_x, dat_file_name="../airfoil.dat"):
     Returns: List of x and y coordinates where the stiffeners are placed
     """
     Air_data = np.genfromtxt(dat_file_name)
+
 
     x_coords = Air_data[:81, 0]
     x_coords = np.flip(x_coords, 0)
@@ -101,7 +102,7 @@ def get_coord_from_perim(n_st, start_x, end_x, dat_file_name="../airfoil.dat"):
     plt.axis((0, 1, 0, 1))
 
     plt.show()
-    return (final_x_coord, final_y_coord, slope_angles)
+    return (final_x_coord*chord_l, final_y_coord*chord_l, slope_angles)
 
 def calc_stringer_inertia(h_str, w_str, t_str):
 
@@ -204,7 +205,7 @@ print('this is', Calc_skin_inertia_Iyy(Wing.ChSpar1, Wing.ChSpar2))
 
 
 # print(calc_stringer_Inertia(Q_("50 mm"),Q_("20 mm"),Q_("2 mm")))
-
+print(get_coord_from_perim(5, 0.2, 0.6, Q_("7 m")))
 
 # function for transforming axis to a rotated version
 # input MMOI I_zz, I_yy, I_zy, and rotation angle rot_angle

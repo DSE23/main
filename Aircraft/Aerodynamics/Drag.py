@@ -26,6 +26,11 @@ loc_max_tc_wing = # 0 if t/c max is < 30%c, 1 if t/c max is >= 30%c
 loc_max_tc_ht = # 0 if t/c max is < 30%c, 1 if t/c max is >= 30%c
 loc_max_tc_vt = # 0 if t/c max is < 30%c, 1 if t/c max is >= 30%c
 Sref = Geometry.Wing.S
+CL_wing = 
+AR_wing = Geometry.Wing.A
+CL_ht =
+AR_ht = Geometry.H_tail.A
+span_eff = 0.792 #span efficiency factor for lift induced drag calcs
 
 
 #Standard values Inputs
@@ -64,16 +69,22 @@ for lift_surface in np.array(['wing', 'ht', 'vt']):
         loc_max_tc = loc_max_tc_wing
         airfoil_co = airfoil_co_wing
         Swet = 2 * Geometry.Wing.A
+        CL = CL_wing
+        A = AR_wing
     elif lift_surface == 'ht':
         chord = chord_ht
         loc_max_tc = loc_max_tc_ht
         airfoil_co_ht = airfoil_co_ht
         Swet = 2 * Geometry.H_tail.A
+        CL = CL_ht
+        A = AR_ht
     elif lift_surface == 'vt':
         chord = chord_vt
         loc_max_tc = loc_max_tc_vt
         airfoil_co_vt = airfoil_co_vt
         Swet = 2 * Geometry.V_tail.A
+        CL = 0
+        A = 1 #value doesn't matter for this, as long as CL = 0
         
     #(Reynolds number calculation        
     Reynolds = density * velocity * chord / viscosity #definition Reynolds number
@@ -114,6 +125,9 @@ for lift_surface in np.array(['wing', 'ht', 'vt']):
     CDO_lifting_s = C_skinfric * (1 + Lpara * average_thickness + 100 *
                                   average_thickness ** 4) * Rls_para *
                                   Swet/Sref
+    
+    #Lift induced drag
+    CDi = CL**2 / m.pi / AR / span_eff
 
 # Body Drag
 
