@@ -12,7 +12,7 @@ import math as m
 import numpy as np
 sys.path.append('../')
 
-from Misc import Q_
+from Misc import Q_, ureg
 from Geometry import Geometry
 from Aerodynamics import Wing as Aero_wing
 from Aerodynamics import HT as Aero_HT
@@ -41,7 +41,7 @@ dE_dalpha = Aero_wing.de_da
 Vh_V = Aero_HT.Vh_v
 Cbar = Geometry.Wing.MAC
 I_yy = Inertia.I_yy
-K_yy = (I_yy/MTOW)/(b**2)
+K_yy = np.sqrt(I_yy/MTOW)/(b)
 CNW_alpha = Aero_wing.C_Nw_alpha
 X_w = Geometry.CG.XLEMAC + 0.25 * Geometry.Wing.MAC      # CoP of main wing
 X_cg = Geometry.CG.CG_mtow
@@ -95,5 +95,6 @@ B_ph = 2 * mu_c * (CXu * Cm_alpha - Cmu * CX_alpha) + Cmq * \
        (CZu * CX_alpha - CXu * CZ_alpha)
 C_ph = - CZ0 * (Cmu * CZ_alpha - CZu * Cm_alpha)
 Det_ph = B_ph**2 - 4 * A_ph * B_ph
-Re_sp = -B_ph/(2 * A_ph)
-Img_sp = m.sqrt(abs(Det_ph))/(2*A_ph)
+Re_ph = -B_ph/(2 * A_ph)
+Img_ph = m.sqrt(abs(Det_ph))/(2*A_ph)
+Damping_ph = -Re_ph/np.sqrt(Re_ph**2+Img_ph**2)
