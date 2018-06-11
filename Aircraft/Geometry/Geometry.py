@@ -73,6 +73,7 @@ class H_tail(object):
     delta_e = m.radians(30)     # Max elevator deflection
     X_h = Q_("5.27 m")                  # [m] 0.25C location compared to the nose
     Z_h = Q_("0.55 m")                  # [m] Distance MAC_h and zero lift line wing
+    i_h = Q_("0 rad")                   #incidence angle ht
     
 class V_tail(object):
     
