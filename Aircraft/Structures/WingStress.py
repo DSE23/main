@@ -42,33 +42,32 @@ M = Q_('0 kg * m ** 2 / s**2')
 Llist = np.array([])
 zslist = np.array([])
 
-while zs > z:
+while zs > z:                               #zs is measured is m from
     Areaofsection = sectionlength*Wing.length_chord(zs)
-    dL = cl * 0.5 * rho * (V**2) * Areaofsection
-    dD = cd * 0.5 * rho * (V**2) * Areaofsection        #Lift times the section length
-    dM = cm * 0.5 * rho * (V ** 2) * Areaofsection * Wing.length_chord(zs)
-    dL_moment = zs * dL
-    dD_moment = zs * dD
-    L = L + dL
-    D = D + dD
-    M = M + dM
-    L_moment = L_moment + dL_moment
+    dL = cl * 0.5 * rho * (V**2) * Areaofsection                #lift of the section
+    dD = cd * 0.5 * rho * (V**2) * Areaofsection        #drag of the section
+    dM = cm * 0.5 * rho * (V ** 2) * Areaofsection * Wing.length_chord(zs)      #moment of the section
+    dL_moment = zs * dL                                 #moment produced by the lift on section
+    dD_moment = zs * dD                                 #drag prduced by the drag on the section
+    L = L + dL                      #Total lift for one wing
+    D = D + dD                      #Total drag for one wing
+    M = M + dM                      #Total moment for one wing
+    L_moment = L_moment + dL_moment     #Total bending moment or
     D_moment = D_moment + dD_moment
 
-    Llist = np.append(Llist, L)
+    Llist = np.append(Llist, dL)            #put the values in a list so we can plot them
     zslist = np.append(zslist, abs(zs))
 
-    zs = zs - sectionlength
+    zs = zs - sectionlength                 #Select other section for the next loop
 
-print(zslist)
-print('L sum ', L)
+print('L sum ', L)                  #print the values
 print('D sum ', D)
 print('M sum ', M)
 print('L_moment', L_moment)
 print('D_moment', D_moment)
 
-plt.plot(zslist, Llist)
-plt.show()
+# plt.plot(zslist, Llist)
+# plt.show()
 
 
 
