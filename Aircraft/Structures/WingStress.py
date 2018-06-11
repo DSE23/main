@@ -18,6 +18,8 @@ from Structures import Wing
 #from Aerodynamics import Wing as AWing
 from Aerodynamics import Wing as AWing
 from Performance import Performance
+import matplotlib.pyplot as plt
+
 
 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
@@ -25,36 +27,51 @@ from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
 cl, cd, cm = AWing.computeloads()           #Load aerodynamic properties
 n = 20                      #number of the devided sections
-b = Geometry.Wing.b         #Wing span
+b = Geometry.Wing.b/2         #Wing span
 z = Wing.z      #Span wise postion of the wing in m
 ChordR = Geometry.Wing.c_r      #root chord in m
 rho = Performance.rho_c         #cruise density
 V = Performance.V_cruise        #cruise speed
-zs = b - b/(n*2)                   #subtract, zodat hij bij de eerste sectie op de helft begint
+zs = b - b/(n*2)     #subtract, zodat hij bij de eerste sectie op de helft begint
 sectionlength = b/n
-L_moment = Q_('0 kg * m ** 3 / s**2')
-D_moment = Q_('0 kg * m ** 3 / s**2')
-
+L_moment = Q_('0 kg * m ** 2 / s**2')
+D_moment = Q_('0 kg * m ** 2 / s**2')
+L = Q_('0 kg * m / s**2')
+D = Q_('0 kg * m / s**2')
+M = Q_('0 kg * m ** 2 / s**2')
+Llist = np.array([])
+zslist = np.array([])
 
 while zs > z:
-    av_chord = (Wing.length_chord(z)+Wing.length_chord(b))/2        #average chord right from the crossection (m)
-    spanleft = b - z
-    Arealeft = spanleft*av_chord
-    L = cl * 0.5 * rho * (V**2) * Arealeft
-    D = cd * 0.5 * rho * (V**2) * Arealeft
-    LoverSection = L * sectionlength                                             #Lift times the section length
-    dL_moment = zs * LoverSection
-    DoverSection = D * sectionlength
-    dD_moment = zs * DoverSection
+    Areaofsection = sectionlength*Wing.length_chord(zs)
+    dL = cl * 0.5 * rho * (V**2) * Areaofsection
+    dD = cd * 0.5 * rho * (V**2) * Areaofsection        #Lift times the section length
+    dM = cm * 0.5 * rho * (V ** 2) * Areaofsection * Wing.length_chord(zs)
+    dL_moment = zs * dL
+    dD_moment = zs * dD
+    L = L + dL
+    D = D + dD
+    M = M + dM
     L_moment = L_moment + dL_moment
     D_moment = D_moment + dD_moment
 
+    Llist = np.append(Llist, L)
+    zslist = np.append(zslist, abs(zs))
+
     zs = zs - sectionlength
 
+print(zslist)
+print('L sum ', L)
+print('D sum ', D)
+print('M sum ', M)
 print('L_moment', L_moment)
 print('D_moment', D_moment)
 
-M = cm * 0.5 * rho * (V**2) * Arealeft * Wing.length_chord(z)
+plt.plot(zslist, Llist)
+plt.show()
+
+
+
 
 
 

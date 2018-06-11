@@ -18,7 +18,7 @@ from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
 A = Geometry.Wing.A                         #Estimate aspect ratio
 t = Geometry.Wing.taper                         #Estimate taper
-s = Geometry.Wing.b                #Estimate span (m)
+s = Geometry.Wing.b/2                #Estimate span (m)
 Lambda25 = 0                    #Quarter chord sweep
 CtoT = 0.15                     #Max Chord to thickness ratio
 Spar2R = 1-0.18                      #Chordwise location of second spar at the root
