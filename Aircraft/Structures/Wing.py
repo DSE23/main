@@ -3,6 +3,7 @@ Name: Wing
 Department: Geometry
 Last updated: 06/06/2018 12:38 by Boris 
 """
+# x is chordwise from LE to TE. y is positive upwards.
 import sys
 sys.path.append('../') # This makes sure the parent directory gets added to the system path
 

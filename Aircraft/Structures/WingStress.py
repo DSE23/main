@@ -71,10 +71,10 @@ shear_modulus = Q_("36 GPa") #G
 
 
 def Normal_stress_due_to_bending(zs, cs, y): # Normal stress due to bending
-    denominator_inertia_term = Inertia.Ixx*Inertia.Iyy-Inertia.Ixy**2
-    inertia_term_1 = (Inertia.Iyy*y-Inertia.Ixy*cs)/denominator_inertia_term
-    inertia_term_2 = (Inertia.Ixx*cs-Inertia.Ixy*y)/denominator_inertia_term
-    sigma_zs = Mx*inertia_term_1 + My*inertia_term_2
+    denominator_inertia_term = Inertia.Ixx_wb*Inertia.Iyy_wb-Inertia.Ixy_wb**2
+    inertia_term_1 = (Inertia.Iyy_wb*y-Inertia.Ixy_wb*cs)/denominator_inertia_term
+    inertia_term_2 = (Inertia.Ixx_wb*cs-Inertia.Ixy_wb*y)/denominator_inertia_term
+    sigma_zs = D_moment*inertia_term_1 + L_moment*inertia_term_2
     return sigma_zs #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
 def Pure_torsion(zs):
@@ -82,7 +82,8 @@ def Pure_torsion(zs):
     length_skin = Wing.Area/Wing.ThSkin
     length_spar1 = Wing.airfoilordinate(Wing.ChSpar1)
     length_spar2 = Wing.airfoilordinate(Wing.ChSpar2)
-    const_tor = T/(2*A_cell**2*shear_modulus) #constant term in twist formula
+    const_tor = M/(2*A_cell**2*shear_modulus) #constant term in twist formula
     line_int_tor = (length_skin*2/Wing.t_skin+length_spar1/Wing.ThSpar1+length_spar2/Wing.ThSpar2) #result from line integral from torsion formula
     twist_wb = const_tor*line_int_tor
     return twist_wb
+
