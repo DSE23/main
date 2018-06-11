@@ -56,7 +56,7 @@ class Fuselage(object):
     front_A = Q_("0.98 m**2")              # [m^2] Frontal area
     S_wet_f= Q_("14.94 m**2")              # [m^2] Fuselage wetted area
     cabin_w = Q_("0.6 m")               # [m] cabin width (inside)
-
+    A_max_canopy = Q_(" m**2")          # [m^2], coming from catia
 class H_tail(object):
     
     S = Q_("2.629 m**2")                 # [m^2] Horizontal tail surface
