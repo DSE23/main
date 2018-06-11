@@ -147,6 +147,7 @@ def Area_Skin_x_c(Spar1, Spar2):                            #Input deminsionless
     dx = ((Spar2-Spar1)/n)
     x = Spar1
     Areaxc = 0
+    arclength
     for i in range(n):
         x = x + dx
         dxlength = dx * Chordlength
@@ -154,9 +155,10 @@ def Area_Skin_x_c(Spar1, Spar2):                            #Input deminsionless
         dlength = np.sqrt(dxlength**2+dylength**2)
         dArea = dlength * ThSkin
         dAreaxc = dArea * x * Chordlength
+        arclength += dlength
         Areaxc = Areaxc + dAreaxc
     Areaxc = Areaxc * 2                                         #Area times chord for both sides of the airfoil (therefore times 2)
-    return Areaxc
+    return Areaxc, arclength
 
 ## Area of cell enclosed by the wing skin and the stringers
 def Area_cell():
@@ -183,7 +185,6 @@ def stif_loc(z, n_st, cs):
         dylength = abs(airfoilordinate(x - dx) - airfoilordinate(x)) * Chordlength
         dlength = np.sqrt(dxlength**2+dylength**2)
         total_perimeter += dlenght
-    #total_perimeter = sp.integrate.quad(Wing.airfoilordinate(x), Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), Wing.Chord_loc_Spar(z,Wing.Spar2R,Wing.Spar2T)) #m
     spacing = total_perimeter / ((n_st + 1) / 2)
     x_y_angle_coords = []
     for i in range(n_st):

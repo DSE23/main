@@ -87,3 +87,21 @@ def Pure_torsion(zs):
     twist_wb = const_tor*line_int_tor
     return twist_wb
 
+def Shear_wb(zs):
+    #section 01
+    section01at1 = Wing.ThSpar1*Wing.HSpar1**2
+    #section12
+    n = 100 #number of sections
+    dx = (Wing.arclength/n)
+    x = 0
+    line_int_skin_wb = section01at1
+    for i in range(n):
+        x = x + dx
+        dline_int_skin_wb = x * Inertia.get_y_for_perimeter(x)
+        line_int_skin_wb += dline_int_skin_wb
+    section12at2 = Wing.ThSkin * line_int_skin_wb
+    #section23
+    section23at3 = section12at2 - Wing.ThSpar2*Wing.HSpar2**2
+    qs = -L/Inertia.Ixx_wb*(section01+section12+section23)
+    
+    return qs, qb
