@@ -99,12 +99,12 @@ def Shear_wb(zs):
     section01at1 = Wing.ThSpar1*Wing.HSpar1**2
     #section12
     n = 100 #number of sections
-    dx = (Wing.arclength/n)
-    x = 0
+    ds = (Wing.arclength/n)
+    s = 0
     line_int_skin_wb = section01at1
     for i in range(n):
-        x = x + dx
-        dline_int_skin_wb = x * Inertia.get_y_for_perimeter(x)
+        s = s + ds
+        dline_int_skin_wb = s * Inertia.get_y_for_perimeter(x)
         line_int_skin_wb += dline_int_skin_wb
     section12at2 = Wing.ThSkin * line_int_skin_wb
     #section23
@@ -114,7 +114,7 @@ def Shear_wb(zs):
     return qs, qbase
 
 
-def Pure_torsion(zs, qbase):
+def Pure_torsion(qbase):
     A_cell = Wing.Area_cell()
     length_skin = Wing.Area/Wing.ThSkin
     length_spar1 = Wing.airfoilordinate(Wing.ChSpar1)
