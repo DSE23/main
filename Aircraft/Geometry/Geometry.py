@@ -55,6 +55,7 @@ class Fuselage(object):
     h_f = Q_("1.1 m")                   # [m] Fuselage height
     front_A = Q_("0.98 m**2")              # [m^2] Frontal area
     S_wet_f= Q_("14.94 m**2")              # [m^2] Fuselage wetted area
+    cabin_w = Q_("0.6 m")               # [m] cabin width (inside)
 
 class H_tail(object):
     

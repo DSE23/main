@@ -16,6 +16,8 @@ from Misc import Q_, ureg
 from Geometry import Geometry
 from Aerodynamics import Wing as Aero_wing
 from Aerodynamics import HT as Aero_HT
+from Aerodynamics import VT as Aero_VT
+from Aerodynamics import General as Aero_gen
 from Inertia import Inertia
 from Performance import Performance
 
@@ -25,9 +27,12 @@ from Performance import Performance
 # Input parameters
 gamma_0 = 0                 # Assuming level flight
 A = Geometry.Wing.A
+alpha_0 = 0                 # update
+Z_cg = 0                    # Update
 CL_alpha = Aero_wing.CL_alpha
 MTOW = Geometry.Masses.W_MTOW
 S_wing = Geometry.Wing.S
+taper = Geometry.Wing.taper
 b = Geometry.Wing.b
 V_a = (Performance.V_a_clean).magnitude
 V_a *= Q_("1 m/s")
@@ -46,14 +51,34 @@ CNW_alpha = Aero_wing.C_Nw_alpha
 X_w = Geometry.CG.XLEMAC + 0.25 * Geometry.Wing.MAC      # CoP of main wing
 X_cg = Geometry.CG.CG_mtow
 mu_c = MTOW/(rho_a*Cbar*S_wing)
-
+CY_v_alpha = Aero_VT.C_Yv_alpha
+dSig_dalpha = Aero_VT.q_dsigma_dbeta
+Vv_V = Aero_VT.Vv_V
+S_v = Geometry.V_tail.S
+Z_v = Geometry.V_tail.Z_v
+X_v = Geometry.V_tail.X_v
+CD0 = Aero_gen.CD_0
+I_xx = Inertia.I_xx
+I_zz = Inertia.I_zz
+K_xx = np.sqrt(I_xx/MTOW)/(b)
+K_zz = np.sqrt(I_zz/MTOW)/(b)
+CD0_alpha = 0                   # Assumed
 # specific parameters (only check if either Lambda or A changes)
 
 
 # Iteration values
 S_h = Geometry.H_tail.S
 l_h = Geometry.H_tail.X_h - X_cg
-# Calculated values
+
+# Values from graphs update with changing A and taper!!!
+C_l_beta_CL_A = -0.02
+dCnp_cl = -0.05
+dCnp_CD0 = 11
+CYr_cl2 = 0
+ybar_r_b = 0.5
+ybar_n_b = 0.55
+
+# Calculated value
 C_L = (MTOW*g0)/(0.5*rho_a*V_a**2*S_wing)
 
 
@@ -73,11 +98,38 @@ Cm_alpha = CNW_alpha * (X_cg - X_w) / Cbar - CNH_alpha * (1-dE_dalpha)*Vh_V**2\
 Cm_alphadot = - CNH_alpha*(Vh_V)**2*S_h*l_h**2/(S_wing*Cbar**2)*dE_dalpha
 Cmq = -1.1 * CNH_alpha * Vh_V**2 * (S_h*l_h**2)/(S_wing * Cbar**2)
 
+# Stability Derivatives (Lateral)
+z_arm = (((Z_v - Z_cg)/b)*np.cos(alpha_0)-((X_v-X_cg)/b)*np.sin(alpha_0))
+x_arm = (((Z_v - Z_cg)/b)*np.sin(alpha_0)-((X_v-X_cg)/b)*np.cos(alpha_0)) #Check this
+CYbeta_v = - CY_v_alpha * dSig_dalpha * Vv_V**2 * (S_v/S_wing)
+Clbeta_w = C_L * C_l_beta_CL_A
+Clbeta_v = CYbeta_v * z_arm
+Cnbeta_w = C_L**2/(4*m.pi*A)
+Cnbeta_v = CYbeta_v * x_arm
+Clp_w = -((CL_alpha + CD0)*Cbar*b)/(24*S_wing)*(1+3*taper)
+Cnp_w = dCnp_cl * C_L + dCnp_CD0 * CD0_alpha
+Cnp_v = -2 * CYbeta_v * x_arm
+CYr_v = 2 * CY_v_alpha * Vv_V**2 * (S_v*(X_v-X_cg))/(S_wing * b)
+Clr_w = ybar_r_b**2 * C_L
+Clr_v = CYr_v * z_arm
+Cnr_w = ybar_n_b * C_L**2/(A*m.pi)
+Cnr_v = CYr_v * x_arm
+
+CYbeta = CYbeta_v
+Clbeta = Clbeta_w + Clbeta_v
+Cnbeta = Cnbeta_w + Cnbeta_v
+Clp = Clp_w
+Cnp = Cnp_w + Cnp_v
+CYr = CYr_v
+Clr = Clr_w + Clr_v
+Cnr = Cnr_w + Cnr_v
+
+
 # CAP
 
 A_sp = -2 * mu_c * K_yy * (CZ_alphadot - 2 * mu_c)          # A for the Short period
 B_sp = -CX_alpha * 2 * mu_c * K_yy + Cmq * (CZ_alphadot -2 * mu_c)\
-        - CZq * Cm_alphadot -2 * mu_c * Cm_alpha
+        - CZq * Cm_alphadot - 2 * mu_c * Cm_alpha
 C_sp = CZ_alpha * Cmq - CZq * Cm_alpha - 2 * mu_c * Cm_alpha
 Det_sp = B_sp**2 - 4 * A_sp * B_sp
 Re_sp = -B_sp/(2*A_sp)
