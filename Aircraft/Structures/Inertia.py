@@ -267,7 +267,7 @@ def calc_total_stringer_inertia(x_y_angle_coords, stringer_inertias):
 # returns stiffener x,y locations and rotation
 # return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 x,y,rot)] m,m,rad
 
-print(calc_total_stringer_inertia(get_coord_from_perim(5, 0.2, 0.6, Q_("7 m")), calc_stringer_inertia(Q_("20 mm"), Q_("20 mm"), Q_("2 mm"))))
+print(calc_total_stringer_inertia(get_coord_from_perim(5, 0.2, 0.6, Q_("7 m")), calc_stringer_inertia(Q_("30 mm"), Q_("30 mm"), Q_("2 mm"))))
 
 #print('this is', Calc_skin_inertia_Ixx(Wing.ChSpar1, Wing.ChSpar2))
 #print('this is', Calc_skin_inertia_Iyy(Wing.ChSpar1, Wing.ChSpar2))
@@ -281,7 +281,7 @@ print(calc_total_stringer_inertia(get_coord_from_perim(5, 0.2, 0.6, Q_("7 m")), 
 #VERIFICATION TESTS
 class InertiaTestCase(unittest.TestCase):
     def setUp(self):
-        self.Inertias = calc_stringer_inertia(Q_("50 mm"), Q_("20 mm"), Q_("2 mm"))
+        self.Inertias = calc_stringer_inertia(Q_("30 mm"), Q_("30 mm"), Q_("2 mm"))
         self.I_xx_centr = self.Inertias[1][0]
         self.I_xx_centr.ito(ureg("mm**4"))
         self.I_yy_centr = self.Inertias[1][1]
