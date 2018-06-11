@@ -127,7 +127,7 @@ class CG(object):
     CG_htail = H_tail.X_h + H_tail.MAC * 0.5    # H-tail cg relative to nose
     CG_vtail = V_tail.X_v + V_tail.b * 0.5      # V-tail cg relative to nose
     CG_fus = Q_("2.88 m")                      # CG fuselage relative to nose !!!update!!!
-    CG_lgear = 0.23 * Fuselage.l_f      # CG LG relative to nose !!!update!!!
+    CG_lgear = 0.23 * Fuselage.l_f             # CG LG relative to nose !!!update!!!
     CG_engine = 0.474 * Q_("1.1 m")            # CG of the engine relative to nose
     CG_prop = Q_("-0.1 m")                     # CG propellor !!!update!!!    
     CG_fuelsys = Q_("1.18 m")                  # CG fuel system !!!update!!!
@@ -150,4 +150,4 @@ class CG(object):
                 (Masses.W_OEW+ Masses.W_pilot)
     CG_mtow = (CG_wpilot*(Masses.W_OEW+ Masses.W_pilot)+CG_fuel * Masses.W_fuel)\
               /(Masses.W_MTOW)
-              
+    Z_cg = 0                                    #  Check this!!!!!!!!!!!!!!!
