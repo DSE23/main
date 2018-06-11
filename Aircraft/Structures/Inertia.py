@@ -205,19 +205,7 @@ print('this is', Calc_skin_inertia_Iyy(Wing.ChSpar1, Wing.ChSpar2))
 # print(calc_stringer_Inertia(Q_("50 mm"),Q_("20 mm"),Q_("2 mm")))
 stiff_x_y_coord = get_coord_from_perim(5, 0.2, 0.6, Q_("7 m"))
 print(stiff_x_y_coord)
-
-# function for transforming axis to a rotated version
-# input MMOI I_zz, I_yy, I_zy, and rotation angle rot_angle
-# outputs new rotated I_uu, I_vv, I_uv
-def axis_transformation(I_zz, I_yy, I_zy, rot_angle):
-    # Axis transformation for rotated axis system used for Inertia calculations
-    I_uu = (I_zz + I_yy) * 0.5 + (I_zz - I_yy) * 0.5 * cos(2 * rot_angle) - I_zy * sin(2 * rot_angle)
-    I_vv = (I_zz + I_yy) * 0.5 - (I_zz - I_yy) * 0.5 * cos(2 * rot_angle) + I_zy * sin(2 * rot_angle)
-    I_uv = (I_zz - I_yy) * 0.5 * sin(2 * rot_angle) + I_zy * cos(2 * rot_angle)
-    return I_uu, I_vv, I_uv
-
-
- #VERIFICATION TESTS
+#VERIFICATION TESTS
 #class InertiaTestCase(unittest.TestCase):
 #    def setUp(self):
 #        self.Inertias = calc_stringer_inertia(Q_("50 mm"), Q_("20 mm"), Q_("2 mm"))
