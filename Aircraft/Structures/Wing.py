@@ -147,7 +147,7 @@ def Area_Skin_x_c(Spar1, Spar2):                            #Input deminsionless
     dx = ((Spar2-Spar1)/n)
     x = Spar1
     Areaxc = 0
-    arclength
+    arclength = 0
     for i in range(n):
         x = x + dx
         dxlength = dx * Chordlength
