@@ -5,18 +5,105 @@ Department: Inertia
 Last updated: 06/06/2018 12:41 by Midas
 """
 import sys
-#import unittest
+import unittest
 sys.path.append('../') # This makes sure the parent directory gets added to the system path
 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import numpy as np
 from scipy import integrate
 from Structures import Wing
+from scipy.interpolate import interp1d
+from matplotlib import pyplot as plt
 
 # print(Wing.h_str)
 Iyy_aircraft = Q_("1492.8 kg/m/m")
 Ixx_aircraft = Q_("1016.9 kg/m/m")
 Izz_aircraft = Q_("2447.2 kg/m/m")
+
+
+def get_perim_from_x(x_coor, dat_file_name="../Airfoil.dat"):
+    """
+    This function returns the perimeter value from the LE until the specified x-coordinate
+
+    Arguments: x_coor (x coordinate)
+               dat_file_name (name of the airfoil data file)
+
+    Returns: perim (Perimiter value)
+    """
+    Air_data = np.genfromtxt(dat_file_name)  # Imports datapoints from airfoil data file
+
+    x_coords = Air_data[:81, 0]  # We only care about 1 half of the airfoil
+    x_coords = np.flip(x_coords, 0)  # Flip them so they are in a good order
+    y_coords = Air_data[:81, 1]  # We only care about 1 half of the airfoil
+    y_coords = np.flip(y_coords, 0)  # Flip them so they are in a good order
+    p = interp1d(x_coords, y_coords, kind='cubic')  # Generate a poly spline based on the airfoil points
+
+    perim = 0  # Set initial perimiter size to 0
+    step = 0.0001  # Step size for algorithm: increase will lead to faster computing times
+    # but lower accuracy
+    # This for loop calculates the perimiter until the specified x-coordinate
+    for x_c in np.arange(0.0, x_coor, step):
+        perim += np.sqrt((step) ** 2 + (p(x_c + step) - p(x_c)) ** 2)
+
+    return perim
+
+
+def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../Airfoil.dat"):
+    """
+    This function returns list of coordinate values where a stiffener is placed
+    based on the spar locations and number of stiffeners. The stiffeners will
+    be distributed equally along the perimiter section between the spars.
+
+    Arguments: -n_st: number of stiffeners
+               -start_x: x location of the LE spar
+               -end_X: x location of the TE spar
+               -dat_file_name: name of the airfoil data file
+
+    Returns: List of x and y coordinates where the stiffeners are placed
+    """
+    Air_data = np.genfromtxt(dat_file_name)
+
+
+    x_coords = Air_data[:81, 0]
+    x_coords = np.flip(x_coords, 0)
+    y_coords = Air_data[:81, 1]
+    y_coords = np.flip(y_coords, 0)
+
+    p = interp1d(x_coords, y_coords, kind='cubic')
+
+    final_x_coord = np.array([])
+    final_y_coord = np.array([])
+    slope_angles = np.array([])
+    perim = 0
+    stif_perim = get_perim_from_x(end_x) - get_perim_from_x(start_x)
+    perim_spacing = stif_perim / (n_st + 1)
+    step = 0.0001
+    i = 0
+    print(perim_spacing)
+    for x_c in np.arange(start_x, end_x, step):
+        perim += np.sqrt((step) ** 2 + (p(x_c + step) - p(x_c)) ** 2)
+        if i >= n_st:
+            break
+        if abs(perim - perim_spacing) < 10e-5:
+            print(perim)
+            final_x_coord = np.append(final_x_coord, 0.5 * (x_c + x_c + step))
+            final_y_coord = np.append(final_y_coord, 0.5 * (p(x_c) + p(x_c + step)))
+            slope_angles = np.append(slope_angles, -np.arctan((p(x_c + step) - p(x_c)) / (step)) + np.pi)
+            perim = 0
+            i += 1
+
+    # print(perim)
+    a_ran = np.arange(0, 1, 0.0001)
+    plt.plot([start_x, start_x], [0, p(start_x)], 'b')
+    plt.plot([end_x, end_x], [0, p(end_x)], 'b')
+    plt.plot(x_coords, y_coords, '+')
+    plt.plot(a_ran, p(a_ran), 'r')
+    plt.plot(final_x_coord, final_y_coord, 'go')
+    plt.axis((0, 1, 0, 1))
+
+    plt.show()
+    return (final_x_coord*chord_l, final_y_coord*chord_l, slope_angles)
+
 def calc_stringer_inertia(h_str, w_str, t_str):
 
     # Calculating Area's of stringer components
@@ -110,36 +197,7 @@ def Calc_skin_inertia_Iyy(Spar1, Spar2):
 
 # returns stiffener x,y locations and rotation
 # return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 x,y,rot)] m,m,rad
-def stif_loc(z, n_st, cs):
-    n = 100  # number of sections
-    dx = ((Spar2 - Spar1) / n)
-    x = Spar1
-    total_perimeter = 0
-    for i in range(n):
-        x = x + dx
-        dxlength = dx * Chordlength
-        dylength = abs(airfoilordinate(x - dx) - airfoilordinate(x)) * Chordlength
-        dlength = np.sqrt(dxlength ** 2 + dylength ** 2)
-        total_perimeter += dlenght
-    # total_perimeter = sp.integrate.quad(Wing.airfoilordinate(x), Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T), Wing.Chord_loc_Spar(z,Wing.Spar2R,Wing.Spar2T)) #m
-    spacing = total_perimeter / ((n_st + 1) / 2)
-    x_y_angle_coords = []
-    for i in range(n_st):
-        local_spacing = i * spacing
-        rot_angle = Wing.Angle(cs) + radians(180)
-        x_coordinate = Wing.Chord_loc_Spar(z, Wing.Spar1R, Wing.Spar1T)
-        x_coordinate += local_spacing
-        # x_coordinate = (-1) * (local_spacing - circle_perim) * cos(atan(0.5 * h / (C_a - 0.5 * h)))
-        y_coordinate = airfoilordinate(x_coordinate)
 
-        apnd_itm = (x_coordinate, y_coordinate, rot_angle)
-        x_y_angle_coords.append(apnd_itm)
-        apnd_itm = (x_coordinate, -y_coordinate, -rot_angle)
-        x_y_angle_coords.append(apnd_itm)
-
-        # print "Stif.", i, "\t x:", x_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
-
-    return x_y_angle_coords  # [(stringer0 x,y,rot),(stringer1 x,y,rot), ...]
 
 
 print('this is', Calc_skin_inertia_Ixx(Wing.ChSpar1, Wing.ChSpar2))
@@ -147,7 +205,7 @@ print('this is', Calc_skin_inertia_Iyy(Wing.ChSpar1, Wing.ChSpar2))
 
 
 # print(calc_stringer_Inertia(Q_("50 mm"),Q_("20 mm"),Q_("2 mm")))
-
+print(get_coord_from_perim(5, 0.2, 0.6, Q_("7 m")))
 
 # function for transforming axis to a rotated version
 # input MMOI I_zz, I_yy, I_zy, and rotation angle rot_angle
@@ -160,7 +218,7 @@ def axis_transformation(I_zz, I_yy, I_zy, rot_angle):
     return I_uu, I_vv, I_uv
 
 
-# VERIFICATION TESTS
+ #VERIFICATION TESTS
 #class InertiaTestCase(unittest.TestCase):
 #    def setUp(self):
 #        self.Inertias = calc_stringer_inertia(Q_("50 mm"), Q_("20 mm"), Q_("2 mm"))
