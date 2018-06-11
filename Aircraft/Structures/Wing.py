@@ -158,7 +158,21 @@ def Area_Skin_x_c(Spar1, Spar2):                            #Input deminsionless
         arclength += dlength
         Areaxc = Areaxc + dAreaxc
     Areaxc = Areaxc * 2                                         #Area times chord for both sides of the airfoil (therefore times 2)
-    return Areaxc, arclength
+    return Areaxc
+
+def length_Skin_x_c(Spar1, Spar2):                            #Input deminsionless chordwise location of spar 1 and spar 2
+    n = 100 #number of sections
+    dx = ((Spar2-Spar1)/n)
+    x = Spar1
+    Areaxc = 0
+    arclength = 0
+    for i in range(n):
+        x = x + dx
+        dxlength = dx * Chordlength
+        dylength = abs(airfoilordinate(x - dx) - airfoilordinate(x)) * Chordlength
+        dlength = np.sqrt(dxlength**2+dylength**2)
+        arclength += dlength
+    return arclength
 
 ## Area of cell enclosed by the wing skin and the stringers
 def Area_cell():
