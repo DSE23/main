@@ -14,7 +14,7 @@ Example on how to use this file:
 import sys
 sys.path.append('../') # This makes sure the parent directory gets added to the system path
 
-from Misc import ureg, Q_ # Imports the unit registry from the Misc folder
+from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import math as m
 import numpy as np
 
@@ -26,6 +26,7 @@ class Wing(object):
     taper = 0.45                # Taper ratio
     c_r = Q_("2.015 m")                 # Root chord
     c_t = c_r * taper           # Tip chord
+    c_avg = (c_r + c_t)/2       #Average chord
     Sweep_25 = 0                # [deg] Quarter chord sweep
     Sweep_25 *= Q_('deg')
     Sweep_50 = m.degrees(m.atan(m.tan(m.radians(Sweep_25))-(4/A) *
@@ -54,6 +55,7 @@ class Fuselage(object):
     h_f = Q_("1.1 m")                   # [m] Fuselage height
     front_A = Q_("0.98 m**2")              # [m^2] Frontal area
     S_wet_f= Q_("14.94 m**2")              # [m^2] Fuselage wetted area
+    cabin_w = Q_("0.6 m")               # [m] cabin width (inside)
 
 class H_tail(object):
     
@@ -71,6 +73,7 @@ class H_tail(object):
     delta_e = m.radians(30)     # Max elevator deflection
     X_h = Q_("5.27 m")                  # [m] 0.25C location compared to the nose
     Z_h = Q_("0.55 m")                  # [m] Distance MAC_h and zero lift line wing
+    i_h = Q_("0 rad")                   #incidence angle ht
     
 class V_tail(object):
     
@@ -126,7 +129,7 @@ class CG(object):
     CG_htail = H_tail.X_h + H_tail.MAC * 0.5    # H-tail cg relative to nose
     CG_vtail = V_tail.X_v + V_tail.b * 0.5      # V-tail cg relative to nose
     CG_fus = Q_("2.88 m")                      # CG fuselage relative to nose !!!update!!!
-    CG_lgear = 0.23 * Fuselage.l_f      # CG LG relative to nose !!!update!!!
+    CG_lgear = 0.23 * Fuselage.l_f             # CG LG relative to nose !!!update!!!
     CG_engine = 0.474 * Q_("1.1 m")            # CG of the engine relative to nose
     CG_prop = Q_("-0.1 m")                     # CG propellor !!!update!!!    
     CG_fuelsys = Q_("1.18 m")                  # CG fuel system !!!update!!!
@@ -149,4 +152,4 @@ class CG(object):
                 (Masses.W_OEW+ Masses.W_pilot)
     CG_mtow = (CG_wpilot*(Masses.W_OEW+ Masses.W_pilot)+CG_fuel * Masses.W_fuel)\
               /(Masses.W_MTOW)
-              
+    Z_cg = 0                                    #  Check this!!!!!!!!!!!!!!!
