@@ -78,6 +78,8 @@ ybar_n_b = 0.55
 C_L = (MTOW*g0)/(0.5*rho_a*V_a**2*S_wing)
 alpha_0 = C_L / CL_alpha
 
+Sh0 = Geometry.H_tail.S
+Sv0 = Geometry.V_tail.S
 
 # CG value import
 X_v_h = Geometry.V_tail.X_v = Geometry.H_tail.X_h  #Distance between the two stabilizers
@@ -116,23 +118,25 @@ CG_fuel = Geometry.CG.CG_fuel
 
 n_Sh = 40                               # Number of different S_h
 n_Sv = 40                               # Number of different S_v
-Iter_Sh = np.linspace(0.1,2.0, n_Sh)
+Iter_Sh = np.linspace(0.5,4.0, n_Sh)
 S_h = np.tile(Iter_Sh,(n_Sv,1))
 S_h *= Q_("m**2")
-Iter_Sv = np.linspace(0.1,2.5, n_Sv)
+Iter_Sv = np.linspace(0.5,2.5, n_Sv)
 S_v = np.tile(Iter_Sv,(n_Sh,1))
 S_v = np.rot90(S_v)
 S_v *= Q_("m**2")
 r_allowed = []
 
-for XLEMAC in (np.linspace(1.4, 2.0, 10)*Q_("m")):
-    for X_h in (np.linspace(4, 7, 50)*Q_("m")):
+for XLEMAC in (np.linspace(1.0, 2.5, 10)*Q_("m")):
+    for X_h in (np.linspace(3.5, 7, 50)*Q_("m")):
         X_v = X_h + X_v_h
         # Local CG calculation for iterations
         CG_wing = CG_wing_mac * Cbar + XLEMAC
         CG_htail = X_h + 0.5 * HMAC
         CG_vtail = X_v + 0.5 * VMAC
-        X_cg = (CG_wing * W_wing + CG_htail * W_htail + CG_vtail * W_vtail +\
+        W_htailrel = W_htail * S_h/Sh0
+        W_vtailrel = W_vtail * S_v/Sv0
+        X_cg = (CG_wing * W_wing + CG_htail * W_htailrel + CG_vtail * W_vtailrel +\
                CG_fus * W_fus + W_gear * CG_lgear + W_engine * CG_engine\
                + W_prop * CG_prop + W_fuelsys * CG_fuelsys + W_hydraulic *\
                CG_hydraulics + W_elecsys * CG_elecsys + W_flightcon * \
@@ -145,15 +149,15 @@ for XLEMAC in (np.linspace(1.4, 2.0, 10)*Q_("m")):
         
         CX0 = (MTOW * g0)/(0.5 * rho_a * V_a**2 * S_wing) * m.sin(gamma_0)
         CXu = -2 * C_L * m.tan(gamma_0)
-        CX_alpha = C_L * (1-(2*CL_alpha))/(Oswald_e*A*m.pi)
+        CX_alpha = C_L * (1-(2*CL_alpha)/(Oswald_e*A*m.pi))
         CZ0 = -(MTOW * g0)/(0.5*rho_a*V_a**2*S_wing)*m.cos(gamma_0)
         CZu = -2*C_L
         CZ_alpha = -CL_alpha
         CZ_alphadot = -CNH_alpha * Vh_V**2 * dE_dalpha * S_h * l_h / (S_wing * Cbar)
         CZq = -2 * Vh_V**2 * S_h * l_h / (S_wing * Cbar)
         Cmu = 0
-        Cm_alpha = CNW_alpha * (X_cg - X_w) / Cbar - CNH_alpha * (1-dE_dalpha)*Vh_V**2\
-                    * S_h * l_h / (S_wing * Cbar)
+        Cm_alpha = CNW_alpha * (X_cg - X_w) / Cbar - CNH_alpha * \
+        (1-dE_dalpha)*Vh_V**2 * S_h * l_h / (S_wing * Cbar)
         Cm_alphadot = - CNH_alpha*(Vh_V)**2*S_h*l_h**2/(S_wing*Cbar**2)*dE_dalpha
         Cmq = -1.1 * CNH_alpha * Vh_V**2 * (S_h*l_h**2)/(S_wing * Cbar**2)
         
@@ -172,8 +176,7 @@ for XLEMAC in (np.linspace(1.4, 2.0, 10)*Q_("m")):
         Clr_w = ybar_r_b**2 * C_L
         Clr_v = CYr_v * z_arm
         Cnr_w = ybar_n_b * C_L**2/(A*m.pi)
-        Cnr_v = CYr_v * x_arm
-        
+        Cnr_v = CYr_v * x_arm        
         CYbeta = CYbeta_v
         Clbeta = Clbeta_w + Clbeta_v
         Cnbeta = Cnbeta_w + Cnbeta_v
@@ -181,8 +184,7 @@ for XLEMAC in (np.linspace(1.4, 2.0, 10)*Q_("m")):
         Cnp = Cnp_w + Cnp_v
         CYr = CYr_v
         Clr = Clr_w + Clr_v
-        Cnr = Cnr_w + Cnr_v
-        
+        Cnr = Cnr_w + Cnr_v      
         
         # CAP
         
@@ -197,8 +199,7 @@ for XLEMAC in (np.linspace(1.4, 2.0, 10)*Q_("m")):
         omega_0 = Eigen_abs_sp * (V_a/Cbar)             # Undamped nat. freq. SP
         n_alpha = (CL_alpha * 0.5 * rho_a * V_a**2 * S_wing)/(MTOW * g0)    # loadfactor per AoA
         CAP = (omega_0**2)/n_alpha
-        
-        
+                
         # Phugoid
         
         A_ph = 2 * mu_c * (CZ_alpha*CZq-2 * mu_c * Cm_alpha)
@@ -228,8 +229,8 @@ for XLEMAC in (np.linspace(1.4, 2.0, 10)*Q_("m")):
                 T_cari = T_car
                 Re_phi = Re_ph[i,j]
                 RE_dri = RE_dr[i,j]
-                test.append(Re_phi.magnitude)
-                if 0.28 < CAPi.magnitude < 3.6 and T_cari.magnitude < 1.0 and RE_dri.magnitude < 0: #and Re_phi < 0:
+                test.append(CAPi.magnitude)
+                if 0.28 < CAPi.magnitude < 3.6 and T_cari.magnitude < 1.0 and RE_dri.magnitude < 0 and Re_phi < 0:
                     Sv = S_v[i,j]
                     Sh = S_h[i,j]
                     r_allowed.append([Sv.magnitude, Sh.magnitude, X_h.magnitude, XLEMAC.magnitude])
@@ -239,16 +240,19 @@ S_hall =[]
 X_hall = []
 
 for i in range(len(r_allowed)):
-    if r_allowed[i][3] == 1.4:
+    if r_allowed[i][3] < 2.0:
         S_vall.append(r_allowed[i][0])
         S_hall.append(r_allowed[i][1])
         X_hall.append(r_allowed[i][2])
-#ax = fig.add_subplot(111, projection='3d')
+ax = fig.add_subplot(111, projection='3d')
 S_vall = np.asarray(S_vall)
 S_hall = np.asarray(S_hall)
 X_hall = np.asarray(X_hall)
-#ax.scatter(S_vall, S_hall, X_hall)
-plt.plot(test)
+ax.scatter(S_vall, S_hall, X_hall)
+ax.set_xlabel("S_v")
+ax.set_ylabel("S_h")
+ax.set_zlabel("X_h")
+#plt.plot(test)
 plt.show()                     
 
 
