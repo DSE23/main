@@ -8,6 +8,7 @@ Last updated: 08/06/2018 12:38 by Boris
 import sys
 sys.path.append('../') # This makes sure the parent directory gets added to the system path
 
+from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import numpy as np
 from scipy import interpolate
 import math as m
@@ -20,9 +21,6 @@ from Aerodynamics import Wing as AWing
 from Performance import Performance
 import matplotlib.pyplot as plt
 
-
-
-from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
 
 cl, cd, cm = AWing.computeloads()           #Load aerodynamic properties
@@ -115,7 +113,7 @@ def Shear_wb(zs):
     return qs, qbase
 
 
-def Pure_torsion(qbase):
+def Torsion(qbase):
     A_cell = Wing.Area_cell()
     length_skin = Wing.Area/Wing.ThSkin
     length_spar1 = Wing.airfoilordinate(Wing.ChSpar1)
@@ -123,7 +121,21 @@ def Pure_torsion(qbase):
     T = M + 2*A_cell*qbase
     const_tor = T/(2*A_cell**2*shear_modulus) #constant term in twist formula
     line_int_tor = (length_skin*2/Wing.t_skin+length_spar1/Wing.ThSpar1+length_spar2/Wing.ThSpar2) #result from line integral from torsion formula
-    twist_wb_pure_tor = const_tor*line_int_tor
-    return twist_wb_pure_tor
+    twist_wb_tor = const_tor*line_int_tor
+    return twist_wb_tor
 
-print('pure torsion, ', twist_wb_pure_tor)
+# Wing deformation in X-direction
+def deformatio_x(zs):
+    deformation_temp = drag_at_root/24*(zs-widthfuselage)^4
+    deformation_temp += drag_slope/120*(zs-widthfuselage)^5
+    deformation_x = 1/(youngs_modulus*Inertia.Ixx_wb)*deformation_temp
+    deformation_x += L_moment/2*widthfuselage
+    return deformation_x
+
+
+def deformatio_y(zs):
+    deformation_temp = lift_at_root/24*(zs-widthfuselage)^4
+    deformation_temp += lift_slope/120*(zs-widthfuselage)^5
+    deformation_y = 1/(youngs_modulus*Inertia.Ixx_wb)*deformation_temp
+    deformation_y += D_moment/2*widthfuselage
+    return deformation_x
