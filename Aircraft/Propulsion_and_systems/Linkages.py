@@ -16,16 +16,56 @@ sys.path.append('../')
 from Misc import ureg, Q_
 # Imports the unit registry from the Misc folder
 
+from Geometry import Geometry
+import numpy as np
+import Stick_pedals
+
 # Start defining global variables for easy editing from elsewhere
 # For explanations of the variables defined here, see below, where they are given values
 
 
-def initialise_stick_moment(inp):
-    global m_s
-    m_s = inp
+def initialise_max_roll_stick_force(inp):
+    global f_s_r_max
+    f_s_r_max = inp
+
+
+def initialise_stick_length(inp):
+    global l_stick
+    l_stick = inp
+
+
+def initialise_rudder_travel(inp):
+    global l_rudder
+    l_rudder = inp
 
 
 # End defining global variables
 
 # Start assigning values to variables
-m_s = Q_("86 N")
+# Maximum stick force in roll
+f_s_r_max = Q_("20 lbf")  # From MIL-F-8785c
+
+# Maximum stick force in pitch
+f_s_p_max = f_s_r_max*2  # From 1:2:3 ratio for control forces
+
+# Maximum rudder force
+f_r_max = f_s_r_max*3  # From 1:2:3 ratio for control forces
+
+# End assigning values
+
+
+# Calculate maximum hinge moment in roll
+m_s_r_max = f_s_r_max * Stick_pedals.l_s
+m_s_r_max.ito(ureg("newton * meter"))
+print(m_s_r_max)
+
+# Calculate maximum hinge moment in pitch
+m_s_p_max = f_s_p_max * Stick_pedals.l_s
+m_s_p_max.ito(ureg("newton * meter"))
+print(m_s_p_max)
+
+# Calculate maximum hinge moment in yaw
+r_rudder = Stick_pedals.d_p/np.tan(Geometry.V_tail.delta_r)
+m_r_max = f_r_max * r_rudder
+m_r_max.ito(ureg("newton * meter"))
+print(m_r_max)
