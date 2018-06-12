@@ -269,14 +269,13 @@ def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../Airfoi
 
     # print(perim)
     a_ran = np.arange(0, 1, 0.0001)
-    plt.plot([start_x, start_x], [0, p(start_x)], 'b')
-    plt.plot([end_x, end_x], [0, p(end_x)], 'b')
-    plt.plot(x_coords, y_coords, '+')
-    plt.plot(a_ran, p(a_ran), 'r')
-    plt.plot(final_x_coords, final_y_coords, 'go')
-    plt.axis((0, 1, 0, 1))
-
-    plt.show()
+    #plt.plot([start_x, start_x], [0, p(start_x)], 'b')
+    #plt.plot([end_x, end_x], [0, p(end_x)], 'b')
+    #plt.plot(x_coords, y_coords, '+')
+    #plt.plot(a_ran, p(a_ran), 'r')
+    #plt.plot(final_x_coords, final_y_coords, 'go')
+    #plt.axis((0, 1, 0, 1))
+    #plt.show()
     return (final_x_coords*chord_l, final_y_coords*chord_l, final_angles)
 
 def stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str):
