@@ -42,6 +42,7 @@ D_moment = Q_('0 kg * m ** 2 / s**2')
 L = Q_('0 kg * m / s**2')
 D = Q_('0 kg * m / s**2')
 M = Q_('0 kg * m ** 2 / s**2')
+dLlist = np.array([])
 Llist = np.array([])
 Dlist = np.array([])
 zslist = np.array([])
@@ -60,7 +61,7 @@ while zs > z:                               #zs is measured is m from
     D_moment = D_moment + dD_moment
 
     Llist = np.append(Llist, dL)            #put the values in a list so we can plot them
-    Dlist = np.append(Dlist, dD) 
+    Dlist = np.append(Dlist, dD)
     zslist = np.append(zslist, abs(zs))
 
     zs = zs - sectionlength                 #Select other section for the next loop
@@ -98,7 +99,7 @@ def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
     sigma_zs = D_moment*inertia_term_1 + L_moment*inertia_term_2
     return sigma_zs #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
-print('sigma_zs', Normal_stress_due_to_bending(Wing.c, Wing.airfoilordinate(Wing.c)))
+print('sigma_zs', Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(Wing.c)))
 
 def Shear_wb(zs):
     #section 01
