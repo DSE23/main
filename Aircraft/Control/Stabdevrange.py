@@ -28,7 +28,7 @@ from Performance import Performance
 # Xlemac, S_h and S_v in which StefX will havel level 1 flying qualities
 
 # Input parameters
-gamma_0 = 0                 # Assuming level flight
+
 A = Geometry.Wing.A
 test = []           
 Z_cg = Geometry.CG.Z_cg
@@ -49,7 +49,8 @@ dE_dalpha = Aero_wing.de_da
 Vh_V = Aero_HT.Vh_v
 Cbar = Geometry.Wing.MAC
 I_yy = Inertia.I_yy
-K_yy = np.sqrt(I_yy/MTOW)/(b)
+#I_yy = Q_("2000 kg m**2")
+K_yy = I_yy/(MTOW*Cbar**2)
 CNW_alpha = Aero_wing.C_Nw_alpha
 mu_c = MTOW/(rho_a*Cbar*S_wing)
 mu_b = MTOW/(rho_a*b*S_wing)
@@ -62,8 +63,8 @@ X_v = Geometry.V_tail.X_v
 CD0 = Aero_gen.CD_0
 I_xx = Inertia.I_xx
 I_zz = Inertia.I_zz
-K_xx = np.sqrt(I_xx/MTOW)/(b)
-K_zz = np.sqrt(I_zz/MTOW)/(b)
+K_xx = I_xx/(MTOW*b**2)
+K_zz = I_zz/(MTOW*b**2)
 CD0_alpha = 0                   # Assumed
 
 # Values from graphs update with changing A and taper!!!
@@ -77,12 +78,13 @@ ybar_n_b = 0.55
 # Calculated value
 C_L = (MTOW*g0)/(0.5*rho_a*V_a**2*S_wing)
 alpha_0 = C_L / CL_alpha
+gamma_0 = alpha_0                 # Assuming level flight
 
 Sh0 = Geometry.H_tail.S
 Sv0 = Geometry.V_tail.S
 
 # CG value import
-X_v_h = Geometry.V_tail.X_v = Geometry.H_tail.X_h  #Distance between the two stabilizers
+X_v_h = (Geometry.V_tail.X_v - Geometry.H_tail.X_h)  #Distance between the two stabilizers
 HMAC = Geometry.H_tail.MAC
 VMAC = Geometry.V_tail.MAC
 W_wing = Geometry.Masses.W_wing
@@ -111,38 +113,39 @@ CG_hydraulics = Geometry.CG.CG_hydraulics
 CG_flightcon = Geometry.CG.CG_flightcon
 CG_avionics = Geometry.CG.CG_avionics
 CG_elecsys = Geometry.CG.CG_elecsys
-CG_lehld = Geometry.CG.CG_lehld
-CG_flaperons = Geometry.CG.CG_flaperons
 CG_pilot = Geometry.CG.CG_pilot
 CG_fuel = Geometry.CG.CG_fuel
 
-n_Sh = 40                               # Number of different S_h
-n_Sv = 40                               # Number of different S_v
-Iter_Sh = np.linspace(0.5,4.0, n_Sh)
+n_Sh = 30                               # Number of different S_h
+n_Sv = 30                               # Number of different S_v
+Iter_Sh = np.linspace(0.5,3.0, n_Sh)
 S_h = np.tile(Iter_Sh,(n_Sv,1))
 S_h *= Q_("m**2")
-Iter_Sv = np.linspace(0.5,2.5, n_Sv)
-S_v = np.tile(Iter_Sv,(n_Sh,1))
+Iter_Sv = np.linspace(1.5,3.0, n_Sv)
+S_v = np.tile(Iter_Sv,(n_Sh, 1))
 S_v = np.rot90(S_v)
 S_v *= Q_("m**2")
 r_allowed = []
 
-for XLEMAC in (np.linspace(1.0, 2.5, 10)*Q_("m")):
-    for X_h in (np.linspace(3.5, 7, 50)*Q_("m")):
+for XLEMAC in (np.linspace(1.1, 2.5, 20)*Q_("m")):
+    for X_h in (np.linspace(3.5, 7, 30)*Q_("m")):
         X_v = X_h + X_v_h
+        
         # Local CG calculation for iterations
         CG_wing = CG_wing_mac * Cbar + XLEMAC
         CG_htail = X_h + 0.5 * HMAC
         CG_vtail = X_v + 0.5 * VMAC
         W_htailrel = W_htail * S_h/Sh0
         W_vtailrel = W_vtail * S_v/Sv0
+        CG_lehld = XLEMAC
+        CG_flaperons = XLEMAC + Cbar
         X_cg = (CG_wing * W_wing + CG_htail * W_htailrel + CG_vtail * W_vtailrel +\
                CG_fus * W_fus + W_gear * CG_lgear + W_engine * CG_engine\
                + W_prop * CG_prop + W_fuelsys * CG_fuelsys + W_hydraulic *\
                CG_hydraulics + W_elecsys * CG_elecsys + W_flightcon * \
                CG_flightcon + W_avionics * CG_avionics + W_lehld *\
               CG_lehld + W_flaperons * CG_flaperons + W_pilot * CG_pilot +\
-              W_fuel * CG_fuel)/MTOW
+              W_fuel * CG_fuel )/(MTOW) 
         X_w = XLEMAC + 0.25 * Cbar     
         l_h = X_h - X_cg
         # Stability Derivatives (Longitudinal)
@@ -163,7 +166,7 @@ for XLEMAC in (np.linspace(1.0, 2.5, 10)*Q_("m")):
         
         # Stability Derivatives (Lateral)
         z_arm = (((Z_v - Z_cg)/b)*np.cos(alpha_0)-((X_v-X_cg)/b)*np.sin(alpha_0))
-        x_arm = (((Z_v - Z_cg)/b)*np.sin(alpha_0)-((X_v-X_cg)/b)*np.cos(alpha_0)) #Check this
+        x_arm = (((Z_v - Z_cg)/b)*np.sin(alpha_0)-((X_v-X_cg)/b)*np.cos(alpha_0))  
         CYbeta_v = - CY_v_alpha * dSig_dalpha * Vv_V**2 * (S_v/S_wing)
         Clbeta_w = C_L * C_l_beta_CL_A
         Clbeta_v = CYbeta_v * z_arm
@@ -189,7 +192,7 @@ for XLEMAC in (np.linspace(1.0, 2.5, 10)*Q_("m")):
         # CAP
         
         A_sp = -2 * mu_c * K_yy * (CZ_alphadot - 2 * mu_c)          # A for the Short period
-        B_sp = -CX_alpha * 2 * mu_c * K_yy + Cmq * (CZ_alphadot -2 * mu_c)\
+        B_sp = -CX_alpha * 2 * mu_c * K_yy + Cmq * (CZ_alphadot - 2 * mu_c)\
                 - CZq * Cm_alphadot - 2 * mu_c * Cm_alpha
         C_sp = CZ_alpha * Cmq - CZq * Cm_alpha - 2 * mu_c * Cm_alpha
         Det_sp = B_sp**2 - 4 * A_sp * B_sp
@@ -227,20 +230,21 @@ for XLEMAC in (np.linspace(1.0, 2.5, 10)*Q_("m")):
             for j in range(n_Sv):
                 CAPi = CAP[i,j]
                 T_cari = T_car
-                Re_phi = Re_ph[i,j]
-                RE_dri = RE_dr[i,j]
-                test.append(CAPi.magnitude)
-                if 0.28 < CAPi.magnitude < 3.6 and T_cari.magnitude < 1.0 and RE_dri.magnitude < 0 and Re_phi < 0:
+                Damping_phi = Damping_ph[i, j]
+                RE_dri = RE_dr[i, j]
+#                test.append(Damping_phi.magnitude)
+                if 0.28 < CAPi.magnitude < 3.6 and T_cari.magnitude < 1.0 and RE_dri.magnitude < 0 and Damping_phi > 0.004:
                     Sv = S_v[i,j]
-                    Sh = S_h[i,j]
+                    Sh = S_h[i,j]                  
                     r_allowed.append([Sv.magnitude, Sh.magnitude, X_h.magnitude, XLEMAC.magnitude])
 
 S_vall = []
 S_hall =[]
 X_hall = []
-
+LEMACall = []
 for i in range(len(r_allowed)):
-    if r_allowed[i][3] < 2.0:
+    LEMACall.append(r_allowed[i][3])
+    if r_allowed[i][3] > 1.6:
         S_vall.append(r_allowed[i][0])
         S_hall.append(r_allowed[i][1])
         X_hall.append(r_allowed[i][2])
@@ -253,7 +257,7 @@ ax.set_xlabel("S_v")
 ax.set_ylabel("S_h")
 ax.set_zlabel("X_h")
 #plt.plot(test)
-plt.show()                     
+plt.show()              
 
 
                         

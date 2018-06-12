@@ -20,126 +20,6 @@ Iyy_aircraft = Q_("1492.8 kg/m/m")
 Ixx_aircraft = Q_("1016.9 kg/m/m")
 Izz_aircraft = Q_("2447.2 kg/m/m")
 
-def get_xy_from_perim(perim_val, start_x=0, dat_file_name="../Airfoil.dat"):
-    """
-        NOTE: Special function for Tobias
-        This function returns the x and y coordinates for a given perimeter
-
-
-        Arguments: -perim_val (x coordinate)
-                   -start_x: x_value from where the perimeter integration needs to start
-                   -dat_file_name (name of the airfoil data file)
-
-        Returns: perim (Perimiter value)
-    """
-
-    Air_data = np.genfromtxt(dat_file_name)  # Imports datapoints from airfoil data file
-
-    x_coords = Air_data[:81, 0]  # We only care about 1 half of the airfoil
-    x_coords = np.flip(x_coords, 0)  # Flip them so they are in a good order
-    y_coords = Air_data[:81, 1]  # We only care about 1 half of the airfoil
-    y_coords = np.flip(y_coords, 0)  # Flip them so they are in a good order
-    p = interp1d(x_coords, y_coords, kind ='cubic')  # Generate a poly spline based on the airfoil points
-
-    perim = 0  # Set initial perimiter size to 0
-    step = 0.0001  # Step size for algorithm: increase will lead to faster computing times
-    min_val = 10
-    for x_c in np.arange(start_x, 1, step):
-        perim += np.sqrt((step) ** 2 + (p(x_c + step) - p(x_c)) ** 2)
-        if abs(perim - perim_val) < min_val:
-            x_coord = 0.5 * (x_c + x_c + step)
-            y_coord = 0.5 * (p(x_c) + p(x_c + step))
-            min_val = abs(perim - perim_val)
-        else:
-            break
-
-    return(x_coord, y_coord)
-
-def get_perim_from_x(x_coor, dat_file_name="../Airfoil.dat"):
-    """
-    This function returns the perimeter value from the LE until the specified x-coordinate
-
-    Arguments: x_coor (x coordinate)
-               dat_file_name (name of the airfoil data file)
-
-    Returns: perim (Perimiter value)
-    """
-    Air_data = np.genfromtxt(dat_file_name)  # Imports datapoints from airfoil data file
-
-    x_coords = Air_data[:81, 0]  # We only care about 1 half of the airfoil
-    x_coords = np.flip(x_coords, 0)  # Flip them so they are in a good order
-    y_coords = Air_data[:81, 1]  # We only care about 1 half of the airfoil
-    y_coords = np.flip(y_coords, 0)  # Flip them so they are in a good order
-    p = interp1d(x_coords, y_coords, kind='cubic')  # Generate a poly spline based on the airfoil points
-
-    perim = 0  # Set initial perimiter size to 0
-    step = 0.0001  # Step size for algorithm: increase will lead to faster computing times
-    # but lower accuracy
-    # This for loop calculates the perimiter until the specified x-coordinate
-    for x_c in np.arange(0.0, x_coor, step):
-        perim += np.sqrt((step) ** 2 + (p(x_c + step) - p(x_c)) ** 2)
-
-    return perim
-
-
-def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../Airfoil.dat"):
-    """
-    This function returns list of coordinate values where a stiffener is placed
-    based on the spar locations and number of stiffeners. The stiffeners will
-    be distributed equally along the perimiter section between the spars.
-
-    Arguments: -n_st: number of stiffeners
-               -start_x: x location of the LE spar
-               -end_X: x location of the TE spar
-               -dat_file_name: name of the airfoil data file
-
-    Returns: List of x and y coordinates where the stiffeners are placed
-    """
-    Air_data = np.genfromtxt(dat_file_name)
-
-
-    x_coords = Air_data[:81, 0]
-    x_coords = np.flip(x_coords, 0)
-    y_coords = Air_data[:81, 1]
-    y_coords = np.flip(y_coords, 0)
-
-    final_x_coords = np.array([])
-    final_y_coords = np.array([])
-    final_angles = np.array([])
-    p = interp1d(x_coords, y_coords, kind='cubic')
-
-    final_x_y_angle_coord = np.array([])
-    perim = 0
-    stif_perim = get_perim_from_x(end_x) - get_perim_from_x(start_x)
-    perim_spacing = stif_perim / (n_st + 1)
-    step = 0.0001
-    i = 0
-    for x_c in np.arange(start_x, end_x, step):
-        perim += np.sqrt((step) ** 2 + (p(x_c + step) - p(x_c)) ** 2)
-        if i >= n_st:
-            break
-        if abs(perim - perim_spacing) < 10e-5:
-            x_coord = 0.5 * (x_c + x_c + step)
-            y_coord = 0.5 * (p(x_c) + p(x_c + step))
-            slope_angle = -(np.pi - np.arctan((p(x_c + step) - p(x_c)) / (step)))
-            final_x_coords = np.append(final_x_coords, x_coord)
-            final_y_coords = np.append(final_y_coords, y_coord)
-            final_angles = np.append(final_angles, slope_angle)
-            perim = 0
-            i += 1
-
-    # print(perim)
-    a_ran = np.arange(0, 1, 0.0001)
-    plt.plot([start_x, start_x], [0, p(start_x)], 'b')
-    plt.plot([end_x, end_x], [0, p(end_x)], 'b')
-    plt.plot(x_coords, y_coords, '+')
-    plt.plot(a_ran, p(a_ran), 'r')
-    plt.plot(final_x_coords, final_y_coords, 'go')
-    plt.axis((0, 1, 0, 1))
-
-    plt.show()
-    return (final_x_coords*chord_l, final_y_coords*chord_l, final_angles)
-
 def calc_stringer_inertia(h_str, w_str, t_str):
 
     b_1 = w_str/2 - 0.5*t_str
@@ -241,23 +121,6 @@ def axis_transformation(I_xx, I_yy, I_xy, rot_angle):
     I_uv = (I_xx - I_yy) * 0.5 * np.sin(2 * rot_angle) + I_xy * np.cos(2 * rot_angle)
     return I_uu, I_vv, I_uv
 
-def stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str):
-
-    x_coords = x_y_angle_coords[0]
-    y_coords = x_y_angle_coords[1]
-    angles = x_y_angle_coords[2]
-    stringer_area = calc_stringer_inertia(h_str, w_str, t_str)[2]
-    AX_cen = 0
-    AY_cen = 0
-    for i in range(len(x_coords)):
-        x_cen = x_coords[i] + np.sin(angles[i])*h_str/2
-        y_cen = y_coords[i] + np.cos(angles[i])*h_str/2
-        AX_cen += x_cen*stringer_area
-        AY_cen += y_cen*stringer_area
-
-    X_cen = AX_cen/(len(x_coords)*stringer_area)
-    return X_cen
-
 def calc_total_stringer_inertia(x_y_angle_coords, stringer_inertias, h_str, w_str, t_str):
 
     x_coords = x_y_angle_coords[0]
@@ -278,7 +141,7 @@ def calc_total_stringer_inertia(x_y_angle_coords, stringer_inertias, h_str, w_st
     I_XX_TOT = Q_("0 m**4")
     I_YY_TOT = Q_("0 m**4")
     I_XY_TOT = Q_("0 m**4")
-    X_CEN = stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str)
+    X_CEN = stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str)[0]
     Y_CEN = Q_("0 m")
     print(y_coords)
     print(X_CEN)
