@@ -39,7 +39,7 @@ def get_xy_from_perim(perim_val, start_x=0, dat_file_name="../Airfoil.dat"):
     x_coords = np.flip(x_coords, 0)  # Flip them so they are in a good order
     y_coords = Air_data[:81, 1]  # We only care about 1 half of the airfoil
     y_coords = np.flip(y_coords, 0)  # Flip them so they are in a good order
-    p = interp1d(x_coords, y_coords, kind='cubic')  # Generate a poly spline based on the airfoil points
+    p = interp1d(x_coords, y_coords, kind ='cubic')  # Generate a poly spline based on the airfoil points
 
     perim = 0  # Set initial perimiter size to 0
     step = 0.0001  # Step size for algorithm: increase will lead to faster computing times
@@ -121,7 +121,7 @@ def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../Airfoi
         if abs(perim - perim_spacing) < 10e-5:
             x_coord = 0.5 * (x_c + x_c + step)
             y_coord = 0.5 * (p(x_c) + p(x_c + step))
-            slope_angle = -np.arctan((p(x_c + step) - p(x_c)) / (step)) + np.pi
+            slope_angle = -(np.pi - np.arctan((p(x_c + step) - p(x_c)) / (step)))
             final_x_coords = np.append(final_x_coords, x_coord)
             final_y_coords = np.append(final_y_coords, y_coord)
             final_angles = np.append(final_angles, slope_angle)
@@ -180,7 +180,7 @@ def calc_stringer_inertia(h_str, w_str, t_str):
     # Calculate I_xy of the stringer w.r.t. the bottom-left hand corner
     I_xy = A_1 * (-(0.5*(b_1) + 0.5*t_str))*(0.5*h_1 - 0) + A_3*(0.5*(b_1) + 0.5*t_str)*((h_str-0.5*h_3) - 0)
     # Calculate I_xy of the stringer w.r.t. the centroid
-    I_xy_centroid = A_1 * (-(0.5*(b_1) + 0.5*t_str))*(0.5*h_1 - y_bar) + A_3*(0.5*(b_1) + 0.5*t_str)*((h_str-0.5*h_3) - y_bar)
+    I_xy_centroid = A_1 * (-(0.5*(b_1) + 0.5*t_str) - 0)*(0.5*h_1 - y_bar) + A_3*((0.5*(b_1) + 0.5*t_str) - 0)*((h_str-0.5*h_3) - y_bar)
 
     I_xy_centroid.ito("m**4")  # Convert to m^4
 
@@ -241,16 +241,35 @@ def axis_transformation(I_xx, I_yy, I_xy, rot_angle):
     I_uv = (I_xx - I_yy) * 0.5 * np.sin(2 * rot_angle) + I_xy * np.cos(2 * rot_angle)
     return I_uu, I_vv, I_uv
 
-#def stiffeners_centroid(x_y_angle_coords, h_st, w_st, t_st):
-
-
-
-
-def calc_total_stringer_inertia(x_y_angle_coords, stringer_inertias):
+def stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str):
 
     x_coords = x_y_angle_coords[0]
     y_coords = x_y_angle_coords[1]
     angles = x_y_angle_coords[2]
+    stringer_area = calc_stringer_inertia(h_str, w_str, t_str)[2]
+    AX_cen = 0
+    AY_cen = 0
+    for i in range(len(x_coords)):
+        x_cen = x_coords[i] + np.sin(angles[i])*h_str/2
+        y_cen = y_coords[i] + np.cos(angles[i])*h_str/2
+        AX_cen += x_cen*stringer_area
+        AY_cen += y_cen*stringer_area
+
+    X_cen = AX_cen/(len(x_coords)*stringer_area)
+    return X_cen
+
+def calc_total_stringer_inertia(x_y_angle_coords, stringer_inertias, h_str, w_str, t_str):
+
+    x_coords = x_y_angle_coords[0]
+    x_coords = np.append(x_coords, x_coords)
+    x_coords *= ureg.meter
+    print(x_coords)
+    y_coords = x_y_angle_coords[1]
+    y_coords = np.append(y_coords, -y_coords)
+    y_coords *= ureg.meter
+    angles = x_y_angle_coords[2]
+    angles = np.append(angles, angles)
+    angles *= ureg("rad")
 
     I_xx_stringer = stringer_inertias[0][0]
     I_yy_stringer = stringer_inertias[0][1]
@@ -258,16 +277,22 @@ def calc_total_stringer_inertia(x_y_angle_coords, stringer_inertias):
     stringer_area = stringer_inertias[2]
     I_XX_TOT = Q_("0 m**4")
     I_YY_TOT = Q_("0 m**4")
+    I_XY_TOT = Q_("0 m**4")
+    X_CEN = stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str)
+    Y_CEN = Q_("0 m")
+    print(y_coords)
+    print(X_CEN)
     for i in range(len(x_coords)):
         loc_I_xx, loc_I_yy, loc_I_xy = axis_transformation(I_xx_stringer, I_yy_stringer, I_xy_stringer, angles[i])
         I_XX_TOT += loc_I_xx + stringer_area*(y_coords[i])**2
-        #I_YY_TOT += loc_I_yy + stringer_area*()
+        I_YY_TOT += loc_I_yy + stringer_area*(x_coords[i] - X_CEN)**2
+        I_XY_TOT += loc_I_xy + stringer_area*(x_coords[i] - X_CEN)*(y_coords[i] - Y_CEN)
 
-    return I_XX_TOT
+    return I_XX_TOT, I_YY_TOT, I_XY_TOT
 # returns stiffener x,y locations and rotation
 # return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 x,y,rot)] m,m,rad
 
-print(calc_total_stringer_inertia(get_coord_from_perim(5, 0.2, 0.6, Q_("7 m")), calc_stringer_inertia(Q_("30 mm"), Q_("30 mm"), Q_("2 mm"))))
+print(calc_total_stringer_inertia(get_coord_from_perim(5, 0.2, 0.8, Q_("7 m")), calc_stringer_inertia(Q_("30 mm"), Q_("30 mm"), Q_("2 mm")), Q_("30 mm"), Q_("30 mm"), Q_("2 mm")))
 
 #print('this is', Calc_skin_inertia_Ixx(Wing.ChSpar1, Wing.ChSpar2))
 #print('this is', Calc_skin_inertia_Iyy(Wing.ChSpar1, Wing.ChSpar2))
@@ -289,6 +314,9 @@ class InertiaTestCase(unittest.TestCase):
         self.I_xy_centr = self.Inertias[1][2]
         self.I_xy_centr.ito(ureg("mm**4"))
 
+        self.I_xx_transf, self.I_yy_transf, self.I_xy_transf = axis_transformation(15494.67, 4518.67,6272 , -30*np.pi/180)
+
+
     def test_Ixx_centroid(self):
         self.assertAlmostEqual(self.I_xx_centr.magnitude, 15494.67, 1,
                                msg="Verification of I_xx for stringer with SolidWorks FAILED")
@@ -300,6 +328,15 @@ class InertiaTestCase(unittest.TestCase):
     def test_Ixy_centroid(self):
         self.assertAlmostEqual(self.I_xy_centr.magnitude,  6272.00, 1,
                                msg="Verification of I_xy for stringer with SolidWorks FAILED")
+
+    def test_Transformation(self):
+        self.assertAlmostEqual(self.I_xx_transf, 18182.38, 1,
+                               msg="Verification of transformation formula with SolidWorks FAILED")
+        self.assertAlmostEqual(self.I_yy_transf, 1830.96, 1,
+                               msg="Verification of transformation formula with SolidWorks FAILED")
+        self.assertAlmostEqual(self.I_xy_transf, -1616.75, 1,
+                               msg="Verification of transformation formula with SolidWorks FAILED")
+
 
 
 if __name__ == '__main__':
