@@ -87,7 +87,7 @@ class V_tail(object):
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))  # [m] Mean aerodynamic chord
     S_wet = S                                   # [m^2] Wetted area
     S_r = Q_("0.5726 m**2")                                # Rudder area
-    c_r = Q_("0.553 m")                                 # Rudder chord
+    c_ru = Q_("0.553 m")                                 # Rudder chord
     delta_r = m.radians(30)                     # Max rudder deflection
     X_v = Q_("5.70 m")                                  # [m] 0.25C location compared to the nose
     Z_v = Q_("0.52 m")                                  # [m] Distance MAC_h and zero lift line wing
