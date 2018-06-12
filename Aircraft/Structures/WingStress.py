@@ -42,33 +42,32 @@ M = Q_('0 kg * m ** 2 / s**2')
 Llist = np.array([])
 zslist = np.array([])
 
-while zs > z:
+while zs > z:                               #zs is measured is m from
     Areaofsection = sectionlength*Wing.length_chord(zs)
-    dL = cl * 0.5 * rho * (V**2) * Areaofsection
-    dD = cd * 0.5 * rho * (V**2) * Areaofsection        #Lift times the section length
-    dM = cm * 0.5 * rho * (V ** 2) * Areaofsection * Wing.length_chord(zs)
-    dL_moment = zs * dL
-    dD_moment = zs * dD
-    L = L + dL
-    D = D + dD
-    M = M + dM
-    L_moment = L_moment + dL_moment
+    dL = cl * 0.5 * rho * (V**2) * Areaofsection                #lift of the section
+    dD = cd * 0.5 * rho * (V**2) * Areaofsection        #drag of the section
+    dM = cm * 0.5 * rho * (V ** 2) * Areaofsection * Wing.length_chord(zs)      #moment of the section
+    dL_moment = zs * dL                                 #moment produced by the lift on section
+    dD_moment = zs * dD                                 #drag prduced by the drag on the section
+    L = L + dL                      #Total lift for one wing
+    D = D + dD                      #Total drag for one wing
+    M = M + dM                      #Total moment for one wing
+    L_moment = L_moment + dL_moment     #Total bending moment or
     D_moment = D_moment + dD_moment
 
-    Llist = np.append(Llist, L)
+    Llist = np.append(Llist, dL)            #put the values in a list so we can plot them
     zslist = np.append(zslist, abs(zs))
 
-    zs = zs - sectionlength
+    zs = zs - sectionlength                 #Select other section for the next loop
 
-print(zslist)
-print('L sum ', L)
+print('L sum ', L)                  #print the values
 print('D sum ', D)
 print('M sum ', M)
 print('L_moment', L_moment)
 print('D_moment', D_moment)
 
-plt.plot(zslist, Llist)
-plt.show()
+# plt.plot(zslist, Llist)
+# plt.show()
 
 
 
@@ -100,12 +99,12 @@ def Shear_wb(zs):
     section01at1 = Wing.ThSpar1*Wing.HSpar1**2
     #section12
     n = 100 #number of sections
-    dx = (Wing.arclength/n)
-    x = 0
+    ds = (Wing.arclength/n)
+    s = 0
     line_int_skin_wb = section01at1
     for i in range(n):
-        x = x + dx
-        dline_int_skin_wb = x * Inertia.get_y_for_perimeter(x)
+        s = s + ds
+        dline_int_skin_wb = s * Inertia.get_y_for_perimeter(x)
         line_int_skin_wb += dline_int_skin_wb
     section12at2 = Wing.ThSkin * line_int_skin_wb
     #section23
@@ -115,7 +114,7 @@ def Shear_wb(zs):
     return qs, qbase
 
 
-def Pure_torsion(zs, qbase):
+def Pure_torsion(qbase):
     A_cell = Wing.Area_cell()
     length_skin = Wing.Area/Wing.ThSkin
     length_spar1 = Wing.airfoilordinate(Wing.ChSpar1)
