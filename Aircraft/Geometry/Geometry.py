@@ -56,7 +56,7 @@ class Fuselage(object):
     front_A = Q_("0.98 m**2")              # [m^2] Frontal area
     S_wet_f= Q_("14.94 m**2")              # [m^2] Fuselage wetted area
     cabin_w = Q_("0.6 m")               # [m] cabin width (inside)
-
+    A_max_canopy = Q_(" m**2")          # [m^2], coming from catia
 class H_tail(object):
     
     S = Q_("2.629 m**2")                 # [m^2] Horizontal tail surface
@@ -73,6 +73,7 @@ class H_tail(object):
     delta_e = m.radians(30)     # Max elevator deflection
     X_h = Q_("5.27 m")                  # [m] 0.25C location compared to the nose
     Z_h = Q_("0.55 m")                  # [m] Distance MAC_h and zero lift line wing
+    i_h = Q_("0 rad")                   #incidence angle ht
     
 class V_tail(object):
     
@@ -128,7 +129,7 @@ class CG(object):
     CG_htail = H_tail.X_h + H_tail.MAC * 0.5    # H-tail cg relative to nose
     CG_vtail = V_tail.X_v + V_tail.b * 0.5      # V-tail cg relative to nose
     CG_fus = Q_("2.88 m")                      # CG fuselage relative to nose !!!update!!!
-    CG_lgear = 0.23 * Fuselage.l_f      # CG LG relative to nose !!!update!!!
+    CG_lgear = 0.23 * Fuselage.l_f             # CG LG relative to nose !!!update!!!
     CG_engine = 0.474 * Q_("1.1 m")            # CG of the engine relative to nose
     CG_prop = Q_("-0.1 m")                     # CG propellor !!!update!!!    
     CG_fuelsys = Q_("1.18 m")                  # CG fuel system !!!update!!!
@@ -151,4 +152,4 @@ class CG(object):
                 (Masses.W_OEW+ Masses.W_pilot)
     CG_mtow = (CG_wpilot*(Masses.W_OEW+ Masses.W_pilot)+CG_fuel * Masses.W_fuel)\
               /(Masses.W_MTOW)
-              
+    Z_cg = 0                                    #  Check this!!!!!!!!!!!!!!!
