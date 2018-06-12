@@ -6,7 +6,8 @@ Last updated: 06/06/2018 12:38 by Boris
 # x is chordwise from LE to TE. y is positive upwards.
 import sys
 sys.path.append('../') # This makes sure the parent directory gets added to the system path
-
+from scipy.interpolate import interp1d
+from matplotlib import pyplot as plt
 import numpy as np
 import scipy as sp
 from scipy import optimize
@@ -38,7 +39,8 @@ w_str = Q_('0.025 m')            #width of the stringer
 t_str = Q_('0.003 m')            #thickness of the stringer
 
 
-z = Q_('0 m')                                       #spanwise posotion in meters
+z = 0                               #spanwise posotion in meters
+z *= Q_('meter')
 c = 0                                               #Chord wise postion in ratio
 
 
@@ -113,6 +115,24 @@ def Angle(cs):                          #input chord ratio
 AreaSpar1 = HSpar1 * ThSpar1
 AreaSpar2 = HSpar2 * ThSpar2
 
+## AREA OF STIFFENERS:
+def calc_stringer_Area(w_str, h_str, t_str):
+    b_1 = w_str / 2 - 0.5 * t_str
+    h_1 = t_str
+
+    b_2 = t_str
+    h_2 = h_str
+
+    b_3 = b_1
+    h_3 = h_1
+
+    # Calculating Area's of stringer components
+    A_1 = b_1 * h_1
+    A_2 = b_2 * h_2
+    A_3 = A_1
+
+    return (A_1 + A_2 + A_3)
+
 #Area of Skin
 def Area_Skin(Spar1, Spar2):                            #Input deminsionless chordwise location of spar 1 and spar 2
     n = 100 #number of sections
@@ -131,9 +151,7 @@ def Area_Skin(Spar1, Spar2):                            #Input deminsionless cho
 
 #Area of the Stringers
 
-A_1 = h_str*t_str
-A_2 = (w_str-t_str)*t_str
-A_stringer = A_1 + A_2                                  #Area of one stringer
+A_stringer = calc_stringer_Area(w_str, h_str, t_str)                           #Area of one stringer
 AreaStringers = A_stringer * N_stringers                #total area of stringer
 
 ## Area multiplied with the distance from the reference point (leading edge c=0)
@@ -141,6 +159,141 @@ AreaStringers = A_stringer * N_stringers                #total area of stringer
 #For the spars
 AreaSpar1xc = AreaSpar1 * ChSpar1 * Chordlength
 AreaSpar2xc = AreaSpar2 * ChSpar2 * Chordlength
+
+def get_xy_from_perim(perim_val, start_x=0, dat_file_name="../Airfoil.dat"):
+    """
+        NOTE: Special function for Tobias
+        This function returns the x and y coordinates for a given perimeter
+
+
+        Arguments: -perim_val (x coordinate)
+                   -start_x: x_value from where the perimeter integration needs to start (IN RELATIVE COORD TO CHORD)
+                   -dat_file_name (name of the airfoil data file)
+
+        Returns: perim (Perimiter value)
+    """
+
+    Air_data = np.genfromtxt(dat_file_name)  # Imports datapoints from airfoil data file
+
+    x_coords = Air_data[:81, 0]  # We only care about 1 half of the airfoil
+    x_coords = np.flip(x_coords, 0)  # Flip them so they are in a good order
+    y_coords = Air_data[:81, 1]  # We only care about 1 half of the airfoil
+    y_coords = np.flip(y_coords, 0)  # Flip them so they are in a good order
+    p = interp1d(x_coords, y_coords, kind ='cubic')  # Generate a poly spline based on the airfoil points
+
+    perim = 0  # Set initial perimiter size to 0
+    step = 0.0001  # Step size for algorithm: increase will lead to faster computing times
+    min_val = 10
+    for x_c in np.arange(start_x, 1, step):
+        perim += np.sqrt((step) ** 2 + (p(x_c + step) - p(x_c)) ** 2)
+        if abs(perim - perim_val) < min_val:
+            x_coord = 0.5 * (x_c + x_c + step)
+            y_coord = 0.5 * (p(x_c) + p(x_c + step))
+            min_val = abs(perim - perim_val)
+        else:
+            break
+
+    return(x_coord, y_coord)
+
+def get_perim_from_x(x_coor, dat_file_name="../Airfoil.dat"):
+    """
+    This function returns the perimeter value from the LE until the specified x-coordinate
+
+    Arguments: x_coor (x coordinate)
+               dat_file_name (name of the airfoil data file)
+
+    Returns: perim (Perimiter value)
+    """
+    Air_data = np.genfromtxt(dat_file_name)  # Imports datapoints from airfoil data file
+
+    x_coords = Air_data[:81, 0]  # We only care about 1 half of the airfoil
+    x_coords = np.flip(x_coords, 0)  # Flip them so they are in a good order
+    y_coords = Air_data[:81, 1]  # We only care about 1 half of the airfoil
+    y_coords = np.flip(y_coords, 0)  # Flip them so they are in a good order
+    p = interp1d(x_coords, y_coords, kind='cubic')  # Generate a poly spline based on the airfoil points
+
+    perim = 0  # Set initial perimiter size to 0
+    step = 0.0001  # Step size for algorithm: increase will lead to faster computing times
+    # but lower accuracy
+    # This for loop calculates the perimiter until the specified x-coordinate
+    for x_c in np.arange(0.0, x_coor, step):
+        perim += np.sqrt((step) ** 2 + (p(x_c + step) - p(x_c)) ** 2)
+
+    return perim
+
+
+def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../Airfoil.dat"):
+    """
+    This function returns list of coordinate values where a stiffener is placed
+    based on the spar locations and number of stiffeners. The stiffeners will
+    be distributed equally along the perimiter section between the spars.
+
+    Arguments: -n_st: number of stiffeners
+               -start_x: x location of the LE spar
+               -end_X: x location of the TE spar
+               -dat_file_name: name of the airfoil data file
+
+    Returns: List of x and y coordinates where the stiffeners are placed
+    """
+    Air_data = np.genfromtxt(dat_file_name)
+
+
+    x_coords = Air_data[:81, 0]
+    x_coords = np.flip(x_coords, 0)
+    y_coords = Air_data[:81, 1]
+    y_coords = np.flip(y_coords, 0)
+
+    final_x_coords = np.array([])
+    final_y_coords = np.array([])
+    final_angles = np.array([])
+    p = interp1d(x_coords, y_coords, kind='cubic')
+
+    final_x_y_angle_coord = np.array([])
+    perim = 0
+    stif_perim = get_perim_from_x(end_x) - get_perim_from_x(start_x)
+    perim_spacing = stif_perim / (n_st + 1)
+    step = 0.0001
+    i = 0
+    for x_c in np.arange(start_x, end_x, step):
+        perim += np.sqrt((step) ** 2 + (p(x_c + step) - p(x_c)) ** 2)
+        if i >= n_st:
+            break
+        if abs(perim - perim_spacing) < 10e-5:
+            x_coord = 0.5 * (x_c + x_c + step)
+            y_coord = 0.5 * (p(x_c) + p(x_c + step))
+            slope_angle = -(np.pi - np.arctan((p(x_c + step) - p(x_c)) / (step)))
+            final_x_coords = np.append(final_x_coords, x_coord)
+            final_y_coords = np.append(final_y_coords, y_coord)
+            final_angles = np.append(final_angles, slope_angle)
+            perim = 0
+            i += 1
+
+    # print(perim)
+    a_ran = np.arange(0, 1, 0.0001)
+    #plt.plot([start_x, start_x], [0, p(start_x)], 'b')
+    #plt.plot([end_x, end_x], [0, p(end_x)], 'b')
+    #plt.plot(x_coords, y_coords, '+')
+    #plt.plot(a_ran, p(a_ran), 'r')
+    #plt.plot(final_x_coords, final_y_coords, 'go')
+    #plt.axis((0, 1, 0, 1))
+    #plt.show()
+    return (final_x_coords*chord_l, final_y_coords*chord_l, final_angles)
+
+def stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str):
+
+    x_coords = x_y_angle_coords[0]
+    y_coords = x_y_angle_coords[1]
+    angles = x_y_angle_coords[2]
+    AX_cen = 0
+    AY_cen = 0
+    for i in range(len(x_coords)):
+        x_cen = x_coords[i] + np.sin(angles[i])*h_str/2
+        y_cen = y_coords[i] + np.cos(angles[i])*h_str/2
+        AX_cen += x_cen*A_stringer
+        AY_cen += y_cen*A_stringer
+    X_cen = AX_cen/AreaStringers
+
+    return(X_cen, 2*AX_cen)
 
 def Area_Skin_x_c(Spar1, Spar2):                            #Input deminsionless chordwise location of spar 1 and spar 2
     n = 100 #number of sections
@@ -177,63 +330,32 @@ def length_Skin_x_c(Spar1, Spar2):                            #Input deminsionle
 ## Area of cell enclosed by the wing skin and the stringers
 def Area_cell():
     n = 100 #number of sections
-    dx = ((Spar2-Spar1)/n)
+    dx = ((ChSpar2-ChSpar1)/n)
     area_cell = 0
+    x = ChSpar1
     for i in range(n):
         x = x + dx
         dxlength = dx * Chordlength
-        area_cell = dxlength*airfoilordinate(x)
+        area_cell = dxlength*airfoilordinate(x)*Chordlength
         area_cell = area_cell*2
     return area_cell
 
-# returns stiffener x,y locations and rotation
-# return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 x,y,rot)] m,m,rad
-def stif_loc(z, n_st, cs):
-    n = 100 #number of sections
-    dx = ((Spar2-Spar1)/n)
-    x = Spar1
-    total_perimeter = 0
-    for i in range(n):
-        x = x + dx
-        dxlength = dx * Chordlength
-        dylength = abs(airfoilordinate(x - dx) - airfoilordinate(x)) * Chordlength
-        dlength = np.sqrt(dxlength**2+dylength**2)
-        total_perimeter += dlenght
-    spacing = total_perimeter / ((n_st + 1) / 2)
-    x_y_angle_coords = []
-    for i in range(n_st):
-        local_spacing = i * spacing
-        rot_angle = Wing.Angle(cs) + radians(180)
-        x_coordinate = Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T)
-        x_coordinate += local_spacing
-        #x_coordinate = (-1) * (local_spacing - circle_perim) * cos(atan(0.5 * h / (C_a - 0.5 * h)))
-        y_coordinate = airfoilordinate(x_coordinate)
-
-        apnd_itm = (x_coordinate, y_coordinate, rot_angle)
-        x_y_angle_coords.append(apnd_itm)
-        apnd_itm = (x_coordinate, -y_coordinate, -rot_angle)
-        x_y_angle_coords.append(apnd_itm)
-
-        # print "Stif.", i, "\t x:", x_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
-
-    return x_y_angle_coords  # [(stringer0 x,y,rot),(stringer1 x,y,rot), ...]
 
 
-# For the stringers (placeholder)
-spacingstringers = ((ChSpar2-ChSpar1)/((N_stringers/2)+1)*Chordlength)
-beginspacing = ChSpar1*Chordlength
-A_stringer_x_c=0
-i=1
-while i < int(((N_stringers/2)+1)):
-    dA_stringer_x_c = (i * spacingstringers + beginspacing) * A_stringer
-    A_stringer_x_c = A_stringer_x_c + dA_stringer_x_c
-    i = i + 1
-
+x_y_angle_coords = get_coord_from_perim(N_stringers/2, ChSpar1, ChSpar2, Chordlength)
+X_cen_strs, A_stringer_x_c = stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str)
 Area_x_c = AreaSpar1xc + AreaSpar2xc + Area_Skin_x_c(ChSpar1, ChSpar2) + A_stringer_x_c
-Area = AreaSpar1 + AreaSpar2 + Area_Skin(ChSpar1, ChSpar2)+A_stringer + A_stringer
+Area = AreaSpar1 + AreaSpar2 + Area_Skin(ChSpar1, ChSpar2)+ AreaStringers
 
+centroidspars= (AreaSpar1xc + AreaSpar2xc)/(AreaSpar1 + AreaSpar2)
+centroidskin=Area_Skin_x_c(ChSpar1, ChSpar2)/Area_Skin(ChSpar1, ChSpar2)
+centroidstringer= A_stringer_x_c/AreaStringers
+
+# print('spars', centroidspars/Chordlength)
+# print('skin', centroidskin/Chordlength)
+# print('stringer', centroidstringer/Chordlength)
 centroid = (Area_x_c/Area)/Chordlength
 centroidlength = Area_x_c/Area
 
-print(centroid)
-
+# print(centroid)
+# print(ChSpar1)

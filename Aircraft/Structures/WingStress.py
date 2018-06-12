@@ -8,30 +8,32 @@ Last updated: 08/06/2018 12:38 by Boris
 import sys
 sys.path.append('../') # This makes sure the parent directory gets added to the system path
 
+from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import numpy as np
 from scipy import interpolate
 import math as m
 from Geometry import Geometry
+from Geometry import Wing as GWing
 import Wing
 from Structures import Inertia
 from Structures import Wing
-#from Aerodynamics import Wing as AWing
 from Aerodynamics import Wing as AWing
 from Performance import Performance
 import matplotlib.pyplot as plt
 
 
 
-from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
-
-
 cl, cd, cm = AWing.computeloads()           #Load aerodynamic properties
 n = 20                      #number of the devided sections
 b = Geometry.Wing.b/2         #Wing span
-z = Wing.z      #Span wise postion of the wing in m
-ChordR = Geometry.Wing.c_r      #root chord in m
-rho = Performance.rho_c         #cruise density
-V = Performance.V_cruise        #cruise speed
+b = b.magnitude * ureg.meter
+
+
+
+z = Wing.z.magnitude * ureg.meter      #Span wise postion of the wing in m
+ChordR = Geometry.Wing.c_r.magnitude * ureg.meter      #root chord in m
+rho = Performance.rho_c.magnitude * ureg("kg/(m**3)")         #cruise density
+V = Performance.V_cruise.magnitude * ureg("m/s")        #cruise speed
 zs = b - b/(n*2)     #subtract, zodat hij bij de eerste sectie op de helft begint
 sectionlength = b/n
 L_moment = Q_('0 kg * m ** 2 / s**2')
@@ -39,12 +41,14 @@ D_moment = Q_('0 kg * m ** 2 / s**2')
 L = Q_('0 kg * m / s**2')
 D = Q_('0 kg * m / s**2')
 M = Q_('0 kg * m ** 2 / s**2')
+dLlist = np.array([])
 Llist = np.array([])
+Dlist = np.array([])
 zslist = np.array([])
 
 while zs > z:                               #zs is measured is m from
     Areaofsection = sectionlength*Wing.length_chord(zs)
-    dL = cl * 0.5 * rho * (V**2) * Areaofsection                #lift of the section
+    dL = cl * 0.5 * rho * (V**2) * Areaofsection.magnitude * Q_("1 m**2")                #lift of the section
     dD = cd * 0.5 * rho * (V**2) * Areaofsection        #drag of the section
     dM = cm * 0.5 * rho * (V ** 2) * Areaofsection * Wing.length_chord(zs)      #moment of the section
     dL_moment = zs * dL                                 #moment produced by the lift on section
@@ -56,16 +60,19 @@ while zs > z:                               #zs is measured is m from
     D_moment = D_moment + dD_moment
 
     Llist = np.append(Llist, dL)            #put the values in a list so we can plot them
+    Dlist = np.append(Dlist, dD)
     zslist = np.append(zslist, abs(zs))
 
     zs = zs - sectionlength                 #Select other section for the next loop
 
-print('L sum ', L)                  #print the values
-print('D sum ', D)
-print('M sum ', M)
-print('L_moment', L_moment)
-print('D_moment', D_moment)
-
+Llist *= ureg("N/m")
+Dlist *= ureg("N/m")
+#print('L sum ', L)                  #print the values
+#print('D sum ', D)
+#print('M sum ', M)
+#print('L_moment', L_moment)
+#print('D_moment', D_moment)
+#print("Llist=", Llist[0])
 # plt.plot(zslist, Llist)
 # plt.show()
 
@@ -86,14 +93,19 @@ shear_modulus = Q_("36 GPa") #G
 
 
 
-def Normal_stress_due_to_bending(zs, cs, y): # Normal stress due to bending
+def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
     denominator_inertia_term = Inertia.Ixx_wb*Inertia.Iyy_wb-Inertia.Ixy_wb**2
     inertia_term_1 = (Inertia.Iyy_wb*y-Inertia.Ixy_wb*cs)/denominator_inertia_term
     inertia_term_2 = (Inertia.Ixx_wb*cs-Inertia.Ixy_wb*y)/denominator_inertia_term
     sigma_zs = D_moment*inertia_term_1 + L_moment*inertia_term_2
     return sigma_zs #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
-
+# print('sigma_zs', Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(Wing.c)))
+#SHEAR IS NOT FINISHED
+#SHEAR IS NOT FINISHED
+#SHEAR IS NOT FINISHED
+#SHEAR IS NOT FINISHED
+#SHEAR IS NOT FINISHED
 def Shear_wb(zs):
     #section 01
     section01at1 = Wing.ThSpar1*Wing.HSpar1**2
@@ -110,17 +122,40 @@ def Shear_wb(zs):
     #section23
     section23at3 = section12at2 - Wing.ThSpar2*Wing.HSpar2**2
     qs = -L/Inertia.Ixx_wb*(section01at1+section12at2+section23at3)
-    qbase = 1
+    qbase = Q_("0 N/m") #SHEAR IS NOT FINISHED
     return qs, qbase
 
 
-def Pure_torsion(qbase):
+def Torsion(qbase):
     A_cell = Wing.Area_cell()
     length_skin = Wing.Area/Wing.ThSkin
     length_spar1 = Wing.airfoilordinate(Wing.ChSpar1)
     length_spar2 = Wing.airfoilordinate(Wing.ChSpar2)
-    T = M + 2*A_cell*qbase
+    T = M + 2*(A_cell*qbase)
     const_tor = T/(2*A_cell**2*shear_modulus) #constant term in twist formula
     line_int_tor = (length_skin*2/Wing.t_skin+length_spar1/Wing.ThSpar1+length_spar2/Wing.ThSpar2) #result from line integral from torsion formula
-    twist_wb_pure_tor = const_tor*line_int_tor
-    return twist_wb_pure_tor
+    twist_wb_tor = const_tor*line_int_tor
+    return twist_wb_tor
+print("twist =", Torsion(0))
+
+# Wing deformation in X-direction
+def deformation_x(zs):
+    deformation_temp = Dlist[0]/24*(zs)**4 #-Geometry.Fuselage.D_fus_max/2
+    deformation_temp += -((Dlist[0]-Dlist[-1])/(GWing.b/2))/120*(zs)**5 #-Geometry.Fuselage.D_fus_max/2
+    deformation_x = deformation_temp/(youngs_modulus*Inertia.Ixx_wb)
+    deformation_x += D_moment/2*Geometry.Fuselage.D_fus_max**2/(youngs_modulus*Inertia.Ixx_wb)
+    return deformation_x
+
+print("deformation_x=", deformation_x(GWing.b/2))
+
+
+# Wing deformation in Y-direction
+def deformation_y(zs):
+    deformation_temp = Llist[0]/24*(zs-Geometry.Fuselage.D_fus_max/2)**4
+    deformation_temp += -((Llist[0]-Llist[-1])/(GWing.b/2))/120*(zs-Geometry.Fuselage.D_fus_max/2)**5
+    deformation_y = deformation_temp/(youngs_modulus*Inertia.Iyy_wb)
+    deformation_y += L_moment/2*Geometry.Fuselage.D_fus_max**2/(youngs_modulus*Inertia.Iyy_wb)
+    return deformation_y
+
+
+print("deformation_y=", deformation_y(GWing.b/2))
