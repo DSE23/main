@@ -27,10 +27,10 @@ Spar2T = 1-0.33                     #Chordwise location of second spar at the ti
 Spar1R = 0.15                   #Chordwise location of first spar at the root
 Spar1T = 0.15                   #Chordwise location of first spar at the tip
 ChordR = Geometry.Wing.c_r         #Length of root (m)
-ThSpar1 = Q_('0.005 m')          #Thickness of Spar 1
-ThSpar2 = Q_('0.005 m')          #Thickness of Spar 2
-ThSkin = Q_('0.003 m')           #Thickness of the skin
-N_stringers = 16                  #Number of stringers
+ThSpar1 = Q_('0.003 m')          #Thickness of Spar 1
+ThSpar2 = Q_('0.003 m')          #Thickness of Spar 2
+ThSkin = Q_('0.001 m')           #Thickness of the skin
+N_stringers = 2                  #Number of stringers
 
 
 ##Stringers                     # C stringer dimentions
