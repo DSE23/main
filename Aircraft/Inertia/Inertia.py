@@ -30,7 +30,7 @@ Sparloc1 = strucwing.ChSpar1
 Sparloc2 = strucwing.ChSpar2
 XLEMAC = Geometry.CG.XLEMAC
 Sweep_LE = Geometry.Wing.Sweep_LE
-Y_mac = (b/6)*((1+2*taper_w)/(1+taper))
+Y_mac = (b/6)*((1+2*taper_w)/(1+taper_w))
 # Fuselage
 Z_cg = Geometry.CG.Z_cg
 Y_cg = 0                #Symmetry :P
@@ -141,13 +141,20 @@ for i in range(N_stw):
 ycgw *= Q_("m")
 chordw *= Q_("m")
 xapexw *= Q_("m")
+xms = (Sparloc1 + Sparloc2)/2
 x_c0 = 0
 x_c1 = 0.5 * Sparloc1
-x_c2 = 0.5 * (Sparloc1 + Sparloc2)
-x_c3 = 0.5 * (1 + Sparloc2)
-x_c4 = 1.0
-X_cg = np.array([[xapexw],
-                [1],
-                [1],
-                [1],
-                [1]])
+x_c2 = 0.5 * (Sparloc1 + xms)
+x_c3 = 0.5 * (xms + Sparloc2)
+x_c4 = 0.5 * (1 + Sparloc2)
+x_c5 = 1.0
+L1 = (x_c1-x_c0)
+L4 = x_c5 - x_c4
+xcgw = np.array([[(xapexw + L1/2 * chordw).magnitude],
+                [(xapexw + Sparloc1 * chordw).magnitude],
+                [(xapexw + xms * chordw).magnitude],
+                [(xapexw + Sparloc2 * chordw).magnitude],
+                [(xapexw + (L4+1)/2 * chordw).magnitude]])
+xcgw = xcgw[:,0,:] * Q_("m")
+    
+    
