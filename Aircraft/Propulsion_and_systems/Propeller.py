@@ -31,11 +31,19 @@ def initialise_propxcg(inp):
     xcg = inp
 
 
+def initialise_propinertia(inp):
+    global ixg
+    ixg = inp
+
+
 # End defining global variables
 
 # Start assigning values to variables
 # Propeller mass
-mass = Q_("30 kg")  # DUMMY VALUE, NOT KNOWN YET
+mass = Q_("30 kg")  # Based on MT-propeller (4-bladed)
 
-# Propeller CG
+# CG
 xcg = Q_("-20 cm")  # DUMMY VALUE, NOT KNOWN YET, negative because in front of datum
+
+# Mass moment of inertia
+ixg = Q_("0.9 kg * m**2")  # Based on slightly different propeller

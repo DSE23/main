@@ -15,7 +15,7 @@ import Engine
 
 # Coordinate system:
 # Origin is in propeller attachment to engine
-# X axis: parallel to the crankshaft centerline, pointing towards tail
+# X axis: parallel to the crankshaft centreline, pointing towards tail
 # Y axis: up
 # Z axis: left
 
