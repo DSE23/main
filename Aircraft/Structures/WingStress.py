@@ -59,19 +59,20 @@ while zs > z:                               #zs is measured is m from
     M = M + dM                      #Total moment for one wing
     L_moment = L_moment + dL_moment     #Total bending moment or
     D_moment = D_moment + dD_moment
-
     Llist = np.append(Llist, dL)            #put the values in a list so we can plot them
     Dlist = np.append(Dlist, dD)
     zslist = np.append(zslist, abs(zs))
 
     zs = zs - sectionlength                 #Select other section for the next loop
 
+Llist *= ureg("kg*m/(s**2)")
+Dlist *= ureg("N/m")
 #print('L sum ', L)                  #print the values
 #print('D sum ', D)
 #print('M sum ', M)
 #print('L_moment', L_moment)
 #print('D_moment', D_moment)
-
+print("Llist=", Llist[0])
 # plt.plot(zslist, Llist)
 # plt.show()
 
@@ -149,6 +150,6 @@ def deformation_y(zs):
     deformation_y += D_moment/2*Geometry.Fuselage.D_fus_max**2/(2*youngs_modulus*Inertia.Iyy_wb)
     return deformation_y
 
-Llist
+
 
 print("deformation_y=", deformation_y(GWing.b/2) )
