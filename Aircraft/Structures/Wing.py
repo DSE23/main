@@ -331,6 +331,7 @@ def Area_cell():
     n = 100 #number of sections
     dx = ((Spar2-Spar1)/n)
     area_cell = 0
+    x = Spar1
     for i in range(n):
         x = x + dx
         dxlength = dx * Chordlength
