@@ -29,17 +29,18 @@ Spar1T = 0.15                   #Chordwise location of first spar at the tip
 ChordR = Geometry.Wing.c_r         #Length of root (m)
 ThSpar1 = Q_('0.003 m')          #Thickness of Spar 1
 ThSpar2 = Q_('0.003 m')          #Thickness of Spar 2
-ThSkin = Q_('0.001 m')           #Thickness of the skin
-N_stringers = 2                  #Number of stringers
+ThSkin = Q_('0.002 m')           #Thickness of the skin
+N_stringers = 8                  #Number of stringers
 
 
 ##Stringers                     # C stringer dimentions
-h_str = Q_('0.025 m')            # height of the stringer
-w_str = Q_('0.025 m')            #width of the stringer
-t_str = Q_('0.003 m')            #thickness of the stringer
+h_str = Q_('0.020 m')            # height of the stringer
+w_str = Q_('0.020 m')            #width of the stringer
+t_str = Q_('0.002 m')            #thickness of the stringer
 
 
-z = Q_('0 m')                                       #spanwise posotion in meters
+z = 0                               #spanwise posotion in meters
+z *= Q_('meter')
 c = 0                                               #Chord wise postion in ratio
 
 
@@ -349,11 +350,11 @@ centroidspars= (AreaSpar1xc + AreaSpar2xc)/(AreaSpar1 + AreaSpar2)
 centroidskin=Area_Skin_x_c(ChSpar1, ChSpar2)/Area_Skin(ChSpar1, ChSpar2)
 centroidstringer= A_stringer_x_c/AreaStringers
 
-print('spars', centroidspars/Chordlength)
-print('skin', centroidskin/Chordlength)
-print('stringer', centroidstringer/Chordlength)
+# print('spars', centroidspars/Chordlength)
+# print('skin', centroidskin/Chordlength)
+# print('stringer', centroidstringer/Chordlength)
 centroid = (Area_x_c/Area)/Chordlength
 centroidlength = Area_x_c/Area
 
-print(centroid)
-print(ChSpar1)
+# print(centroid)
+# print(ChSpar1)

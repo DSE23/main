@@ -12,6 +12,9 @@ from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import numpy as np
 from scipy import integrate
 from Structures import Wing
+from Aerodynamics import Wing as AWing
+from Geometry import Geometry
+from Performance import Performance
 from scipy.interpolate import interp1d
 from matplotlib import pyplot as plt
 
@@ -131,7 +134,7 @@ def calc_total_stringer_inertia(x_y_angle_coords, stringer_inertias):
     x_coords = x_y_angle_coords[0]
     x_coords = np.append(x_coords, x_coords)
     x_coords *= ureg.meter
-    print(x_coords)
+    # print(x_coords)
     y_coords = x_y_angle_coords[1]
     y_coords = np.append(y_coords, -y_coords)
     y_coords *= ureg.meter
@@ -167,8 +170,8 @@ I_YY_Skin = Calc_skin_inertia_Iyy(Wing.ChSpar1, Wing.ChSpar2)
 Ixx_wb = I_XX_TOT_str + I_XX_Spar1 + I_XX_Spar2 + I_XX_Skin
 Iyy_wb = I_YY_TOT_str + I_YY_Spar1 + I_YY_Spar2 + I_YY_Skin
 
-print("I_XX TOTAL:", Ixx_wb)
-print("I_YY TOTAL:", Iyy_wb)
+# print("I_XX TOTAL:", Ixx_wb)
+# print("I_YY TOTAL:", Iyy_wb)
 #print('this is', Calc_skin_inertia_Ixx(Wing.ChSpar1, Wing.ChSpar2))
 #print('this is', Calc_skin_inertia_Iyy(Wing.ChSpar1, Wing.ChSpar2))
 
