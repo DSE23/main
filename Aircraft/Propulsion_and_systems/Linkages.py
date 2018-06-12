@@ -16,7 +16,8 @@ sys.path.append('../')
 from Misc import ureg, Q_
 # Imports the unit registry from the Misc folder
 
-
+from Geometry import Geometry
+import numpy as np
 
 # Start defining global variables for easy editing from elsewhere
 # For explanations of the variables defined here, see below, where they are given values
@@ -53,7 +54,7 @@ f_r_max = f_s_r_max*3  # From 1:2:3 ratio for control forces
 l_stick = Q_("81 cm")  # As defined by Gijs
 
 # Rudder travel
-l_rudder = Q_("30 cm")
+l_rudder = Q_("30 cm")  # DUMMY
 # End assigning values
 
 
@@ -68,6 +69,7 @@ m_s_p_max.ito(ureg("newton * meter"))
 print(m_s_p_max)
 
 # Calculate maximum hinge moment in yaw
+r_rudder = l_rudder/np.tan(Geometry.V_tail.delta_r)
 m_r_max = f_r_max * r_rudder
 m_r_max.ito(ureg("newton * meter"))
 print(m_r_max)
