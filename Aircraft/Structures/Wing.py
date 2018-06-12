@@ -390,4 +390,4 @@ centroid = (Area_x_c/Area)/Chordlength
 centroidlength = Area_x_c/Area
 
 print(centroid)
-
+print(ChSpar1)
