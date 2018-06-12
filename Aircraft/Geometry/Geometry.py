@@ -88,7 +88,7 @@ class V_tail(object):
     S_wet = S                                   # [m^2] Wetted area
     S_r = Q_("0.5726 m**2")                                # Rudder area
     c_ru = Q_("0.553 m")                                 # Rudder chord
-    delta_r = m.radians(30)                     # Max rudder deflection
+    delta_r = Q_("30 deg")                     # Max rudder deflection
     X_v = Q_("5.70 m")                                  # [m] 0.25C location compared to the nose
     Z_v = Q_("0.52 m")                                  # [m] Distance MAC_h and zero lift line wing
     t_c = 0.15                                  # [-] t/c V-tail
