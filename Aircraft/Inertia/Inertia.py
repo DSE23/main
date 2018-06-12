@@ -22,7 +22,6 @@ I_zz = Q_("2629 kg m**2")
 
 
 # New inertia Calculation
-Z_w = 0                     # Check this!!!!!!!!!!
 b = Geometry.Wing.b
 c_rw = Geometry.Wing.c_r
 taper_w = Geometry.Wing.taper
@@ -31,6 +30,7 @@ Sparloc2 = strucwing.ChSpar2
 XLEMAC = Geometry.CG.XLEMAC
 Sweep_LE = Geometry.Wing.Sweep_LE
 Y_mac = (b/6)*((1+2*taper_w)/(1+taper_w))
+W_wing = Geometry.Masses.W_wing
 # Fuselage
 Z_cg = Geometry.CG.Z_cg
 Y_cg = 0                #Symmetry :P
@@ -127,7 +127,6 @@ def AreaAfoil(x1, x2, chord):
         x = x + dx
         area_cell = dxlength* strucwing.airfoilordinate(x)
         area_cell = area_cell * 2
-        print(area_cell)
     return area_cell
 
 N_stw = 40
@@ -156,5 +155,28 @@ xcgw = np.array([[(xapexw + L1/2 * chordw).magnitude],
                 [(xapexw + Sparloc2 * chordw).magnitude],
                 [(xapexw + (L4+1)/2 * chordw).magnitude]])
 xcgw = xcgw[:,0,:] * Q_("m")
-    
-    
+zcgw = np.zeros(N_stw)
+a = -W_wing*(((c_rw*(1-taper_w))/sum(chordw))/N_stw)**2
+C1 = 2/b.magnitude *(W_wing.magnitude/2 - b.magnitude**2/8 * a.magnitude)
+C1 = C1 * Q_("m * kg")
+A1 = b**2/(4*N_stw**2)*a/2 + b/(2*N_stw) * C1
+B1 = (3 * b**2)/(2*N_stw**2) * a/4 + b /(2 * N_stw) * C1
+par = B1 - A1
+A_airfoili = np.array([[(AreaAfoil(x_c0, x_c1, chordw)).magnitude],
+                        [(AreaAfoil(x_c1, x_c2, chordw)).magnitude],
+                        [(AreaAfoil(x_c2, x_c3, chordw)).magnitude],
+                        [(AreaAfoil(x_c3, x_c4, chordw)).magnitude],
+                        [(AreaAfoil(x_c4, x_c5-1*10**-10, chordw)).magnitude]])
+A_airfoili = A_airfoili[:,0,:]*Q_("m**2")
+A_airfoilfrac = A_airfoili/sum(A_airfoili)
+from matplotlib import pyplot
+plt.plot(ycgw, A_airfoili[0]*W_wing)
+plt.plot(ycgw, A_airfoili[1]*W_wing)
+plt.plot(ycgw, A_airfoili[2]*W_wing)
+plt.plot(ycgw, A_airfoili[3]*W_wing)
+plt.plot(ycgw, A_airfoili[4]*W_wing)
+
+
+
+
+
