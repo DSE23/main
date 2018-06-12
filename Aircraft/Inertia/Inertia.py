@@ -22,8 +22,10 @@ I_zz = Q_("2629 kg m**2")
 # New inertia Calculation
 
 # Fuselage
-
-x_fus = np.linspace(0, 6.2, 16)
+Z_cg = Geometry.CG.Z_cg
+Y_cg = 0                #Symmetry :P
+X_cg = Geometry.CG.CG_mtow
+x_fus = np.linspace(0, 6.2, 16) * Q_("m")
 y_fus1 = [-400, -502, -520, -520, -509, -482, -439, -390, -342, -292,
           -243, -194, -145, -96, -47, -7.3] * Q_("mm")  # left fuselage y-coord
 y_fus1.ito(Q_("m"))                                   # Centre fuselage y-coord
@@ -53,7 +55,7 @@ r = np.array([[z_fus1.magnitude - z_fus2.magnitude],
               [y_fus2.magnitude - y_fus1.magnitude],
               [r2.magnitude]])
 r *= Q_("m")
-r = r[:,0]
+r = r[:, 0]
 theta = np.array([[np.arctan((y_fus2-y_fus1)/(z_fus1-z_fus2))],
                  [m.radians(90) - np.arctan((y_fus2-y_fus1)/(z_fus1-z_fus2))],
                  [np.arctan((z_fus2-z_fus3)/(y_fus2-y_fus1))],
@@ -62,34 +64,43 @@ theta = np.array([[np.arctan((y_fus2-y_fus1)/(z_fus1-z_fus2))],
                  [np.arctan((z_fus2-z_fus3)/(y_fus2-y_fus1))],
                  [m.radians(90) - np.arctan((y_fus2-y_fus1)/(z_fus1-z_fus2))],
                  [np.arctan((y_fus2-y_fus1)/(z_fus1-z_fus2))]])
+theta = theta[:,0,:] * Q_("rad")
 
-
-alpha = np.array([[theta[0,0]],
-                 [(theta[0,0]+theta[1,0])/2],
-                 [(theta[0,0]+theta[1,0])/2],
-                 [(theta[2,0] + theta[3,0])/2],
-                 [theta[3,0]],
-                 [(theta[2,0] + theta[3,0])/2],
-                 [(theta[0,0]+theta[1,0])/2],
-                 [(theta[0,0]+theta[1,0])/2]])
-alpha = alpha[:,0]
-ycg = np.array([[y_fus1],
-                [r[1]*np.cos(theta[1])],
-                [y_fus2 - y_fus1],
-                [r[3]*np.sin(theta[3])],
-                [y_fus1],
-                [-(r[3]*np.sin(theta[3]))],
-                [-(y_fus2 - y_fus1)],
-                [-(r[1]*np.cos(theta[1]))]])
-ycg = ycg[:,0]
-zcg = np.array([[z_fus1],
-                [z_fus2 + r[1]*np.sin(theta[1])],
-                [z_fus2],
-                [z_fus2 - r[3]*np.cos(theta[3])],
-                [z_fus2],
-                [z_fus2 - r[3]*np.cos(theta[3])],
-                [z_fus2 + r[1]*np.sin(theta[1])]])
-zcg = zcg[:,0]
-
+alpha = np.array([[theta[0]],
+                 [(theta[0] + theta[1])/2],
+                 [(theta[0] + theta[1])/2],
+                 [(theta[2] + theta[3])/2],
+                 [theta[3]],
+                 [(theta[2] + theta[3])/2],
+                 [(theta[0] + theta[1])/2],
+                 [(theta[0] + theta[1])/2]])
+alpha = alpha[:, 0]
+ycg = np.array([[y_fus1.magnitude],
+                [r[1].magnitude*np.cos(theta[1])],
+                [y_fus2.magnitude - y_fus1.magnitude],
+                [r[3].magnitude*np.sin(theta[3])],
+                [y_fus1.magnitude],
+                [-(r[3].magnitude*np.sin(theta[3]))],
+                [-(y_fus2.magnitude - y_fus1.magnitude)],
+                [-(r[1].magnitude*np.cos(theta[1]))]])
+ycg = ycg[:, 0, :] * Q_("m")
+zcg = np.array([[z_fus1.magnitude],
+                [z_fus2.magnitude + r[1].magnitude*np.sin(theta[1, 0])],
+                [z_fus2.magnitude],
+                [z_fus2.magnitude - r[3].magnitude*np.cos(theta[3, 0])],
+                [z_fus2.magnitude],
+                [z_fus2.magnitude - r[3].magnitude*np.cos(theta[3, 0])],
+                [z_fus2.magnitude],
+                [z_fus2.magnitude + r[1].magnitude*np.sin(theta[1, 0])]])
+zcg = zcg[:, 0, :] * Q_("m")
+xcg = np.tile(x_fus, (8,1)) * Q_("m")
 s_pm = r * alpha
 mpm = W_ifus * s_pm/(sum(s_pm))
+I_xxpmf = mpm * ((ycg - Y_cg)**2 + (zcg - Z_cg)**2)
+I_yypmf = mpm * ((zcg - Z_cg)**2 + (xcg - X_cg)**2)
+I_zzpmf = mpm * ((xcg - X_cg)**2 + (ycg - Y_cg)**2)
+I_xzpmf = mpm * ((xcg - X_cg)+(zcg - Z_cg))
+I_xxf = np.sum(np.sum(I_xxpmf))
+I_yyf = np.sum(np.sum(I_yypmf))
+I_zzf = np.sum(np.sum(I_zzpmf))
+I_xzf = np.sum(np.sum(I_xzpmf))
