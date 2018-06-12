@@ -81,7 +81,7 @@ xcg = Engine.length
 # Max load factor (defined from requirements):
 loadfactor = 20
 # Gravitational acceleration
-gravity = Q_("9.81 m/s**2")
+gravity = Q_("9.80665 m/s**2")
 # Roll acceleration, assumed about crankshaft
 roll_acc = Q_("1 rad/s**2")  # DUMMY
 
