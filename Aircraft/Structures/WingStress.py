@@ -26,10 +26,12 @@ import matplotlib.pyplot as plt
 cl, cd, cm = AWing.computeloads()           #Load aerodynamic properties
 n = 20                      #number of the devided sections
 b = Geometry.Wing.b/2         #Wing span
-z = Wing.z      #Span wise postion of the wing in m
-ChordR = Geometry.Wing.c_r      #root chord in m
-rho = Performance.rho_c         #cruise density
-V = Performance.V_cruise        #cruise speed
+b = b.magnitude * ureg.meter
+
+z = Wing.z.magnitude * ureg.meter      #Span wise postion of the wing in m
+ChordR = Geometry.Wing.c_r.magnitude * ureg.meter      #root chord in m
+rho = Performance.rho_c.magnitude * ureg("kg/(m**3)")         #cruise density
+V = Performance.V_cruise.magnitude * ureg("m/s")        #cruise speed
 zs = b - b/(n*2)     #subtract, zodat hij bij de eerste sectie op de helft begint
 sectionlength = b/n
 L_moment = Q_('0 kg * m ** 2 / s**2')
@@ -38,11 +40,12 @@ L = Q_('0 kg * m / s**2')
 D = Q_('0 kg * m / s**2')
 M = Q_('0 kg * m ** 2 / s**2')
 Llist = np.array([])
+Dlist = np.array([])
 zslist = np.array([])
 
 while zs > z:                               #zs is measured is m from
     Areaofsection = sectionlength*Wing.length_chord(zs)
-    dL = cl * 0.5 * rho * (V**2) * Areaofsection                #lift of the section
+    dL = cl * 0.5 * rho * (V**2) * Areaofsection.magnitude * Q_("1 m**2")                #lift of the section
     dD = cd * 0.5 * rho * (V**2) * Areaofsection        #drag of the section
     dM = cm * 0.5 * rho * (V ** 2) * Areaofsection * Wing.length_chord(zs)      #moment of the section
     dL_moment = zs * dL                                 #moment produced by the lift on section
@@ -54,6 +57,7 @@ while zs > z:                               #zs is measured is m from
     D_moment = D_moment + dD_moment
 
     Llist = np.append(Llist, dL)            #put the values in a list so we can plot them
+    Dlist = np.append(Dlist, dD) 
     zslist = np.append(zslist, abs(zs))
 
     zs = zs - sectionlength                 #Select other section for the next loop
@@ -132,6 +136,7 @@ def deformatio_x(zs):
     deformation_x += L_moment/2*widthfuselage
     return deformation_x
 
+print("deformation_x=", deformation_x )
 
 def deformatio_y(zs):
     deformation_temp = lift_at_root/24*(zs-Geometry.D_fus_max/2)^4
@@ -139,3 +144,7 @@ def deformatio_y(zs):
     deformation_y = 1/(youngs_modulus*Inertia.Ixx_wb)*deformation_temp
     deformation_y += D_moment/2*Geometry.D_fus_max/2
     return deformation_y
+
+Llist
+
+print("deformation_y=", deformation_y )
