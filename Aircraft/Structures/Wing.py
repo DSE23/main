@@ -27,16 +27,16 @@ Spar2T = 1-0.33                     #Chordwise location of second spar at the ti
 Spar1R = 0.15                   #Chordwise location of first spar at the root
 Spar1T = 0.15                   #Chordwise location of first spar at the tip
 ChordR = Geometry.Wing.c_r         #Length of root (m)
-ThSpar1 = Q_('0.003 m')          #Thickness of Spar 1
-ThSpar2 = Q_('0.003 m')          #Thickness of Spar 2
-ThSkin = Q_('0.002 m')           #Thickness of the skin
-N_stringers = 8                  #Number of stringers
+ThSpar1 = Q_('0.005 m')          #Thickness of Spar 1
+ThSpar2 = Q_('0.005 m')          #Thickness of Spar 2
+ThSkin = Q_('0.003 m')           #Thickness of the skin
+N_stringers = 16                  #Number of stringers
 
 
 ##Stringers                     # C stringer dimentions
-h_str = Q_('0.020 m')            # height of the stringer
-w_str = Q_('0.020 m')            #width of the stringer
-t_str = Q_('0.002 m')            #thickness of the stringer
+h_str = Q_('0.025 m')            # height of the stringer
+w_str = Q_('0.025 m')            #width of the stringer
+t_str = Q_('0.003 m')            #thickness of the stringer
 
 
 z = 0                               #spanwise posotion in meters
@@ -330,12 +330,13 @@ def length_Skin_x_c(Spar1, Spar2):                            #Input deminsionle
 ## Area of cell enclosed by the wing skin and the stringers
 def Area_cell():
     n = 100 #number of sections
-    dx = ((Spar2-Spar1)/n)
+    dx = ((ChSpar2-ChSpar1)/n)
     area_cell = 0
+    x = ChSpar1
     for i in range(n):
         x = x + dx
         dxlength = dx * Chordlength
-        area_cell = dxlength*airfoilordinate(x)
+        area_cell = dxlength*airfoilordinate(x)*Chordlength
         area_cell = area_cell*2
     return area_cell
 

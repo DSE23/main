@@ -7,8 +7,7 @@ Last updated: 08/06/2018 12:38 by Boris
 ## Forces
 import sys
 sys.path.append('../') # This makes sure the parent directory gets added to the system path
-import fileinput
-import importlib
+
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import numpy as np
 from scipy import interpolate
@@ -22,7 +21,7 @@ from Aerodynamics import Wing as AWing
 from Performance import Performance
 import matplotlib.pyplot as plt
 
-'''Those calculations are done in the Inertia file'''
+
 
 cl, cd, cm = AWing.computeloads()           #Load aerodynamic properties
 n = 20                      #number of the devided sections
@@ -66,12 +65,14 @@ while zs > z:                               #zs is measured is m from
 
     zs = zs - sectionlength                 #Select other section for the next loop
 
-# print('L sum ', L)                  #print the values
-# print('D sum ', D)
-# print('M sum ', M)
-# print('L_moment', L_moment)
-# print('D_moment', D_moment)
-
+Llist *= ureg("N/m")
+Dlist *= ureg("N/m")
+#print('L sum ', L)                  #print the values
+#print('D sum ', D)
+#print('M sum ', M)
+#print('L_moment', L_moment)
+#print('D_moment', D_moment)
+#print("Llist=", Llist[0])
 # plt.plot(zslist, Llist)
 # plt.show()
 
@@ -92,7 +93,6 @@ shear_modulus = Q_("36 GPa") #G
 
 
 
-
 def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
     denominator_inertia_term = Inertia.Ixx_wb*Inertia.Iyy_wb-Inertia.Ixy_wb**2
     inertia_term_1 = (Inertia.Iyy_wb*y-Inertia.Ixy_wb*cs)/denominator_inertia_term
@@ -100,60 +100,62 @@ def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
     sigma_zs = D_moment*inertia_term_1 + L_moment*inertia_term_2
     return sigma_zs #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
-# print('sigma_zs', Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(0.15)))
+# print('sigma_zs', Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(Wing.c)))
+#SHEAR IS NOT FINISHED
+#SHEAR IS NOT FINISHED
+#SHEAR IS NOT FINISHED
+#SHEAR IS NOT FINISHED
+#SHEAR IS NOT FINISHED
+def Shear_wb(zs):
+    #section 01
+    section01at1 = Wing.ThSpar1*Wing.HSpar1**2
+    #section12
+    n = 100 #number of sections
+    ds = (Wing.arclength/n)
+    s = 0
+    line_int_skin_wb = section01at1
+    for i in range(n):
+        s = s + ds
+        dline_int_skin_wb = s * Inertia.get_y_for_perimeter(x)
+        line_int_skin_wb += dline_int_skin_wb
+    section12at2 = Wing.ThSkin * line_int_skin_wb
+    #section23
+    section23at3 = section12at2 - Wing.ThSpar2*Wing.HSpar2**2
+    qs = -L/Inertia.Ixx_wb*(section01at1+section12at2+section23at3)
+    qbase = Q_("0 N/m") #SHEAR IS NOT FINISHED
+    return qs, qbase
 
 
-# NS = Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(0.15))
-# print(Wing.z, NS)
+def Torsion(qbase):
+    A_cell = Wing.Area_cell()
+    length_skin = Wing.Area/Wing.ThSkin
+    length_spar1 = Wing.airfoilordinate(Wing.ChSpar1)
+    length_spar2 = Wing.airfoilordinate(Wing.ChSpar2)
+    T = M + 2*(A_cell*qbase)
+    const_tor = T/(2*A_cell**2*shear_modulus) #constant term in twist formula
+    line_int_tor = (length_skin*2/Wing.t_skin+length_spar1/Wing.ThSpar1+length_spar2/Wing.ThSpar2) #result from line integral from torsion formula
+    twist_wb_tor = const_tor*line_int_tor
+    return twist_wb_tor
+print("twist =", Torsion(0))
 
-#
-# def Shear_wb(zs):
-#     #section 01
-#     section01at1 = Wing.ThSpar1*Wing.HSpar1**2
-#     #section12
-#     n = 100 #number of sections
-#     ds = (Wing.arclength/n)
-#     s = 0
-#     line_int_skin_wb = section01at1
-#     for i in range(n):
-#         s = s + ds
-#         dline_int_skin_wb = s * Inertia.get_y_for_perimeter(x)
-#         line_int_skin_wb += dline_int_skin_wb
-#     section12at2 = Wing.ThSkin * line_int_skin_wb
-#     #section23
-#     section23at3 = section12at2 - Wing.ThSpar2*Wing.HSpar2**2
-#     qs = -L/Inertia.Ixx_wb*(section01at1+section12at2+section23at3)
-#     qbase = 1
-#     return qs, qbase
-#
-#
-# def Torsion(qbase):
-#     A_cell = Wing.Area_cell()
-#     length_skin = Wing.Area/Wing.ThSkin
-#     length_spar1 = Wing.airfoilordinate(Wing.ChSpar1)
-#     length_spar2 = Wing.airfoilordinate(Wing.ChSpar2)
-#     T = M + 2*A_cell*qbase
-#     const_tor = T/(2*A_cell**2*shear_modulus) #constant term in twist formula
-#     line_int_tor = (length_skin*2/Wing.t_skin+length_spar1/Wing.ThSpar1+length_spar2/Wing.ThSpar2) #result from line integral from torsion formula
-#     twist_wb_tor = const_tor*line_int_tor
-#     return twist_wb_tor
-#
-# # Wing deformation in X-direction
-# def deformation_x(zs):
-#     deformation_temp = Dlist[0]/24*(zs-Geometry.Fuselage.D_fus_max)**4
-#     deformation_temp += -((Dlist[0]-Dlist[-1])/(GWing.b/2))/120*(zs-Geometry.Fuselage.D_fus_max/2)**5
-#     deformation_x = 1/(youngs_modulus*Inertia.Ixx_wb)*deformation_temp
-#     deformation_x += L_moment/2*Geometry.Fuselage.D_fus_max/2
-#     return deformation_x
-#
-# print("deformation_x=", deformation_x(GWing.b/2))
-#
-# def deformation_y(zs):
-#     deformation_temp = Llist[0]/24*(zs-Geometry.Fuselage.D_fus_max/2)**4
-#     deformation_temp += -((Llist[0]-Llist[-1])/(GWing.b/2))/120*(zs-Geometry.Fuselage.D_fus_max/2)**5
-#     deformation_y = 1/(youngs_modulus*Inertia.Ixx_wb)*deformation_temp
-#     deformation_y += D_moment/2*Geometry.Fuselage.D_fus_max/2
-#     return deformation_y
-#
-#
-# print("deformation_y=", deformation_y(GWing.b/2) )
+# Wing deformation in X-direction
+def deformation_x(zs):
+    deformation_temp = Dlist[0]/24*(zs)**4 #-Geometry.Fuselage.D_fus_max/2
+    deformation_temp += -((Dlist[0]-Dlist[-1])/(GWing.b/2))/120*(zs)**5 #-Geometry.Fuselage.D_fus_max/2
+    deformation_x = deformation_temp/(youngs_modulus*Inertia.Ixx_wb)
+    deformation_x += D_moment/2*Geometry.Fuselage.D_fus_max**2/(youngs_modulus*Inertia.Ixx_wb)
+    return deformation_x
+
+print("deformation_x=", deformation_x(GWing.b/2))
+
+
+# Wing deformation in Y-direction
+def deformation_y(zs):
+    deformation_temp = Llist[0]/24*(zs-Geometry.Fuselage.D_fus_max/2)**4
+    deformation_temp += -((Llist[0]-Llist[-1])/(GWing.b/2))/120*(zs-Geometry.Fuselage.D_fus_max/2)**5
+    deformation_y = deformation_temp/(youngs_modulus*Inertia.Iyy_wb)
+    deformation_y += L_moment/2*Geometry.Fuselage.D_fus_max**2/(youngs_modulus*Inertia.Iyy_wb)
+    return deformation_y
+
+
+print("deformation_y=", deformation_y(GWing.b/2))

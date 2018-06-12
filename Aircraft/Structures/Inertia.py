@@ -12,9 +12,6 @@ from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import numpy as np
 from scipy import integrate
 from Structures import Wing
-from Aerodynamics import Wing as AWing
-from Geometry import Geometry
-from Performance import Performance
 from scipy.interpolate import interp1d
 from matplotlib import pyplot as plt
 
