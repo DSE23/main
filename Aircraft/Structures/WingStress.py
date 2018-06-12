@@ -64,8 +64,8 @@ print('M sum ', M)
 print('L_moment', L_moment)
 print('D_moment', D_moment)
 
-plt.plot(zslist, Llist)
-plt.show()
+# plt.plot(zslist, Llist)
+# plt.show()
 
 
 
@@ -133,8 +133,8 @@ def deformatio_x(zs):
 
 
 def deformatio_y(zs):
-    deformation_temp = lift_at_root/24*(zs-widthfuselage)^4
-    deformation_temp += lift_slope/120*(zs-widthfuselage)^5
+    deformation_temp = lift_at_root/24*(zs-Geometry.D_fus_max/2)^4
+    deformation_temp += lift_slope/120*(zs-Geometry.D_fus_max/2)^5
     deformation_y = 1/(youngs_modulus*Inertia.Ixx_wb)*deformation_temp
-    deformation_y += D_moment/2*widthfuselage
-    return deformation_x
+    deformation_y += D_moment/2*Geometry.D_fus_max/2
+    return deformation_y
