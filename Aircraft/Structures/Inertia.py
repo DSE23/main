@@ -27,7 +27,7 @@ def get_xy_from_perim(perim_val, start_x=0, dat_file_name="../Airfoil.dat"):
 
 
         Arguments: -perim_val (x coordinate)
-                   -start_x: x_value from where the perimeter integration needs to start
+                   -start_x: x_value from where the perimeter integration needs to start (IN RELATIVE COORD TO CHORD)
                    -dat_file_name (name of the airfoil data file)
 
         Returns: perim (Perimiter value)
@@ -256,7 +256,7 @@ def stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str):
         AY_cen += y_cen*stringer_area
 
     X_cen = AX_cen/(len(x_coords)*stringer_area)
-    return X_cen
+    return(X_cen, 2*AX_cen, 2*len(x_coords)*stringer_area)
 
 def calc_total_stringer_inertia(x_y_angle_coords, stringer_inertias, h_str, w_str, t_str):
 
@@ -278,7 +278,7 @@ def calc_total_stringer_inertia(x_y_angle_coords, stringer_inertias, h_str, w_st
     I_XX_TOT = Q_("0 m**4")
     I_YY_TOT = Q_("0 m**4")
     I_XY_TOT = Q_("0 m**4")
-    X_CEN = stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str)
+    X_CEN = stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str)[0]
     Y_CEN = Q_("0 m")
     print(y_coords)
     print(X_CEN)
