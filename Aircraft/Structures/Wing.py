@@ -339,54 +339,20 @@ def Area_cell():
         area_cell = area_cell*2
     return area_cell
 
-# returns stiffener x,y locations and rotation
-# return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 x,y,rot)] m,m,rad
-def stif_loc(z, n_st, cs):
-    n = 100 #number of sections
-    dx = ((Spar2-Spar1)/n)
-    x = Spar1
-    total_perimeter = 0
-    for i in range(n):
-        x = x + dx
-        dxlength = dx * Chordlength
-        dylength = abs(airfoilordinate(x - dx) - airfoilordinate(x)) * Chordlength
-        dlength = np.sqrt(dxlength**2+dylength**2)
-        total_perimeter += dlenght
-    spacing = total_perimeter / ((n_st + 1) / 2)
-    x_y_angle_coords = []
-    for i in range(n_st):
-        local_spacing = i * spacing
-        rot_angle = Wing.Angle(cs) + radians(180)
-        x_coordinate = Wing.Chord_loc_Spar(z,Wing.Spar1R,Wing.Spar1T)
-        x_coordinate += local_spacing
-        #x_coordinate = (-1) * (local_spacing - circle_perim) * cos(atan(0.5 * h / (C_a - 0.5 * h)))
-        y_coordinate = airfoilordinate(x_coordinate)
 
-        apnd_itm = (x_coordinate, y_coordinate, rot_angle)
-        x_y_angle_coords.append(apnd_itm)
-        apnd_itm = (x_coordinate, -y_coordinate, -rot_angle)
-        x_y_angle_coords.append(apnd_itm)
-
-        # print "Stif.", i, "\t x:", x_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
-
-    return x_y_angle_coords  # [(stringer0 x,y,rot),(stringer1 x,y,rot), ...]
-
-
-# For the stringers (placeholder)
-spacingstringers = ((ChSpar2-ChSpar1)/((N_stringers/2)+1)*Chordlength)
-beginspacing = ChSpar1*Chordlength
-A_stringer_x_c=0
-i=1
-while i < int(((N_stringers/2)+1)):
-    dA_stringer_x_c = (i * spacingstringers + beginspacing) * A_stringer
-    A_stringer_x_c = A_stringer_x_c + dA_stringer_x_c
-    i = i + 1
 
 x_y_angle_coords = get_coord_from_perim(N_stringers/2, ChSpar1, ChSpar2, Chordlength)
 X_cen_strs, A_stringer_x_c = stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str)
 Area_x_c = AreaSpar1xc + AreaSpar2xc + Area_Skin_x_c(ChSpar1, ChSpar2) + A_stringer_x_c
-Area = AreaSpar1 + AreaSpar2 + Area_Skin(ChSpar1, ChSpar2)+A_stringer + A_stringer
+Area = AreaSpar1 + AreaSpar2 + Area_Skin(ChSpar1, ChSpar2)+ AreaStringers
 
+centroidspars= (AreaSpar1xc + AreaSpar2xc)/(AreaSpar1 + AreaSpar2)
+centroidskin=Area_Skin_x_c(ChSpar1, ChSpar2)/Area_Skin(ChSpar1, ChSpar2)
+centroidstringer= A_stringer_x_c/AreaStringers
+
+print('spars', centroidspars/Chordlength)
+print('skin', centroidskin/Chordlength)
+print('stringer', centroidstringer/Chordlength)
 centroid = (Area_x_c/Area)/Chordlength
 centroidlength = Area_x_c/Area
 
