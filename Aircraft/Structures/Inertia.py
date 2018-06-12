@@ -20,6 +20,8 @@ Iyy_aircraft = Q_("1492.8 kg/m/m")
 Ixx_aircraft = Q_("1016.9 kg/m/m")
 Izz_aircraft = Q_("2447.2 kg/m/m")
 
+Ixy_wb = 0 #due to symmetry
+
 def calc_stringer_inertia(h_str, w_str, t_str):
 
     b_1 = w_str/2 - 0.5*t_str
@@ -141,22 +143,29 @@ def calc_total_stringer_inertia(x_y_angle_coords, stringer_inertias, h_str, w_st
     I_XX_TOT = Q_("0 m**4")
     I_YY_TOT = Q_("0 m**4")
     I_XY_TOT = Q_("0 m**4")
-    X_CEN = stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str)[0]
     Y_CEN = Q_("0 m")
-    print(y_coords)
-    print(X_CEN)
     for i in range(len(x_coords)):
         loc_I_xx, loc_I_yy, loc_I_xy = axis_transformation(I_xx_stringer, I_yy_stringer, I_xy_stringer, angles[i])
         I_XX_TOT += loc_I_xx + stringer_area*(y_coords[i])**2
-        I_YY_TOT += loc_I_yy + stringer_area*(x_coords[i] - X_CEN)**2
-        I_XY_TOT += loc_I_xy + stringer_area*(x_coords[i] - X_CEN)*(y_coords[i] - Y_CEN)
+        I_YY_TOT += loc_I_yy + stringer_area*(x_coords[i] - Wing.centroid*Wing.Chordlength)**2
+        I_XY_TOT += loc_I_xy + stringer_area*(x_coords[i] - Wing.centroid*Wing.Chordlength)*(y_coords[i] - Y_CEN)
 
     return I_XX_TOT, I_YY_TOT, I_XY_TOT
 # returns stiffener x,y locations and rotation
 # return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 x,y,rot)] m,m,rad
 
-print(calc_total_stringer_inertia(get_coord_from_perim(5, 0.2, 0.8, Q_("7 m")), calc_stringer_inertia(Q_("30 mm"), Q_("30 mm"), Q_("2 mm")), Q_("30 mm"), Q_("30 mm"), Q_("2 mm")))
+I_XX_TOT_str, I_YY_TOT_str, I_XY_TOT_str = calc_total_stringer_inertia(Wing.get_coord_from_perim(5, 0.2, 0.8, Q_("7 m")), calc_stringer_inertia(Q_("30 mm"), Q_("30 mm"), Q_("2 mm")), Q_("30 mm"), Q_("30 mm"), Q_("2 mm"))
+I_XX_Spar1, I_YY_Spar1 = Calc_spar_inertia(Wing.HSpar1, Wing.ThSpar1, Wing.ChSpar1, Wing.z)
+I_XX_Spar2, I_YY_Spar2 = Calc_spar_inertia(Wing.HSpar2, Wing.ThSpar2, Wing.ChSpar2, Wing.z)
 
+I_XX_Skin = Calc_skin_inertia_Ixx(Wing.ChSpar1, Wing.ChSpar2)
+I_YY_Skin = Calc_skin_inertia_Iyy(Wing.ChSpar1, Wing.ChSpar2)
+
+Ixx_wb = I_XX_TOT_str + I_XX_Spar1 + I_XX_Spar2 + I_XX_Skin
+Iyy_wb = I_YY_TOT_str + I_YY_Spar1 + I_YY_Spar2 + I_YY_Skin
+
+print("I_XX TOTAL:", Ixx_wb)
+print("I_YY TOTAL:", Iyy_wb)
 #print('this is', Calc_skin_inertia_Ixx(Wing.ChSpar1, Wing.ChSpar2))
 #print('this is', Calc_skin_inertia_Iyy(Wing.ChSpar1, Wing.ChSpar2))
 
