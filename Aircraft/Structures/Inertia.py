@@ -126,7 +126,7 @@ def axis_transformation(I_xx, I_yy, I_xy, rot_angle):
     I_uv = (I_xx - I_yy) * 0.5 * np.sin(2 * rot_angle) + I_xy * np.cos(2 * rot_angle)
     return I_uu, I_vv, I_uv
 
-def calc_total_stringer_inertia(x_y_angle_coords, stringer_inertias, h_str, w_str, t_str):
+def calc_total_stringer_inertia(x_y_angle_coords, stringer_inertias):
 
     x_coords = x_y_angle_coords[0]
     x_coords = np.append(x_coords, x_coords)
@@ -157,7 +157,7 @@ def calc_total_stringer_inertia(x_y_angle_coords, stringer_inertias, h_str, w_st
 # returns stiffener x,y locations and rotation
 # return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 x,y,rot)] m,m,rad
 
-I_XX_TOT_str, I_YY_TOT_str, I_XY_TOT_str = calc_total_stringer_inertia(Wing.get_coord_from_perim(5, 0.2, 0.8, Q_("7 m")), calc_stringer_inertia(Q_("30 mm"), Q_("30 mm"), Q_("2 mm")), Q_("30 mm"), Q_("30 mm"), Q_("2 mm"))
+I_XX_TOT_str, I_YY_TOT_str, I_XY_TOT_str = calc_total_stringer_inertia(Wing.get_coord_from_perim(Wing.N_stringers/2, Wing.ChSpar1, Wing.ChSpar2, Wing.Chordlength), calc_stringer_inertia(Wing.h_str, Wing.w_str, Wing.t_str))
 I_XX_Spar1, I_YY_Spar1 = Calc_spar_inertia(Wing.HSpar1, Wing.ThSpar1, Wing.ChSpar1, Wing.z)
 I_XX_Spar2, I_YY_Spar2 = Calc_spar_inertia(Wing.HSpar2, Wing.ThSpar2, Wing.ChSpar2, Wing.z)
 
