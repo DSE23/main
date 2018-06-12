@@ -20,6 +20,8 @@ Iyy_aircraft = Q_("1492.8 kg/m/m")
 Ixx_aircraft = Q_("1016.9 kg/m/m")
 Izz_aircraft = Q_("2447.2 kg/m/m")
 
+Ixy_wb = 0 #due to symmetry
+
 def calc_stringer_inertia(h_str, w_str, t_str):
 
     b_1 = w_str/2 - 0.5*t_str
@@ -159,11 +161,11 @@ I_XX_Spar2, I_YY_Spar2 = Calc_spar_inertia(Wing.HSpar2, Wing.ThSpar2, Wing.ChSpa
 I_XX_Skin = Calc_skin_inertia_Ixx(Wing.ChSpar1, Wing.ChSpar2)
 I_YY_Skin = Calc_skin_inertia_Iyy(Wing.ChSpar1, Wing.ChSpar2)
 
-I_XX_TOTAL = I_XX_TOT_str + I_XX_Spar1 + I_XX_Spar2 + I_XX_Skin
-I_YY_TOTAL = I_YY_TOT_str + I_YY_Spar1 + I_YY_Spar2 + I_YY_Skin
+Ixx_wb = I_XX_TOT_str + I_XX_Spar1 + I_XX_Spar2 + I_XX_Skin
+Iyy_wb = I_YY_TOT_str + I_YY_Spar1 + I_YY_Spar2 + I_YY_Skin
 
-print("I_XX TOTAL:", I_XX_TOTAL)
-print("I_YY TOTAL:", I_YY_TOTAL)
+print("I_XX TOTAL:", Ixx_wb)
+print("I_YY TOTAL:", Iyy_wb)
 #print('this is', Calc_skin_inertia_Ixx(Wing.ChSpar1, Wing.ChSpar2))
 #print('this is', Calc_skin_inertia_Iyy(Wing.ChSpar1, Wing.ChSpar2))
 

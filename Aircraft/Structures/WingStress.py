@@ -13,6 +13,7 @@ import numpy as np
 from scipy import interpolate
 import math as m
 from Geometry import Geometry
+from Geometry import Wing as GWing
 import Wing
 from Structures import Inertia
 from Structures import Wing
@@ -27,6 +28,8 @@ cl, cd, cm = AWing.computeloads()           #Load aerodynamic properties
 n = 20                      #number of the devided sections
 b = Geometry.Wing.b/2         #Wing span
 b = b.magnitude * ureg.meter
+
+
 
 z = Wing.z.magnitude * ureg.meter      #Span wise postion of the wing in m
 ChordR = Geometry.Wing.c_r.magnitude * ureg.meter      #root chord in m
@@ -129,22 +132,22 @@ def Torsion(qbase):
     return twist_wb_tor
 
 # Wing deformation in X-direction
-def deformatio_x(zs):
-    deformation_temp = drag_at_root/24*(zs-widthfuselage)^4
-    deformation_temp += drag_slope/120*(zs-widthfuselage)^5
+def deformation_x(zs):
+    deformation_temp = Dlist[0]/24*(zs-Geometry.D_fus_max)**4
+    deformation_temp += -((Dlist[0]-Dlist[-1])/(GWing.b/2))/120*(zs-Geometry.D_fus_max/2)**5
     deformation_x = 1/(youngs_modulus*Inertia.Ixx_wb)*deformation_temp
-    deformation_x += L_moment/2*widthfuselage
+    deformation_x += L_moment/2*Geometry.D_fus_max/2
     return deformation_x
 
-print("deformation_x=", deformation_x )
+print("deformation_x=", deformation_x(GWing.b/2))
 
-def deformatio_y(zs):
-    deformation_temp = lift_at_root/24*(zs-Geometry.D_fus_max/2)^4
-    deformation_temp += lift_slope/120*(zs-Geometry.D_fus_max/2)^5
+def deformation_y(zs):
+    deformation_temp = Llist[0]/24*(zs-Geometry.D_fus_max/2)**4
+    deformation_temp += -((Llist[0]-Llist[-1])/(GWing.b/2))/120*(zs-Geometry.D_fus_max/2)**5
     deformation_y = 1/(youngs_modulus*Inertia.Ixx_wb)*deformation_temp
     deformation_y += D_moment/2*Geometry.D_fus_max/2
     return deformation_y
 
 Llist
 
-print("deformation_y=", deformation_y )
+print("deformation_y=", deformation_y(GWing.b/2) )
