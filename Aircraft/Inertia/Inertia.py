@@ -14,13 +14,23 @@ from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import math as m
 import numpy as np
 from Geometry import Geometry
+from Structures import Wing as strucwing
 
 I_yy = Q_("1594 kg m**2")
 I_xx = Q_("1089 kg m**2")
 I_zz = Q_("2629 kg m**2")
 
-# New inertia Calculation
 
+# New inertia Calculation
+Z_w = 0                     # Check this!!!!!!!!!!
+b = Geometry.Wing.b
+c_rw = Geometry.Wing.c_r
+taper_w = Geometry.Wing.taper
+Sparloc1 = strucwing.ChSpar1
+Sparloc2 = strucwing.ChSpar2
+XLEMAC = Geometry.CG.XLEMAC
+Sweep_LE = Geometry.Wing.Sweep_LE
+Y_mac = (b/6)*((1+2*taper_w)/(1+taper_w))
 # Fuselage
 Z_cg = Geometry.CG.Z_cg
 Y_cg = 0                #Symmetry :P
@@ -75,7 +85,7 @@ alpha = np.array([[theta[0]],
                  [(theta[0] + theta[1])/2],
                  [(theta[0] + theta[1])/2]])
 alpha = alpha[:, 0]
-ycg = np.array([[y_fus1.magnitude],
+ycgf = np.array([[y_fus1.magnitude],
                 [r[1].magnitude*np.cos(theta[1])],
                 [y_fus2.magnitude - y_fus1.magnitude],
                 [r[3].magnitude*np.sin(theta[3])],
@@ -83,8 +93,8 @@ ycg = np.array([[y_fus1.magnitude],
                 [-(r[3].magnitude*np.sin(theta[3]))],
                 [-(y_fus2.magnitude - y_fus1.magnitude)],
                 [-(r[1].magnitude*np.cos(theta[1]))]])
-ycg = ycg[:, 0, :] * Q_("m")
-zcg = np.array([[z_fus1.magnitude],
+ycgf = ycgf[:, 0, :] * Q_("m")
+zcgf = np.array([[z_fus1.magnitude],
                 [z_fus2.magnitude + r[1].magnitude*np.sin(theta[1, 0])],
                 [z_fus2.magnitude],
                 [z_fus2.magnitude - r[3].magnitude*np.cos(theta[3, 0])],
@@ -92,15 +102,59 @@ zcg = np.array([[z_fus1.magnitude],
                 [z_fus2.magnitude - r[3].magnitude*np.cos(theta[3, 0])],
                 [z_fus2.magnitude],
                 [z_fus2.magnitude + r[1].magnitude*np.sin(theta[1, 0])]])
-zcg = zcg[:, 0, :] * Q_("m")
-xcg = np.tile(x_fus, (8,1)) * Q_("m")
+zcgf = zcgf[:, 0, :] * Q_("m")
+xcgf = np.tile(x_fus, (8,1)) * Q_("m")
 s_pm = r * alpha
 mpm = W_ifus * s_pm/(sum(s_pm))
-I_xxpmf = mpm * ((ycg - Y_cg)**2 + (zcg - Z_cg)**2)
-I_yypmf = mpm * ((zcg - Z_cg)**2 + (xcg - X_cg)**2)
-I_zzpmf = mpm * ((xcg - X_cg)**2 + (ycg - Y_cg)**2)
-I_xzpmf = mpm * ((xcg - X_cg)+(zcg - Z_cg))
+I_xxpmf = mpm * ((ycgf - Y_cg)**2 + (zcgf - Z_cg)**2)
+I_yypmf = mpm * ((zcgf - Z_cg)**2 + (xcgf - X_cg)**2)
+I_zzpmf = mpm * ((xcgf - X_cg)**2 + (ycgf - Y_cg)**2)
+I_xzpmf = mpm * ((xcgf - X_cg)+(zcgf - Z_cg))
 I_xxf = np.sum(np.sum(I_xxpmf))
 I_yyf = np.sum(np.sum(I_yypmf))
 I_zzf = np.sum(np.sum(I_zzpmf))
 I_xzf = np.sum(np.sum(I_xzpmf))
+
+# Wing
+
+def AreaAfoil(x1, x2, chord):
+    n = 100
+    dx = (x2 - x1)/n
+    dxlength = dx * chord
+    area_cell = 0
+    x = x1
+    for i in range(n):
+        x = x + dx
+        area_cell = dxlength* strucwing.airfoilordinate(x)
+        area_cell = area_cell * 2
+        print(area_cell)
+    return area_cell
+
+N_stw = 40
+ycgw = []
+chordw = []
+xapexw = []
+for i in range(N_stw):
+    ycgw = np.append(ycgw, ((i+1)/N_stw * b/2 - 1/2 * (b/2)/N_stw))
+    chordw = np.append(chordw, (c_rw * (1- (((i+1)-0.5) * (1-taper_w))/N_stw)))
+    xapexw = np.append(xapexw, (XLEMAC + ((ycgw[i]*Q_("m")) - Y_mac) * np.tan(Sweep_LE)))
+ycgw *= Q_("m")
+chordw *= Q_("m")
+xapexw *= Q_("m")
+xms = (Sparloc1 + Sparloc2)/2
+x_c0 = 0
+x_c1 = 0.5 * Sparloc1
+x_c2 = 0.5 * (Sparloc1 + xms)
+x_c3 = 0.5 * (xms + Sparloc2)
+x_c4 = 0.5 * (1 + Sparloc2)
+x_c5 = 1.0
+L1 = (x_c1-x_c0)
+L4 = x_c5 - x_c4
+xcgw = np.array([[(xapexw + L1/2 * chordw).magnitude],
+                [(xapexw + Sparloc1 * chordw).magnitude],
+                [(xapexw + xms * chordw).magnitude],
+                [(xapexw + Sparloc2 * chordw).magnitude],
+                [(xapexw + (L4+1)/2 * chordw).magnitude]])
+xcgw = xcgw[:,0,:] * Q_("m")
+    
+    
