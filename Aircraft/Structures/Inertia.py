@@ -20,7 +20,10 @@ Iyy_aircraft = Q_("1492.8 kg/m/m")
 Ixx_aircraft = Q_("1016.9 kg/m/m")
 Izz_aircraft = Q_("2447.2 kg/m/m")
 
-Ixy_wb = 0 #due to symmetry
+
+#Ixy Wing box
+
+Ixy_wb = Q_('0 m**4')
 
 def calc_stringer_inertia(h_str, w_str, t_str):
 
@@ -123,7 +126,7 @@ def axis_transformation(I_xx, I_yy, I_xy, rot_angle):
     I_uv = (I_xx - I_yy) * 0.5 * np.sin(2 * rot_angle) + I_xy * np.cos(2 * rot_angle)
     return I_uu, I_vv, I_uv
 
-def calc_total_stringer_inertia(x_y_angle_coords, stringer_inertias, h_str, w_str, t_str):
+def calc_total_stringer_inertia(x_y_angle_coords, stringer_inertias):
 
     x_coords = x_y_angle_coords[0]
     x_coords = np.append(x_coords, x_coords)
@@ -154,7 +157,7 @@ def calc_total_stringer_inertia(x_y_angle_coords, stringer_inertias, h_str, w_st
 # returns stiffener x,y locations and rotation
 # return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 x,y,rot)] m,m,rad
 
-I_XX_TOT_str, I_YY_TOT_str, I_XY_TOT_str = calc_total_stringer_inertia(Wing.get_coord_from_perim(5, 0.2, 0.8, Q_("7 m")), calc_stringer_inertia(Q_("30 mm"), Q_("30 mm"), Q_("2 mm")), Q_("30 mm"), Q_("30 mm"), Q_("2 mm"))
+I_XX_TOT_str, I_YY_TOT_str, I_XY_TOT_str = calc_total_stringer_inertia(Wing.get_coord_from_perim(Wing.N_stringers/2, Wing.ChSpar1, Wing.ChSpar2, Wing.Chordlength), calc_stringer_inertia(Wing.h_str, Wing.w_str, Wing.t_str))
 I_XX_Spar1, I_YY_Spar1 = Calc_spar_inertia(Wing.HSpar1, Wing.ThSpar1, Wing.ChSpar1, Wing.z)
 I_XX_Spar2, I_YY_Spar2 = Calc_spar_inertia(Wing.HSpar2, Wing.ThSpar2, Wing.ChSpar2, Wing.z)
 
@@ -164,8 +167,8 @@ I_YY_Skin = Calc_skin_inertia_Iyy(Wing.ChSpar1, Wing.ChSpar2)
 Ixx_wb = I_XX_TOT_str + I_XX_Spar1 + I_XX_Spar2 + I_XX_Skin
 Iyy_wb = I_YY_TOT_str + I_YY_Spar1 + I_YY_Spar2 + I_YY_Skin
 
-print("I_XX TOTAL:", Ixx_wb)
-print("I_YY TOTAL:", Iyy_wb)
+#print("I_XX TOTAL:", Ixx_wb)
+#print("I_YY TOTAL:", Iyy_wb)
 #print('this is', Calc_skin_inertia_Ixx(Wing.ChSpar1, Wing.ChSpar2))
 #print('this is', Calc_skin_inertia_Iyy(Wing.ChSpar1, Wing.ChSpar2))
 
@@ -175,41 +178,41 @@ print("I_YY TOTAL:", Iyy_wb)
 #print(stiff_x_y_coord)
 
 
-#VERIFICATION TESTS
-class InertiaTestCase(unittest.TestCase):
-    def setUp(self):
-        self.Inertias = calc_stringer_inertia(Q_("30 mm"), Q_("30 mm"), Q_("2 mm"))
-        self.I_xx_centr = self.Inertias[1][0]
-        self.I_xx_centr.ito(ureg("mm**4"))
-        self.I_yy_centr = self.Inertias[1][1]
-        self.I_yy_centr.ito(ureg("mm**4"))
-        self.I_xy_centr = self.Inertias[1][2]
-        self.I_xy_centr.ito(ureg("mm**4"))
-
-        self.I_xx_transf, self.I_yy_transf, self.I_xy_transf = axis_transformation(15494.67, 4518.67,6272 , -30*np.pi/180)
-
-
-    def test_Ixx_centroid(self):
-        self.assertAlmostEqual(self.I_xx_centr.magnitude, 15494.67, 1,
-                               msg="Verification of I_xx for stringer with SolidWorks FAILED")
-
-    def test_Iyy_centroid(self):
-        self.assertAlmostEqual(self.I_yy_centr.magnitude, 4518.67, 1,
-                               msg="Verification of I_yy for stringer with SolidWorks FAILED")
-
-    def test_Ixy_centroid(self):
-        self.assertAlmostEqual(self.I_xy_centr.magnitude,  6272.00, 1,
-                               msg="Verification of I_xy for stringer with SolidWorks FAILED")
-
-    def test_Transformation(self):
-        self.assertAlmostEqual(self.I_xx_transf, 18182.38, 1,
-                               msg="Verification of transformation formula with SolidWorks FAILED")
-        self.assertAlmostEqual(self.I_yy_transf, 1830.96, 1,
-                               msg="Verification of transformation formula with SolidWorks FAILED")
-        self.assertAlmostEqual(self.I_xy_transf, -1616.75, 1,
-                               msg="Verification of transformation formula with SolidWorks FAILED")
-
-
-
-if __name__ == '__main__':
-    unittest.main()
+# #VERIFICATION TESTS
+# class InertiaTestCase(unittest.TestCase):
+#     def setUp(self):
+#         self.Inertias = calc_stringer_inertia(Q_("30 mm"), Q_("30 mm"), Q_("2 mm"))
+#         self.I_xx_centr = self.Inertias[1][0]
+#         self.I_xx_centr.ito(ureg("mm**4"))
+#         self.I_yy_centr = self.Inertias[1][1]
+#         self.I_yy_centr.ito(ureg("mm**4"))
+#         self.I_xy_centr = self.Inertias[1][2]
+#         self.I_xy_centr.ito(ureg("mm**4"))
+#
+#         self.I_xx_transf, self.I_yy_transf, self.I_xy_transf = axis_transformation(15494.67, 4518.67,6272 , -30*np.pi/180)
+#
+#
+#     def test_Ixx_centroid(self):
+#         self.assertAlmostEqual(self.I_xx_centr.magnitude, 15494.67, 1,
+#                                msg="Verification of I_xx for stringer with SolidWorks FAILED")
+#
+#     def test_Iyy_centroid(self):
+#         self.assertAlmostEqual(self.I_yy_centr.magnitude, 4518.67, 1,
+#                                msg="Verification of I_yy for stringer with SolidWorks FAILED")
+#
+#     def test_Ixy_centroid(self):
+#         self.assertAlmostEqual(self.I_xy_centr.magnitude,  6272.00, 1,
+#                                msg="Verification of I_xy for stringer with SolidWorks FAILED")
+#
+#     def test_Transformation(self):
+#         self.assertAlmostEqual(self.I_xx_transf, 18182.38, 1,
+#                                msg="Verification of transformation formula with SolidWorks FAILED")
+#         self.assertAlmostEqual(self.I_yy_transf, 1830.96, 1,
+#                                msg="Verification of transformation formula with SolidWorks FAILED")
+#         self.assertAlmostEqual(self.I_xy_transf, -1616.75, 1,
+#                                msg="Verification of transformation formula with SolidWorks FAILED")
+#
+#
+#
+# if __name__ == '__main__':
+#     unittest.main()

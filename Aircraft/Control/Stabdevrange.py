@@ -49,7 +49,6 @@ dE_dalpha = Aero_wing.de_da
 Vh_V = Aero_HT.Vh_v
 Cbar = Geometry.Wing.MAC
 I_yy = Inertia.I_yy
-#I_yy = Q_("2000 kg m**2")
 K_yy = I_yy/(MTOW*Cbar**2)
 CNW_alpha = Aero_wing.C_Nw_alpha
 mu_c = MTOW/(rho_a*Cbar*S_wing)

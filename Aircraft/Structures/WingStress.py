@@ -42,6 +42,7 @@ D_moment = Q_('0 kg * m ** 2 / s**2')
 L = Q_('0 kg * m / s**2')
 D = Q_('0 kg * m / s**2')
 M = Q_('0 kg * m ** 2 / s**2')
+dLlist = np.array([])
 Llist = np.array([])
 Dlist = np.array([])
 zslist = np.array([])
@@ -58,19 +59,20 @@ while zs > z:                               #zs is measured is m from
     M = M + dM                      #Total moment for one wing
     L_moment = L_moment + dL_moment     #Total bending moment or
     D_moment = D_moment + dD_moment
-
     Llist = np.append(Llist, dL)            #put the values in a list so we can plot them
-    Dlist = np.append(Dlist, dD) 
+    Dlist = np.append(Dlist, dD)
     zslist = np.append(zslist, abs(zs))
 
     zs = zs - sectionlength                 #Select other section for the next loop
 
-print('L sum ', L)                  #print the values
-print('D sum ', D)
-print('M sum ', M)
-print('L_moment', L_moment)
-print('D_moment', D_moment)
-
+Llist *= ureg("kg*m/(s**2)")
+Dlist *= ureg("N/m")
+#print('L sum ', L)                  #print the values
+#print('D sum ', D)
+#print('M sum ', M)
+#print('L_moment', L_moment)
+#print('D_moment', D_moment)
+print("Llist=", Llist[0])
 # plt.plot(zslist, Llist)
 # plt.show()
 
@@ -98,7 +100,7 @@ def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
     sigma_zs = D_moment*inertia_term_1 + L_moment*inertia_term_2
     return sigma_zs #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
-print('sigma_zs', Normal_stress_due_to_bending(Wing.c, Wing.airfoilordinate(Wing.c)))
+print('sigma_zs', Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(Wing.c)))
 
 def Shear_wb(zs):
     #section 01
@@ -133,21 +135,21 @@ def Torsion(qbase):
 
 # Wing deformation in X-direction
 def deformation_x(zs):
-    deformation_temp = Dlist[0]/24*(zs-Geometry.D_fus_max)**4
-    deformation_temp += -((Dlist[0]-Dlist[-1])/(GWing.b/2))/120*(zs-Geometry.D_fus_max/2)**5
-    deformation_x = 1/(youngs_modulus*Inertia.Ixx_wb)*deformation_temp
-    deformation_x += L_moment/2*Geometry.D_fus_max/2
+    deformation_temp = Dlist[0]/24*(zs-Geometry.Fuselage.D_fus_max/2)**4
+    deformation_temp += -((Dlist[0]-Dlist[-1])/(GWing.b/2))/120*(zs-Geometry.Fuselage.D_fus_max/2)**5
+    deformation_x = deformation_temp/(youngs_modulus*Inertia.Ixx_wb)
+    deformation_x += L_moment/2*Geometry.Fuselage.D_fus_max**2/(2*youngs_modulus*Inertia.Ixx_wb)
     return deformation_x
 
 print("deformation_x=", deformation_x(GWing.b/2))
 
 def deformation_y(zs):
-    deformation_temp = Llist[0]/24*(zs-Geometry.D_fus_max/2)**4
-    deformation_temp += -((Llist[0]-Llist[-1])/(GWing.b/2))/120*(zs-Geometry.D_fus_max/2)**5
-    deformation_y = 1/(youngs_modulus*Inertia.Ixx_wb)*deformation_temp
-    deformation_y += D_moment/2*Geometry.D_fus_max/2
+    deformation_temp = Llist[0]/24*(zs-Geometry.Fuselage.D_fus_max/2)**4
+    deformation_temp += -((Llist[0]-Llist[-1])/(GWing.b/2))/120*(zs-Geometry.Fuselage.D_fus_max/2)**5
+    deformation_y = deformation_temp/(youngs_modulus*Inertia.Iyy_wb)
+    deformation_y += D_moment/2*Geometry.Fuselage.D_fus_max**2/(2*youngs_modulus*Inertia.Iyy_wb)
     return deformation_y
 
-Llist
+
 
 print("deformation_y=", deformation_y(GWing.b/2) )
