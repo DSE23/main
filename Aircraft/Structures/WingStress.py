@@ -17,7 +17,6 @@ from Geometry import Wing as GWing
 import Wing
 from Structures import Inertia
 from Structures import Wing
-#from Aerodynamics import Wing as AWing
 from Aerodynamics import Wing as AWing
 from Performance import Performance
 import matplotlib.pyplot as plt
@@ -59,6 +58,7 @@ while zs > z:                               #zs is measured is m from
     M = M + dM                      #Total moment for one wing
     L_moment = L_moment + dL_moment     #Total bending moment or
     D_moment = D_moment + dD_moment
+
     Llist = np.append(Llist, dL)            #put the values in a list so we can plot them
     Dlist = np.append(Dlist, dD)
     zslist = np.append(zslist, abs(zs))
@@ -72,7 +72,7 @@ Dlist *= ureg("N/m")
 #print('M sum ', M)
 #print('L_moment', L_moment)
 #print('D_moment', D_moment)
-print("Llist=", Llist[0])
+#print("Llist=", Llist[0])
 # plt.plot(zslist, Llist)
 # plt.show()
 
@@ -100,7 +100,7 @@ def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
     sigma_zs = D_moment*inertia_term_1 + L_moment*inertia_term_2
     return sigma_zs #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
-print('sigma_zs', Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(Wing.c)))
+# print('sigma_zs', Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(Wing.c)))
 #SHEAR IS NOT FINISHED
 #SHEAR IS NOT FINISHED
 #SHEAR IS NOT FINISHED

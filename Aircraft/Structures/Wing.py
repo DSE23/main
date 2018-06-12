@@ -39,7 +39,8 @@ w_str = Q_('0.025 m')            #width of the stringer
 t_str = Q_('0.003 m')            #thickness of the stringer
 
 
-z = Q_('0 m')                                       #spanwise posotion in meters
+z = 0                               #spanwise posotion in meters
+z *= Q_('meter')
 c = 0                                               #Chord wise postion in ratio
 
 
@@ -350,11 +351,11 @@ centroidspars= (AreaSpar1xc + AreaSpar2xc)/(AreaSpar1 + AreaSpar2)
 centroidskin=Area_Skin_x_c(ChSpar1, ChSpar2)/Area_Skin(ChSpar1, ChSpar2)
 centroidstringer= A_stringer_x_c/AreaStringers
 
-#print('spars', centroidspars/Chordlength)
-#print('skin', centroidskin/Chordlength)
-#print('stringer', centroidstringer/Chordlength)
+# print('spars', centroidspars/Chordlength)
+# print('skin', centroidskin/Chordlength)
+# print('stringer', centroidstringer/Chordlength)
 centroid = (Area_x_c/Area)/Chordlength
 centroidlength = Area_x_c/Area
 
-#print(centroid)
-#print(ChSpar1)
+# print(centroid)
+# print(ChSpar1)
