@@ -66,11 +66,11 @@ while zs > z:                               #zs is measured is m from
 
     zs = zs - sectionlength                 #Select other section for the next loop
 
-print('L sum ', L)                  #print the values
-print('D sum ', D)
-print('M sum ', M)
-print('L_moment', L_moment)
-print('D_moment', D_moment)
+#print('L sum ', L)                  #print the values
+#print('D sum ', D)
+#print('M sum ', M)
+#print('L_moment', L_moment)
+#print('D_moment', D_moment)
 
 # plt.plot(zslist, Llist)
 # plt.show()
@@ -134,10 +134,10 @@ def Torsion(qbase):
 
 # Wing deformation in X-direction
 def deformation_x(zs):
-    deformation_temp = Dlist[0]/24*(zs-Geometry.Fuselage.D_fus_max)**4
+    deformation_temp = Dlist[0]/24*(zs-Geometry.Fuselage.D_fus_max/2)**4
     deformation_temp += -((Dlist[0]-Dlist[-1])/(GWing.b/2))/120*(zs-Geometry.Fuselage.D_fus_max/2)**5
-    deformation_x = 1/(youngs_modulus*Inertia.Ixx_wb)*deformation_temp
-    deformation_x += L_moment/2*Geometry.Fuselage.D_fus_max/2
+    deformation_x = deformation_temp/(youngs_modulus*Inertia.Ixx_wb)
+    deformation_x += L_moment/2*Geometry.Fuselage.D_fus_max/(2*youngs_modulus*Inertia.Ixx_wb)
     return deformation_x
 
 print("deformation_x=", deformation_x(GWing.b/2))
@@ -145,8 +145,8 @@ print("deformation_x=", deformation_x(GWing.b/2))
 def deformation_y(zs):
     deformation_temp = Llist[0]/24*(zs-Geometry.Fuselage.D_fus_max/2)**4
     deformation_temp += -((Llist[0]-Llist[-1])/(GWing.b/2))/120*(zs-Geometry.Fuselage.D_fus_max/2)**5
-    deformation_y = 1/(youngs_modulus*Inertia.Ixx_wb)*deformation_temp
-    deformation_y += D_moment/2*Geometry.Fuselage.D_fus_max/2
+    deformation_y = deformation_temp/(youngs_modulus*Inertia.Iyy_wb)
+    deformation_y += D_moment/2*Geometry.Fuselage.D_fus_max/(2*youngs_modulus*Inertia.Iyy_wb)
     return deformation_y
 
 Llist

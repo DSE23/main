@@ -349,11 +349,11 @@ centroidspars= (AreaSpar1xc + AreaSpar2xc)/(AreaSpar1 + AreaSpar2)
 centroidskin=Area_Skin_x_c(ChSpar1, ChSpar2)/Area_Skin(ChSpar1, ChSpar2)
 centroidstringer= A_stringer_x_c/AreaStringers
 
-print('spars', centroidspars/Chordlength)
-print('skin', centroidskin/Chordlength)
-print('stringer', centroidstringer/Chordlength)
+#print('spars', centroidspars/Chordlength)
+#print('skin', centroidskin/Chordlength)
+#print('stringer', centroidstringer/Chordlength)
 centroid = (Area_x_c/Area)/Chordlength
 centroidlength = Area_x_c/Area
 
-print(centroid)
-print(ChSpar1)
+#print(centroid)
+#print(ChSpar1)

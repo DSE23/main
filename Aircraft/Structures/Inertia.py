@@ -167,8 +167,8 @@ I_YY_Skin = Calc_skin_inertia_Iyy(Wing.ChSpar1, Wing.ChSpar2)
 Ixx_wb = I_XX_TOT_str + I_XX_Spar1 + I_XX_Spar2 + I_XX_Skin
 Iyy_wb = I_YY_TOT_str + I_YY_Spar1 + I_YY_Spar2 + I_YY_Skin
 
-print("I_XX TOTAL:", Ixx_wb)
-print("I_YY TOTAL:", Iyy_wb)
+#print("I_XX TOTAL:", Ixx_wb)
+#print("I_YY TOTAL:", Iyy_wb)
 #print('this is', Calc_skin_inertia_Ixx(Wing.ChSpar1, Wing.ChSpar2))
 #print('this is', Calc_skin_inertia_Iyy(Wing.ChSpar1, Wing.ChSpar2))
 
