@@ -73,8 +73,8 @@ Dlist *= ureg("N/m")
 #print('L_moment', L_moment)
 #print('D_moment', D_moment)
 #print("Llist=", Llist[0])
-# plt.plot(zslist, Llist)
-# plt.show()
+plt.plot(zslist, Llist)
+plt.show()
 
 
 
