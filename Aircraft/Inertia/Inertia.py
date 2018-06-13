@@ -33,7 +33,7 @@ Sparloc1 = strucwing.ChSpar1
 Sparloc2 = strucwing.ChSpar2
 XLEMAC = Geometry.CG.XLEMAC
 Sweep_LE = Geometry.Wing.Sweep_LE
-Y_mac = (b/6)*((1+2*taper_w)/(1+taper_w))
+Y_mac = (b/6)*((1+2*taper_w)/(1+taper_w))           # Y location MAC
 W_Htail = Geometry.Masses.W_htail
 W_Vtail = Geometry.Masses.W_vtail
 W_wing = Geometry.Masses.W_wing
@@ -44,14 +44,14 @@ rho_rib = StrucVal.Density                          # Density rib material
 k_rib = 0.5 * 10**-3                                # Value from Inertia report
 t_ref = Q_("1 m")                                   # Reference thickness
 t_c = Geometry.Wing.T_Cmax
-t_rootwrib = c_rw * t_c
-t_tipwrib = c_tw * t_c
+t_rootwrib = c_rw * t_c                           # Thickness of airfoil at root
+t_tipwrib = c_tw * t_c                            # Thickness of airfoil at tip
 W_rib = k_rib * rho_rib * S_wing * (t_ref + (t_rootwrib + t_tipwrib)/2)
-W_skin = W_wing - (W_spar1 + W_spar2 + W_rib)
-F_fs = W_spar1/W_wing
-F_rs = W_spar2/W_wing
-F_skin = W_skin/W_wing
-F_ribs = W_rib/W_wing
+W_skin = W_wing - (W_spar1 + W_spar2 + W_rib)     # Skin weight
+F_fs = W_spar1/W_wing                             # Front spar W fraction
+F_rs = W_spar2/W_wing                             # Rear spar W fraction
+F_skin = W_skin/W_wing                            # Skin W fraction
+F_ribs = W_rib/W_wing                             # Ribs W fraction
 
 # Fuselage
 Z_cg = Geometry.CG.Z_cg
@@ -69,12 +69,12 @@ z_fus3 = [395, 115, 6.0, 9, 25, 41, 57, 73, 90, 106,
           122, 138, 154, 171, 187, 200] * Q_("mm")  # Fuselage Z-coord lower
 z_fus3.ito(Q_("m"))
 z_fus2 = (z_fus1 + z_fus3) / 2
-Afusi = abs(y_fus1) * (z_fus1-z_fus2) * np.pi
-SumAfus = sum(Afusi)
+Afusi = abs(y_fus1) * (z_fus1-z_fus2) * np.pi      # Areas of fuselage sections
+SumAfus = sum(Afusi)                                
 W_fus = Geometry.Masses.W_fus
 W_ifus = W_fus * Afusi/SumAfus
 
-rho_12 = 1
+rho_12 = 1                                         # Needs update (tomorrow)
 rho_23 = 1
 r2 = rho_12 * np.sqrt((z_fus1-z_fus2)**2+(y_fus2-y_fus1)**2)
 r4 = rho_23 * np.sqrt((z_fus1 - z_fus2)**2 + (y_fus2 - y_fus1)**2)
@@ -96,7 +96,7 @@ theta = np.array([[np.arctan((y_fus2-y_fus1)/(z_fus1-z_fus2))],
                  [np.arctan((z_fus2-z_fus3)/(y_fus2-y_fus1))],
                  [m.radians(90) - np.arctan((y_fus2-y_fus1)/(z_fus1-z_fus2))],
                  [np.arctan((y_fus2-y_fus1)/(z_fus1-z_fus2))]])
-theta = theta[:,0,:] * Q_("rad")
+theta = theta[:, 0, :] * Q_("rad")
 
 alpha = np.array([[theta[0]],
                  [(theta[0] + theta[1])/2],
@@ -129,7 +129,7 @@ xcgf = np.tile(x_fus, (8, 1)) * Q_("m")
 s_pm = r * alpha
 mpm = W_ifus * s_pm/(sum(s_pm))
 
-I_xxpmf = mpm * ((ycgf - Y_cg)**2 + (zcgf - Z_cg)**2)
+I_xxpmf = mpm * ((ycgf - Y_cg)**2 + (zcgf - Z_cg)**2)     
 I_yypmf = mpm * ((zcgf - Z_cg)**2 + (xcgf - X_cg)**2)
 I_zzpmf = mpm * ((xcgf - X_cg)**2 + (ycgf - Y_cg)**2)
 I_xzpmf = mpm * ((xcgf - X_cg) * (zcgf - Z_cg))
@@ -139,6 +139,7 @@ I_zzf = np.sum(np.sum(I_zzpmf))
 I_xzf = np.sum(np.sum(I_xzpmf))
 
 # Wing
+
 
 def AreaAfoil(x1, x2, chord):
     n = 100
@@ -172,9 +173,9 @@ x_c3 = 0.5 * (xms + Sparloc2)
 x_c4 = 0.5 * (1 + Sparloc2)
 x_c5 = 1.0
 L1 = x_c1
-L2 = x_c2 
-L3 = x_c3 
-L4 = x_c4 
+L2 = x_c2
+L3 = x_c3
+L4 = x_c4
 L5 = 1
 xcgw = np.array([[(xapexw + L1/2 * chordw).magnitude],
                 [(xapexw + Sparloc1 * chordw).magnitude],
@@ -182,25 +183,22 @@ xcgw = np.array([[(xapexw + L1/2 * chordw).magnitude],
                 [(xapexw + Sparloc2 * chordw).magnitude],
                 [(xapexw + (L4+1)/2 * chordw).magnitude]])
 xcgw = xcgw[:, 0, :] * Q_("m")
-ycgw = np.tile(ycgw, (5,1))
+ycgw = np.tile(ycgw, (5, 1))
 ycgw = ycgw * Q_("m")
 zcgw = np.zeros(N_stw) * Q_("m")
 a = -W_wing*(((c_rw*(1-taper_w))/sum(chordw))/N_stw)**2
-C1 = 2/b.magnitude *(W_wing.magnitude/2 - b.magnitude**2/8 * a.magnitude)
+C1 = 2/b.magnitude * (W_wing.magnitude/2 - b.magnitude**2/8 * a.magnitude)
 C1 = C1 * Q_("m * kg")
 A1 = b**2/(4*N_stw**2)*a/2 + b/(2*N_stw) * C1
-B1 = (3 * b**2)/(2*N_stw**2) * a/4 + b /(2 * N_stw) * C1
+B1 = (3 * b**2) / (2 * N_stw**2) * a/4 + b / (2 * N_stw) * C1
 par = B1 - A1
 A_airfoili = np.array([[(AreaAfoil(x_c0, x_c1, chordw)).magnitude],
                        [(AreaAfoil(x_c1, x_c2, chordw)).magnitude],
                        [(AreaAfoil(x_c2, x_c3, chordw)).magnitude],
                        [(AreaAfoil(x_c3, x_c4, chordw)).magnitude],
                        [(AreaAfoil(x_c4, x_c5-1*10**-10, chordw)).magnitude]])
-# A_airfoili = A_airfoili[:, 0, :]*Q_("m**2")
 A_airfoilfrac = A_airfoili/sum(A_airfoili)
-# W_sec = ycgw/((b/2) * N_stw) * W_wing
-# mpmw = W_sec * A_airfoilfrac
-N_windex = np.linspace(1,40,40)
+N_windex = np.linspace(1, 40, 40)
 mpmw = np.array([[((L1 * F_skin + A_airfoilfrac[0]*F_ribs)*(A1+par*(N_windex-1))).magnitude],
                  [(((L2 - L1) * F_skin + A_airfoilfrac[1] * F_ribs + F_fs)*(A1 + par*(N_windex-1))).magnitude],
                  [(((L3 - L2) * F_skin + A_airfoilfrac[2] * F_ribs)*(A1 + par*(N_windex-1))).magnitude],
@@ -223,10 +221,10 @@ c_rh = Geometry.H_tail.c_r
 b_h = Geometry.H_tail.b
 c_th = Geometry.H_tail.c_t
 Sweep_LE = Geometry.H_tail.Sweep_LE
-C_ah = min(c_rh, ((b_h*np.tan(Sweep_LE))/2), (c_th + (b_h*np.tan(Sweep_LE))/2) )
+C_ah = min(c_rh, ((b_h*np.tan(Sweep_LE))/2), (c_th + (b_h*np.tan(Sweep_LE))/2))
 C_bh = b_h*np.tan(Sweep_LE)/2 + c_th
-C_ch = max(c_rh, ((b_h*np.tan(Sweep_LE))/2), (c_th + (b_h*np.tan(Sweep_LE))/2) )
-rho_h = W_Htail/ (0.5 * ( -C_ah + C_bh + C_ch))
+C_ch = max(c_rh, ((b_h*np.tan(Sweep_LE))/2), (c_th + (b_h*np.tan(Sweep_LE))/2))
+rho_h = W_Htail / (0.5 * (-C_ah + C_bh + C_ch))
 n_disctail = 25
 x_h1 = np.linspace(0, C_ah, n_disctail)
 x_h2 = np.linspace(C_ah, C_bh, n_disctail)
@@ -239,23 +237,23 @@ x_h3 *= Q_("m")
 hdx3 = x_h3[1]-x_h3[0]
 y1 = rho_h/C_ah * x_h1
 y2 = rho_h * (n_disctail*[1])
-y3 = -((rho_h* x_h3)/(C_ch - C_bh)) + (rho_h * C_ch)/(C_ch - C_bh)
+y3 = -((rho_h * x_h3)/(C_ch - C_bh)) + (rho_h * C_ch)/(C_ch - C_bh)
 I_h = rho_h/12 * (-C_ah**3 + C_bh**3 + C_ch**2 * C_bh + C_ch*C_bh**2 + C_ch**3)
-K_0 = 0.771                             # From source 
+K_0 = 0.771                             # From source
 sigmx_h = sum(y1 * hdx1 * x_h1) + sum(y2 * hdx2 * x_h2) + sum(y3 * hdx3 * x_h3)
 sigm_h = sum(y1 * hdx1) + sum(y2 * hdx2) + sum(y3 * hdx3)
 I_0yh = K_0 * (I_h - sigmx_h**2/sigm_h)
-dxLE_h =  0.25 * c_rh - 0.25* c_th 
-y_h = (2*c_th* dxLE_h + c_th**2 + dxLE_h * c_rh +\
-       c_th * c_rh + c_rh**2)/(3*(c_rh + c_th)) 
+dxLE_h = 0.25 * c_rh - 0.25 * c_th
+y_h = (2 * c_th * dxLE_h + c_th**2 + dxLE_h * c_rh +\
+       c_th * c_rh + c_rh**2)/(3 * (c_rh + c_th))
 H_rollcoeff = y_h/(b_h/6*((c_rh + 2 * c_th)/(c_rh + c_th)))
 if not 0.95 < H_rollcoeff < 0.97:
     print(" !!!!Change k_4!!!!!")
 k_4 = 0.88                              # From graphs, dependent on H_rollcoeff
-I_0xh = (W_Htail * b_h**2 * k_4)/24 * ((c_rh+3*c_th)/(c_rh +c_th))
+I_0xh = (W_Htail * b_h**2 * k_4)/24 * ((c_rh+3 * c_th)/(c_rh + c_th))
 I_0zh = I_0yh + I_0xh
 ycgh = 0
-zcgh = Geometry.H_tail.Z_h              # Symmetric wing, so cg in middle of height
+zcgh = Geometry.H_tail.Z_h          # Symmetric wing, so cg in middle of height
 xcgh = Geometry.CG.CG_htail             # CG location in x-axis of the H-tail
 I_xxh = I_0xh + W_Htail * ((ycgh - Y_cg)**2 + (zcgh - Z_cg)**2)
 I_yyh = I_0yh + W_Htail * ((xcgh - X_cg)**2 + (zcgh - Z_cg)**2)
@@ -270,7 +268,7 @@ Sweep_LEv = Geometry.V_tail.Sweep_LE
 C_av = min(c_rv, ((b_v*np.tan(Sweep_LEv))/2), (c_tv + (b_v*np.tan(Sweep_LEv))/2))
 C_bv = c_tv + (b_v*np.tan(Sweep_LEv))/2
 C_cv = max(c_rv, ((b_v*np.tan(Sweep_LEv))/2), (c_tv + (b_v*np.tan(Sweep_LEv))/2))
-rho_v =W_Vtail/(0.5 * (-C_av + C_bv + C_cv))
+rho_v = W_Vtail/(0.5 * (-C_av + C_bv + C_cv))
 x_v1 = np.linspace(0, C_av, n_disctail)
 x_v2 = np.linspace(C_av, C_bv, n_disctail)
 x_v3 = np.linspace(C_bv, C_cv, n_disctail)
@@ -291,7 +289,7 @@ V_rollcoef = z_vbar/((b_v/3)*(c_rv + 2* c_tv)/(c_rv + c_tv))
 k_5 = 1.4
 if not 1.6 < V_rollcoef < 1.65:
     print(" !!!! Change K_5!!!!!")
-I_0xv = (W_Vtail * b_v**2 * k_5)/18 * (1+ (2*c_rv*c_tv)/(c_rv+c_tv)**2)
+I_0xv = (W_Vtail * b_v**2 * k_5)/18 * (1+ (2 * c_rv * c_tv)/(c_rv + c_tv)**2)
 sigmx_v = sum(yv1 * vdx1 * x_v1) + sum(yv2 * vdx2 * x_v2) + sum(yv3 * vdx3 * x_v3)
 sigm_v = sum(yv1 * vdx1) + sum(yv2 * vdx2) + sum(yv3 * vdx3)
 I_0zv = K_0 * (I_v - sigmx_v**2/sigm_v)
@@ -316,7 +314,7 @@ xcge = Geometry.CG.CG_engine
 I_xxe = I_0xe + W_engine * ((ycge - Y_cg)**2 + (zcge - Z_cg)**2)
 I_yye = I_0ye + W_engine * ((xcge - X_cg)**2 + (zcge - Z_cg)**2)
 I_zze = I_0ze + W_engine * ((xcge - X_cg)**2 + (ycge - Y_cg)**2)
-I_xze = W_engine *(xcge - X_cg) * (zcge - Z_cg)
+I_xze = W_engine * (xcge - X_cg) * (zcge - Z_cg)
 
 
 # Fuel

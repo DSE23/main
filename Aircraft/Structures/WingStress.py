@@ -148,11 +148,7 @@ def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
     return sigma_zs #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
 # print('sigma_zs', Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(Wing.c)))
-#SHEAR IS NOT FINISHED
-#SHEAR IS NOT FINISHED
-#SHEAR IS NOT FINISHED
-#SHEAR IS NOT FINISHED
-#SHEAR IS NOT FINISHED
+
 def calc_moment_from_shear(qs, t_sk, t_sp, zs):
     Moment = 0
     step = 0.0001
@@ -218,7 +214,7 @@ def Shear_wb(zs):
     section23at3 = qs3[-1]
     qbase = 2*(""" add moment here from part of midas above, we may not forget to change this, this is why this line exceeds the length limit """ )/Wing.Area_cell()
     qbase = Q_("0 N/m")
-    return qs, qbase
+    return qs1, s1,qs2, s2,qs3, s3, qbase
 
 # print(Shear_wb(Wing.z))
 
@@ -258,6 +254,10 @@ def deformation_y(zs):
 
 
 #print("deformation_y=", deformation_y(GWing.b/2))
+
+
+#Von Mises Yield stress criterion
+
 
 
 
