@@ -8,9 +8,9 @@ from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import numpy as np
 from scipy import interpolate
 import math as m
+import Wing
 from Geometry import Geometry
 from Geometry import Wing as GWing
-import Wing
 from Structures import Inertia
 from Structures import Wing
 from Structures import WingStress
@@ -28,6 +28,9 @@ Vol_mat_spar2 = Q_('0 m**3')
 Vol_mat_skin = Q_('0 m**3')
 Vol_mat_string = Q_('0 m**3')
 Vol_mat_wing = Q_('0 m**3')
+
+Lmomentlist = np.array([])
+
 z = 0
 while z < b.magnitude+0.1:
     NS = WingStress.Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(0.15))
@@ -40,8 +43,9 @@ while z < b.magnitude+0.1:
     Vol_mat_skin = Vol_mat_skin + Wing.Area_Skin(Wing.ChSpar1, Wing.ChSpar2) * (b / n)
     Vol_mat_string = Vol_mat_string + Wing.AreaStringers * (b / n)
     Vol_mat_wing = Vol_mat_wing + Wing.Area * (b / n)
+    Lmomentlist = np.append(Lmomentlist, WingStress.L_moment)
 
-    print(Wing.z, NS)
+    print(Wing.z, NS, Wing.N_stringers)
     text_to_search = 'z = ' + str(z)
     z = z + b.magnitude/n
     replacement_text = 'z = ' + str(z)
@@ -49,9 +53,33 @@ while z < b.magnitude+0.1:
         for line in file:
             print(line.replace(text_to_search, replacement_text), end='')
 
-    if z > 2.3:
+    if Geometry.Fuselage.b_f.magnitude < z < 2.0:
         text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
-        New_N_stringers = 25
+        New_N_stringers = 15
+        replacement_text = 'N_stringers = ' + str(New_N_stringers)
+        with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
+            for line in file:
+                print(line.replace(text_to_search, replacement_text), end='')
+
+    if 2.0 < z < 2.5:
+        text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
+        New_N_stringers = 10
+        replacement_text = 'N_stringers = ' + str(New_N_stringers)
+        with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
+            for line in file:
+                print(line.replace(text_to_search, replacement_text), end='')
+
+    if 2.5 < z < 3.5:
+        text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
+        New_N_stringers = 2
+        replacement_text = 'N_stringers = ' + str(New_N_stringers)
+        with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
+            for line in file:
+                print(line.replace(text_to_search, replacement_text), end='')
+
+    if z > 3.5:
+        text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
+        New_N_stringers = 2
         replacement_text = 'N_stringers = ' + str(New_N_stringers)
         with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
             for line in file:
@@ -96,5 +124,5 @@ data[17] = 'Density = Q_(\"' + str(Density) + '\")\n'
 with open('StrucVal.py', 'w') as file:
     file.writelines(data)
 
-plt.plot(zarray, Normalstress)
+plt.plot(zarray, Lmomentlist)
 plt.show()
