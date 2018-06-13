@@ -17,6 +17,7 @@ sys.path.append('../') # This makes sure the parent directory gets added to the 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import math as m
 import numpy as np
+from Structures import StrucVal
 
 class Wing(object):
     
@@ -40,6 +41,7 @@ class Wing(object):
     Sweep_LE *= Q_('deg')
     Dihedral = Q_('0.0 deg')             # [deg] Dihedral angle
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))   # [m] Mean aerodynamic chord
+    T_Cmax = 0.1513                             #Max thickness over chord
     S_wet = 2*S                   # Wetted wing area
     S_a = Q_('2.677 m**2')                 # Aileron area
     c_a = Q_('0.3828 m')                # Aileron chord
@@ -100,7 +102,7 @@ class Landing_gear(object):
 
 
 class Masses(object):                    # !!!Structures should watch this!!!
-    W_wing = Q_("121 kg")                # [kg] Mass of the wing
+    W_wing = StrucVal.Weightwing * 2     # Weight of the wing
     W_htail = Q_("18 kg")                # [kg] Mass of H_tail
     W_vtail = Q_("6 kg")                 # [kg] Mass of V_tail
     W_fus = Q_("82 kg")                  # [kg] Mass of Fuselage
