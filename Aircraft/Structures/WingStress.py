@@ -97,6 +97,19 @@ for i in np.arange(0, len(dLlist)):
     L_moment *= Q_('kg * m**2/s**2')
     D_moment *= Q_('kg * m**2/s**2')
 
+'''For the 20G manoeuver'''
+MTOW = Geometry.Masses.W_MTOW
+Max_20G_N = MTOW * 9.81 * 20
+Tot_L = 2 * L
+fac_20G = Max_20G_N / Tot_L
+fac_20G = fac_20G.magnitude
+
+L_moment = L_moment * fac_20G
+D_moment = D_moment * fac_20G
+L = L * fac_20G
+D = D * fac_20G
+M = M * fac_20G
+
 
 Llist *= ureg("N/m")
 Dlist *= ureg("N/m")
@@ -126,20 +139,16 @@ shear_modulus = Q_("36 GPa") #G
 
 
 
-def Normal_stress_due_to_bending(cs, y, zs): # Normal stress due to bending
+def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
     denominator_inertia_term = Inertia.Ixx_wb*Inertia.Iyy_wb-Inertia.Ixy_wb**2
     inertia_term_1 = (Inertia.Iyy_wb*y-Inertia.Ixy_wb*cs)/denominator_inertia_term
     inertia_term_2 = (Inertia.Ixx_wb*cs-Inertia.Ixy_wb*y)/denominator_inertia_term
     sigma_zs = D_moment*inertia_term_1 + L_moment*inertia_term_2
-    strain = sigma_zs /youngs_modulus*zs 
-    return strain #Gives the normal stress function for a given span zs, and x- and y- coordinate
+    strain = sigma_zs /youngs_modulus
+    return sigma_zs #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
 # print('sigma_zs', Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(Wing.c)))
-#SHEAR IS NOT FINISHED
-#SHEAR IS NOT FINISHED
-#SHEAR IS NOT FINISHED
-#SHEAR IS NOT FINISHED
-#SHEAR IS NOT FINISHED
+
 def calc_moment_from_shear(qs, t_sk, t_sp, zs):
     Moment = 0
     step = 0.0001
@@ -205,9 +214,9 @@ def Shear_wb(zs):
     section23at3 = qs3[-1]
     qbase = 2*(""" add moment here from part of midas above, we may not forget to change this, this is why this line exceeds the length limit """ )/Wing.Area_cell()
     qbase = Q_("0 N/m")
-    return qs, qbase
+    return qs1, s1,qs2, s2,qs3, s3, qbase
 
-print(Shear_wb(Wing.z))
+# print(Shear_wb(Wing.z))
 
 def Torsion(zs, qbase):
     A_cell = Wing.Area_cell()
@@ -245,6 +254,10 @@ def deformation_y(zs):
 
 
 #print("deformation_y=", deformation_y(GWing.b/2))
+
+
+#Von Mises Yield stress criterion
+
 
 
 
