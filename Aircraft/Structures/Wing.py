@@ -30,7 +30,7 @@ ChordR = Geometry.Wing.c_r         #Length of root (m)
 ThSpar1 = Q_('0.003 m')          #Thickness of Spar 1
 ThSpar2 = Q_('0.002 m')          #Thickness of Spar 2
 ThSkin = Q_('0.002 m')           #Thickness of the skin
-N_stringers = 2                  #Number of stringers
+N_stringers = 10                  #Number of stringers
 
 
 ##Stringers                     # C stringer dimentions
@@ -39,7 +39,7 @@ w_str = Q_('0.025 m')            #width of the stringer
 t_str = Q_('0.003 m')            #thickness of the stringer
 
 
-z = 0                           #spanwise posotion in meters
+z = 4.017773014992261                           #spanwise posotion in meters
 z *= Q_('meter')
 c = 0                                               #Chord wise postion in ratio
 
