@@ -16,8 +16,8 @@ from Misc import ureg, Q_
 
 
 def initialise_stick_length(inp):
-    global l_s
-    l_s = inp
+    global l_s_t
+    l_s_t = inp
 
 
 def initialise_bottom_length(inp):
@@ -33,11 +33,14 @@ def initialise_pedal_travel(inp):
 # End defining global variables
 
 # Start assigning values to variables
+# Total stick length
+l_s_t = Q_("81 cm")  # As defined by Gijs
+
 # Stick length from hinge point to pilot's hand
-l_s = Q_("81 cm")  # As defined by Gijs
+l_s = Q_("60 cm")  # DUMMY
 
 # Stick length below hinge point
-l_s_b = Q_("10 cm")  # DUMMY
+l_s_b = l_s_t - l_s  # DUMMY
 
 # Pedal travel
 d_p = Q_("30 cm")  # DUMMY

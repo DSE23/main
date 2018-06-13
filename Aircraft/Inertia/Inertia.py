@@ -155,6 +155,7 @@ xcgw = np.array([[(xapexw + L1/2 * chordw).magnitude],
                 [(xapexw + Sparloc2 * chordw).magnitude],
                 [(xapexw + (L4+1)/2 * chordw).magnitude]])
 xcgw = xcgw[:,0,:] * Q_("m")
+ycgw = np.tile(ycgw, (5,1))
 zcgw = np.zeros(N_stw)
 a = -W_wing*(((c_rw*(1-taper_w))/sum(chordw))/N_stw)**2
 C1 = 2/b.magnitude *(W_wing.magnitude/2 - b.magnitude**2/8 * a.magnitude)
@@ -169,12 +170,8 @@ A_airfoili = np.array([[(AreaAfoil(x_c0, x_c1, chordw)).magnitude],
                         [(AreaAfoil(x_c4, x_c5-1*10**-10, chordw)).magnitude]])
 A_airfoili = A_airfoili[:,0,:]*Q_("m**2")
 A_airfoilfrac = A_airfoili/sum(A_airfoili)
-from matplotlib import pyplot
-plt.plot(ycgw, A_airfoili[0]*W_wing)
-plt.plot(ycgw, A_airfoili[1]*W_wing)
-plt.plot(ycgw, A_airfoili[2]*W_wing)
-plt.plot(ycgw, A_airfoili[3]*W_wing)
-plt.plot(ycgw, A_airfoili[4]*W_wing)
+W_sec = ycgw/((b/2) * N_stw) * W_wing
+mpmw = W_sec * A_airfoilfrac
 
 
 
