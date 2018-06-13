@@ -40,7 +40,7 @@ class Wing(object):
     Sweep_LE *= Q_('deg')
     Dihedral = Q_('0.0 deg')             # [deg] Dihedral angle
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))   # [m] Mean aerodynamic chord
-    S_wet = S                   # Wetted wing area
+    S_wet = 2*S                   # Wetted wing area
     S_a = Q_('2.677 m**2')                 # Aileron area
     c_a = Q_('0.3828 m')                # Aileron chord
     delta_a = m.radians(30)     # [rad] max aileron deflection
