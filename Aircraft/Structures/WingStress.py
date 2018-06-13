@@ -67,7 +67,7 @@ while zs > z:                               #zs is measured is m from
 
 Llist *= ureg("N/m")
 Dlist *= ureg("N/m")
-#print('L sum ', L)                  #print the values
+print('L sum ', L)                  #print the values
 #print('D sum ', D)
 #print('M sum ', M)
 #print('L_moment', L_moment)
@@ -126,17 +126,17 @@ def Shear_wb(zs):
     return qs, qbase
 
 
-def Torsion(qbase):
-    A_cell = Wing.Area_cell()
-    length_skin = Wing.Area/Wing.ThSkin
-    length_spar1 = Wing.airfoilordinate(Wing.ChSpar1)
-    length_spar2 = Wing.airfoilordinate(Wing.ChSpar2)
-    T = M + 2*(A_cell*qbase)
-    const_tor = T/(2*A_cell**2*shear_modulus) #constant term in twist formula
-    line_int_tor = (length_skin*2/Wing.t_skin+length_spar1/Wing.ThSpar1+length_spar2/Wing.ThSpar2) #result from line integral from torsion formula
-    twist_wb_tor = const_tor*line_int_tor
-    return twist_wb_tor
-print("twist =", Torsion(0))
+# def Torsion(qbase):
+#     A_cell = Wing.Area_cell()
+#     length_skin = Wing.Area/Wing.ThSkin
+#     length_spar1 = Wing.airfoilordinate(Wing.ChSpar1)
+#     length_spar2 = Wing.airfoilordinate(Wing.ChSpar2)
+#     T = M + 2*(A_cell*qbase)
+#     const_tor = T/(2*A_cell**2*shear_modulus) #constant term in twist formula
+#     line_int_tor = (length_skin*2/Wing.t_skin+length_spar1/Wing.ThSpar1+length_spar2/Wing.ThSpar2) #result from line integral from torsion formula
+#     twist_wb_tor = const_tor*line_int_tor
+#     return twist_wb_tor
+# print("twist =", Torsion(0))
 
 # Wing deformation in X-direction
 def deformation_x(zs):
@@ -146,7 +146,7 @@ def deformation_x(zs):
     deformation_x += D_moment/2*Geometry.Fuselage.D_fus_max**2/(youngs_modulus*Inertia.Ixx_wb)
     return deformation_x
 
-print("deformation_x=", deformation_x(GWing.b/2))
+#print("deformation_x=", deformation_x(GWing.b/2))
 
 
 # Wing deformation in Y-direction
@@ -158,4 +158,19 @@ def deformation_y(zs):
     return deformation_y
 
 
-print("deformation_y=", deformation_y(GWing.b/2))
+#print("deformation_y=", deformation_y(GWing.b/2))
+
+
+
+# with is like your try .. finally block in this case
+with open('StrucVal.py', 'r') as file:
+    # read a list of lines into data
+    data = file.readlines()
+
+data[18] = 'youngs_modulus = Q_(\"' + str(youngs_modulus) + '\")\n'
+
+# now change the 2nd line, note that you have to add a newline
+
+# and write everything back
+with open('StrucVal.py', 'w') as file:
+    file.writelines(data)
