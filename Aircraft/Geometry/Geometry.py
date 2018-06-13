@@ -67,7 +67,7 @@ class H_tail(object):
     taper = 0.529               # taper ratio
     c_r = Q_("1.329 m")                # [m] H-tail root chord
     c_t = c_r * taper         # [m] H-tail tip chord
-    Sweep = Q_("0 deg")                 # [deg] Sweep H-tail
+    Sweep_25 = Q_("0 deg")                 # [deg] Sweep H-tail
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))  # [m] Mean aerodynamic chord
     S_wet = 2*S                 # [m^2] Wetted area
     S_e = Q_("1.3145 m**2")                # Elevator area
@@ -76,6 +76,8 @@ class H_tail(object):
     X_h = Q_("5.27 m")                  # [m] 0.25C location compared to the nose
     Z_h = Q_("0.55 m")                  # [m] Distance MAC_h and zero lift line wing
     i_h = Q_("0 rad")                   #incidence angle ht
+    Sweep_LE = (np.arctan(np.tan((Sweep_25))-(4/A) *
+                       ((0-0.25)*(1-taper)/(1+taper))))
     
 class V_tail(object):
     
@@ -86,6 +88,8 @@ class V_tail(object):
     c_r = Q_("1.660 m")                                 # [m] V-tail root chord
     c_t = c_r * taper                           # [m] V-tail tip chord
     Sweep = Q_("0 deg")                                   # [deg] Sweep V-tail
+    Sweep_LE = (np.arctan(np.tan((Sweep))-(4/A) *
+                       ((0-0.25)*(1-taper)/(1+taper))))     #LE sweep angle
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))  # [m] Mean aerodynamic chord
     S_wet = 2*S                                   # [m^2] Wetted area
     S_r = Q_("0.5726 m**2")                                # Rudder area
