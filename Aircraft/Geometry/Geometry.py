@@ -17,7 +17,8 @@ sys.path.append('../') # This makes sure the parent directory gets added to the 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import math as m
 import numpy as np
-
+from Structures import StrucVal
+from Propulsion_and_systems import Engine
 class Wing(object):
     
     S = Q_('11.74 m**2')                   # [m^2] Wing Surface
@@ -40,11 +41,11 @@ class Wing(object):
     Sweep_LE *= Q_('deg')
     Dihedral = Q_('0.0 deg')             # [deg] Dihedral angle
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))   # [m] Mean aerodynamic chord
+    T_Cmax = 0.1513                             #Max thickness over chord
     S_wet = 2*S                   # Wetted wing area
     S_a = Q_('2.677 m**2')                 # Aileron area
     c_a = Q_('0.3828 m')                # Aileron chord
     delta_a = Q_("30 deg")     # max aileron deflection
-    delta_a *= Q_('rad')
     delta_CL_max_a = 0.8267     # Max lift coeff difference due to aileron deflection
 
 class Fuselage(object):
@@ -65,7 +66,7 @@ class H_tail(object):
     taper = 0.529               # taper ratio
     c_r = Q_("1.329 m")                # [m] H-tail root chord
     c_t = c_r * taper         # [m] H-tail tip chord
-    Sweep = Q_("0 deg")                 # [deg] Sweep H-tail
+    Sweep_25 = Q_("0 deg")                 # [deg] Sweep H-tail
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))  # [m] Mean aerodynamic chord
     S_wet = 2*S                 # [m^2] Wetted area
     S_e = Q_("1.3145 m**2")                # Elevator area
@@ -74,6 +75,8 @@ class H_tail(object):
     X_h = Q_("5.27 m")                  # [m] 0.25C location compared to the nose
     Z_h = Q_("0.55 m")                  # [m] Distance MAC_h and zero lift line wing
     i_h = Q_("0 rad")                   #incidence angle ht
+    Sweep_LE = (np.arctan(np.tan((Sweep_25))-(4/A) *
+                       ((0-0.25)*(1-taper)/(1+taper))))
     
 class V_tail(object):
     
@@ -84,13 +87,15 @@ class V_tail(object):
     c_r = Q_("1.660 m")                                 # [m] V-tail root chord
     c_t = c_r * taper                           # [m] V-tail tip chord
     Sweep = Q_("0 deg")                                   # [deg] Sweep V-tail
+    Sweep_LE = (np.arctan(np.tan((Sweep))-(4/A) *
+                       ((0-0.25)*(1-taper)/(1+taper))))     #LE sweep angle
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))  # [m] Mean aerodynamic chord
     S_wet = 2*S                                   # [m^2] Wetted area
     S_r = Q_("0.5726 m**2")                                # Rudder area
     c_ru = Q_("0.553 m")                                 # Rudder chord
     delta_r = Q_("30 deg")                     # Max rudder deflection
     X_v = Q_("5.70 m")                                  # [m] 0.25C location compared to the nose
-    Z_v = Q_("0.52 m")                                  # [m] Distance MAC_h and zero lift line wing
+    Z_v = Q_("0.312 m")                                  # [m] Distance MAC_v and zero lift line wing
     t_c = 0.15                                  # [-] t/c V-tail
     
 class Landing_gear(object):
@@ -100,12 +105,12 @@ class Landing_gear(object):
 
 
 class Masses(object):                    # !!!Structures should watch this!!!
-    W_wing = Q_("121 kg")                # [kg] Mass of the wing
+    W_wing = StrucVal.Weightwing * 2     # Weight of the wing
     W_htail = Q_("18 kg")                # [kg] Mass of H_tail
     W_vtail = Q_("6 kg")                 # [kg] Mass of V_tail
     W_fus = Q_("82 kg")                  # [kg] Mass of Fuselage
     W_gear = Q_("58 kg")                 # [kg] Mass of landing gear
-    W_engine = Q_("324 kg")              # [kg] Mass of engine
+    W_engine = Engine.mass              # [kg] Mass of engine
     W_prop = Q_("0 kg")                  # [kg] Mass of propellor
     W_fuelsys = Q_("10 kg")              # [kg] Mass of fuel system
     W_hydraulic = Q_("1 kg")             # [kg] Mass of hydraulics
@@ -130,7 +135,7 @@ class CG(object):
     CG_vtail = V_tail.X_v + V_tail.b * 0.5      # V-tail cg relative to nose
     CG_fus = Q_("2.88 m")                      # CG fuselage relative to nose !!!update!!!
     CG_lgear = 0.23 * Fuselage.l_f             # CG LG relative to nose !!!update!!!
-    CG_engine = 0.474 * Q_("1.1 m")            # CG of the engine relative to nose
+    CG_engine = Engine.xcg                     # CG of the engine relative to nose
     CG_prop = Q_("-0.1 m")                     # CG propellor !!!update!!!    
     CG_fuelsys = Q_("1.18 m")                  # CG fuel system !!!update!!!
     CG_hydraulics = Q_("1.115 m")              # CG hydraulics !!!update!!!

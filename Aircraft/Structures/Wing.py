@@ -27,10 +27,10 @@ Spar2T = 1-0.33                     #Chordwise location of second spar at the ti
 Spar1R = 0.15                   #Chordwise location of first spar at the root
 Spar1T = 0.15                   #Chordwise location of first spar at the tip
 ChordR = Geometry.Wing.c_r         #Length of root (m)
-ThSpar1 = Q_('0.005 m')          #Thickness of Spar 1
-ThSpar2 = Q_('0.005 m')          #Thickness of Spar 2
-ThSkin = Q_('0.003 m')           #Thickness of the skin
-N_stringers = 16                  #Number of stringers
+ThSpar1 = Q_('0.003 m')          #Thickness of Spar 1
+ThSpar2 = Q_('0.002 m')          #Thickness of Spar 2
+ThSkin = Q_('0.002 m')           #Thickness of the skin
+N_stringers = 2                  #Number of stringers
 
 
 ##Stringers                     # C stringer dimentions
@@ -39,7 +39,7 @@ w_str = Q_('0.025 m')            #width of the stringer
 t_str = Q_('0.003 m')            #thickness of the stringer
 
 
-z = 0                               #spanwise posotion in meters
+z = 0                           #spanwise posotion in meters
 z *= Q_('meter')
 c = 0                                               #Chord wise postion in ratio
 
@@ -177,7 +177,7 @@ def get_xy_from_perim(perim_val, start_x=0, dat_file_name="../Airfoil.dat"):
 
     x_coords = Air_data[:81, 0]  # We only care about 1 half of the airfoil
     x_coords = np.flip(x_coords, 0)  # Flip them so they are in a good order
-    y_coords = Air_data[:81, 1]  # We only care about 1 half of the airfoil
+    y_coords = Air_data[:81, 1]  # We only care about 1 half of the airfoilfs
     y_coords = np.flip(y_coords, 0)  # Flip them so they are in a good order
     p = interp1d(x_coords, y_coords, kind ='cubic')  # Generate a poly spline based on the airfoil points
 
