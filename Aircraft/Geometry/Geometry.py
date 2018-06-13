@@ -17,6 +17,7 @@ sys.path.append('../') # This makes sure the parent directory gets added to the 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import math as m
 import numpy as np
+from Structures import StrucVal
 
 class Wing(object):
     
@@ -40,7 +41,8 @@ class Wing(object):
     Sweep_LE *= Q_('deg')
     Dihedral = Q_('0.0 deg')             # [deg] Dihedral angle
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))   # [m] Mean aerodynamic chord
-    S_wet = S                   # Wetted wing area
+    T_Cmax = 0.1513                             #Max thickness over chord
+    S_wet = 2*S                   # Wetted wing area
     S_a = Q_('2.677 m**2')                 # Aileron area
     c_a = Q_('0.3828 m')                # Aileron chord
     delta_a = Q_("30 deg")     # max aileron deflection
@@ -67,7 +69,7 @@ class H_tail(object):
     c_t = c_r * taper         # [m] H-tail tip chord
     Sweep = Q_("0 deg")                 # [deg] Sweep H-tail
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))  # [m] Mean aerodynamic chord
-    S_wet = S                 # [m^2] Wetted area
+    S_wet = 2*S                 # [m^2] Wetted area
     S_e = Q_("1.3145 m**2")                # Elevator area
     c_e = Q_("0.50829 m")               # Elevator chord
     delta_e = Q_("30 deg")     # Max elevator deflection
@@ -85,7 +87,7 @@ class V_tail(object):
     c_t = c_r * taper                           # [m] V-tail tip chord
     Sweep = Q_("0 deg")                                   # [deg] Sweep V-tail
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))  # [m] Mean aerodynamic chord
-    S_wet = S                                   # [m^2] Wetted area
+    S_wet = 2*S                                   # [m^2] Wetted area
     S_r = Q_("0.5726 m**2")                                # Rudder area
     c_ru = Q_("0.553 m")                                 # Rudder chord
     delta_r = Q_("30 deg")                     # Max rudder deflection
@@ -100,7 +102,7 @@ class Landing_gear(object):
 
 
 class Masses(object):                    # !!!Structures should watch this!!!
-    W_wing = Q_("121 kg")                # [kg] Mass of the wing
+    W_wing = StrucVal.Weightwing * 2     # Weight of the wing
     W_htail = Q_("18 kg")                # [kg] Mass of H_tail
     W_vtail = Q_("6 kg")                 # [kg] Mass of V_tail
     W_fus = Q_("82 kg")                  # [kg] Mass of Fuselage

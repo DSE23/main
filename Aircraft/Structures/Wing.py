@@ -30,7 +30,7 @@ ChordR = Geometry.Wing.c_r         #Length of root (m)
 ThSpar1 = Q_('0.005 m')          #Thickness of Spar 1
 ThSpar2 = Q_('0.005 m')          #Thickness of Spar 2
 ThSkin = Q_('0.003 m')           #Thickness of the skin
-N_stringers = 16                  #Number of stringers
+N_stringers = 20                  #Number of stringers
 
 
 ##Stringers                     # C stringer dimentions
@@ -177,7 +177,7 @@ def get_xy_from_perim(perim_val, start_x=0, dat_file_name="../Airfoil.dat"):
 
     x_coords = Air_data[:81, 0]  # We only care about 1 half of the airfoil
     x_coords = np.flip(x_coords, 0)  # Flip them so they are in a good order
-    y_coords = Air_data[:81, 1]  # We only care about 1 half of the airfoil
+    y_coords = Air_data[:81, 1]  # We only care about 1 half of the airfoilfs
     y_coords = np.flip(y_coords, 0)  # Flip them so they are in a good order
     p = interp1d(x_coords, y_coords, kind ='cubic')  # Generate a poly spline based on the airfoil points
 
