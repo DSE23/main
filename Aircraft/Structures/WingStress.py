@@ -102,7 +102,8 @@ def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
     inertia_term_1 = (Inertia.Iyy_wb*y-Inertia.Ixy_wb*cs)/denominator_inertia_term
     inertia_term_2 = (Inertia.Ixx_wb*cs-Inertia.Ixy_wb*y)/denominator_inertia_term
     sigma_zs = D_moment*inertia_term_1 + L_moment*inertia_term_2
-    return sigma_zs #Gives the normal stress function for a given span zs, and x- and y- coordinate
+    strain = sigma_zs /youngs_modulus 
+    return strain #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
 # print('sigma_zs', Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(Wing.c)))
 #SHEAR IS NOT FINISHED

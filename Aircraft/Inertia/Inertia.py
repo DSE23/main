@@ -15,6 +15,7 @@ import math as m
 import numpy as np
 from Geometry import Geometry
 from Structures import Wing as strucwing
+from Structures import StrucVal
 
 I_yy = Q_("1594 kg m**2")
 I_xx = Q_("1089 kg m**2")
@@ -23,19 +24,29 @@ I_zz = Q_("2629 kg m**2")
 
 # New inertia Calculation
 b = Geometry.Wing.b
+S_wing = Geometry.Wing.S
 c_rw = Geometry.Wing.c_r
 taper_w = Geometry.Wing.taper
+c_tw = c_rw * taper_w
 Sparloc1 = strucwing.ChSpar1
 Sparloc2 = strucwing.ChSpar2
 XLEMAC = Geometry.CG.XLEMAC
 Sweep_LE = Geometry.Wing.Sweep_LE
 Y_mac = (b/6)*((1+2*taper_w)/(1+taper_w))
 W_wing = Geometry.Masses.W_wing
-W_spar1 = Q_("8 kg")
-W_spar2 = Q_("3 kg")
+W_spar1 = StrucVal.Weightspar1
+W_spar2 = StrucVal.Weightspar2
+rho_rib = Q_(" 1 kg/m**3")                                         # Density rib material
+k_rib = 0.5 * 10**-3                                # Value from Inertia report
+t_ref = Q_("1 m")                                   # Reference thickness
+t_c = Geometry.Wing.T_Cmax
+t_rootwrib = c_rw * t_c
+t_tipwrib =  c_tw * t_c
+W_rib = k_rib * rho_rib * S_wing *(t_ref + (t_rootwrib + t_tipwrib)/2)
+W_skin = W_wing - (W_spar1 + W_spar2 + W_rib)
 F_fs = W_spar1/W_wing
 F_rs = W_spar2/W_wing
-F_skin = (2*Q_("kg") )/W_wing
+F_skin = W_skin/W_wing
 F_ribs = 1 
 
 # Fuselage
@@ -48,10 +59,10 @@ y_fus1 = [-400, -502, -520, -520, -509, -482, -439, -390, -342, -292,
 y_fus1.ito(Q_("m"))                                   # Centre fuselage y-coord
 y_fus2 = ([0]*16)*Q_("m")
 z_fus1 = [595, 714., 783, 812, 836, 843, 826, 801, 775, 749,
-          724, 698, 672, 647, 621, 600] * Q_("mm")
+          724, 698, 672, 647, 621, 600] * Q_("mm")  # Fuselage Z-coord upper
 z_fus1.ito(Q_("m"))
 z_fus3 = [395, 115, 6.0, 9, 25, 41, 57, 73, 90, 106,
-          122, 138, 154, 171, 187, 200] * Q_("mm")
+          122, 138, 154, 171, 187, 200] * Q_("mm")  # Fuselage Z-coord lower
 z_fus3.ito(Q_("m"))
 z_fus2 = (z_fus1 + z_fus3) / 2
 Afusi = abs(y_fus1) * (z_fus1-z_fus2) * np.pi
@@ -123,12 +134,6 @@ I_yyf = np.sum(np.sum(I_yypmf))
 I_zzf = np.sum(np.sum(I_zzpmf))
 I_xzf = np.sum(np.sum(I_xzpmf))
 
-mfus = 16*[0]
-xfus = 16*[0]
-for i in range(16):
-    mfus[i] = sum(mpm[:,i]).magnitude
-    xfus[i] = (xcgf[0,i]).magnitude
-
 # Wing
 
 def AreaAfoil(x1, x2, chord):
@@ -163,7 +168,10 @@ x_c3 = 0.5 * (xms + Sparloc2)
 x_c4 = 0.5 * (1 + Sparloc2)
 x_c5 = 1.0
 L1 = (x_c1-x_c0)
-L4 = x_c5 - x_c4
+L2 = x_c2 - x_c1
+L3 = x_c3 - x_c2
+L4 = x_c4 - x_c3
+L5 = x_c5 - x_c4
 xcgw = np.array([[(xapexw + L1/2 * chordw).magnitude],
                 [(xapexw + Sparloc1 * chordw).magnitude],
                 [(xapexw + xms * chordw).magnitude],
@@ -184,12 +192,15 @@ A_airfoili = np.array([[(AreaAfoil(x_c0, x_c1, chordw)).magnitude],
                        [(AreaAfoil(x_c2, x_c3, chordw)).magnitude],
                        [(AreaAfoil(x_c3, x_c4, chordw)).magnitude],
                        [(AreaAfoil(x_c4, x_c5-1*10**-10, chordw)).magnitude]])
-#A_airfoili = A_airfoili[:, 0, :]*Q_("m**2")
+# A_airfoili = A_airfoili[:, 0, :]*Q_("m**2")
 A_airfoilfrac = A_airfoili/sum(A_airfoili)
-#W_sec = ycgw/((b/2) * N_stw) * W_wing
-#mpmw = W_sec * A_airfoilfrac
+# W_sec = ycgw/((b/2) * N_stw) * W_wing
+# mpmw = W_sec * A_airfoilfrac
 N_windex = np.linspace(1,40,40)
-mpmw = np.array([[((L1 * F_skin + A_airfoilfrac[0]*F_ribs)*(A1+par*(N_windex-1))).magnitude]])
+mpmw = np.array([[((L1 * F_skin + A_airfoilfrac[0]*F_ribs)*(A1+par*(N_windex-1))).magnitude],
+                 [(((L2 - L1) * F_skin + A_airfoilfrac[1] * F_ribs + F_fs)*(A1 + par*(N_windex-1))).magnitude],
+                 [(((L3 - L2) * F_skin + A_airfoilfrac[2] * F_ribs)*(A1 + par*(N_windex-1))).magnitude],
+                 [(((L4 - L3) * F_skin + A_airfoilfrac[3] * F_ribs + F_rs)*(A1 + par*(N_windex-1))).magnitude]])
 
 
 I_xxpmw = mpmw * ((ycgw - Y_cg)**2 + (zcgw - Z_cg)**2)
@@ -200,7 +211,3 @@ I_xxw = 2 * sum(sum(I_xxpmw))
 I_yyw = 2 * sum(sum(I_yypmw))
 I_zzw = 2 * sum(sum(I_zzpmw))
 I_xyw = 2 * sum(sum(I_xypmw))
-
-from matplotlib import pyplot as plt
-plt.plot(xfus, mfus)
-plt.show()
