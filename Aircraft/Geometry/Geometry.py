@@ -43,10 +43,10 @@ class Wing(object):
     S_wet = 2*S                   # Wetted wing area
     S_a = Q_('2.677 m**2')                 # Aileron area
     c_a = Q_('0.3828 m')                # Aileron chord
-    delta_a = m.radians(30)     # [rad] max aileron deflection
+    delta_a = Q_("30 deg")     # max aileron deflection
     delta_a *= Q_('rad')
     delta_CL_max_a = 0.8267     # Max lift coeff difference due to aileron deflection
-    
+
 class Fuselage(object):
     
     l_f = Q_("6.22 m")                  # [m] Fuselage length
@@ -70,7 +70,7 @@ class H_tail(object):
     S_wet = S                 # [m^2] Wetted area
     S_e = Q_("1.3145 m**2")                # Elevator area
     c_e = Q_("0.50829 m")               # Elevator chord
-    delta_e = m.radians(30)     # Max elevator deflection
+    delta_e = Q_("30 deg")     # Max elevator deflection
     X_h = Q_("5.27 m")                  # [m] 0.25C location compared to the nose
     Z_h = Q_("0.55 m")                  # [m] Distance MAC_h and zero lift line wing
     i_h = Q_("0 rad")                   #incidence angle ht
@@ -87,11 +87,11 @@ class V_tail(object):
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))  # [m] Mean aerodynamic chord
     S_wet = S                                   # [m^2] Wetted area
     S_r = Q_("0.5726 m**2")                                # Rudder area
-    c_r = Q_("0.553 m")                                 # Rudder chord
-    delta_r = m.radians(30)                     # Max rudder deflection
+    c_ru = Q_("0.553 m")                                 # Rudder chord
+    delta_r = Q_("30 deg")                     # Max rudder deflection
     X_v = Q_("5.70 m")                                  # [m] 0.25C location compared to the nose
     Z_v = Q_("0.52 m")                                  # [m] Distance MAC_h and zero lift line wing
-
+    t_c = 0.15                                  # [-] t/c V-tail
     
 class Landing_gear(object):
     
