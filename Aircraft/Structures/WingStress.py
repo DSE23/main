@@ -130,10 +130,11 @@ def Shear_wb(zs):
     #section 01
     n = 100
     ds = Wing.HSpar1/n
-    qs1 = array([])
+    qs1 = np.array([])
     s1 = np.array([])
     qs1 = np.append(qs1, 0)
     s1 = np.append(s1, 0)
+    s = 0
     for i in range(n):
         s = s + ds
         s1 = np.append(s1, s)
@@ -143,11 +144,12 @@ def Shear_wb(zs):
     #section12
     n = 100 #number of sections
     ds = (Wing.arclength/n)
-    qs2 = array([])
+    qs2 = np.array([])
     s2 = np.array([])
     qs2 = np.append(qs1, section01at1)
     s2 = np.append(s1, 0)
     line_int_skin_wb = section01at1
+    s = 0
     for i in range(n):
         s = s + ds
         s2 = np.append(s2, s)
@@ -163,6 +165,7 @@ def Shear_wb(zs):
     s3 = np.array([])
     qs3 = np.append(qs3, section12at2)
     s3 = np.append(s3, 0)
+    s = 0
     for i in range(n):
         s = s + ds
         s3 = np.append(s3, s)
@@ -172,6 +175,7 @@ def Shear_wb(zs):
     qbase = Q_("0 N/m") #SHEAR IS NOT FINISHED
     return qs, qbase
 
+print(Shear_wb(4))
 
 def Torsion(zs, qbase):
     A_cell = Wing.Area_cell()
