@@ -43,4 +43,4 @@ l_s = Q_("60 cm")  # DUMMY
 l_s_b = l_s_t - l_s  # DUMMY
 
 # Pedal travel
-d_p = Q_("30 cm")  # DUMMY
+d_p = Q_("20 cm")  # DUMMY

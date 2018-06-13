@@ -73,8 +73,8 @@ Dlist *= ureg("N/m")
 #print('L_moment', L_moment)
 #print('D_moment', D_moment)
 #print("Llist=", Llist[0])
-# plt.plot(zslist, Llist)
-# plt.show()
+plt.plot(zslist, Llist)
+plt.show()
 
 
 
@@ -134,7 +134,7 @@ def Torsion(zs, qbase):
     length_spar2 = Wing.airfoilordinate(Wing.ChSpar2)
     T = M #+ 2*(A_cell*qbase)
     const_tor = T/(4*A_cell**2*shear_modulus) #constant term in twist formula
-    line_int_tor  = length_skin/Wing.ThSkin   
+    line_int_tor  = length_skin/Wing.ThSkin
     line_int_tor += length_spar1*Wing.length_chord(zs)/Wing.ThSpar1
     line_int_tor += length_spar2*Wing.length_chord(zs)/Wing.ThSpar2 #result from line integral from torsion formula
     twist_wb_tor_per_m  = const_tor*line_int_tor
@@ -150,7 +150,7 @@ def deformation_x(zs):
     #deformation_x += D_moment/2*Geometry.Fuselage.D_fus_max**2/(youngs_modulus*Inertia.Ixx_wb)
     return deformation_x
 
-print("deformation_x=", deformation_x(GWing.b/2))
+#print("deformation_x=", deformation_x(GWing.b/2))
 
 
 # Wing deformation in Y-direction
@@ -162,4 +162,19 @@ def deformation_y(zs):
     return deformation_y.to(ureg("meter"))
 
 
-print("deformation_y=", deformation_y(Q_("1 m")))
+#print("deformation_y=", deformation_y(GWing.b/2))
+
+
+
+# with is like your try .. finally block in this case
+with open('StrucVal.py', 'r') as file:
+    # read a list of lines into data
+    data = file.readlines()
+
+data[18] = 'youngs_modulus = Q_(\"' + str(youngs_modulus) + '\")\n'
+
+# now change the 2nd line, note that you have to add a newline
+
+# and write everything back
+with open('StrucVal.py', 'w') as file:
+    file.writelines(data)
