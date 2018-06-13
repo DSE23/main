@@ -46,7 +46,6 @@ class Wing(object):
     S_a = Q_('2.677 m**2')                 # Aileron area
     c_a = Q_('0.3828 m')                # Aileron chord
     delta_a = Q_("30 deg")     # max aileron deflection
-    delta_a *= Q_('rad')
     delta_CL_max_a = 0.8267     # Max lift coeff difference due to aileron deflection
 
 class Fuselage(object):
