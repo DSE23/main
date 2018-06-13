@@ -78,7 +78,7 @@ data[7] = 'Weightspar2 = Q_(\"' + str(Weightspar2) + '\")\n'
 data[8] = 'Weightskin = Q_(\"' + str(Weightskin) + '\")\n'
 data[9] = 'Weightstring = Q_(\"' + str(Weightstring) + '\")\n'
 data[10] = 'Weightwing = Q_(\"' + str(Weightwing) + '\")\n'
-
+data[17] = 'Density = Q_(\"' + str(Density) + '\")\n'
 # now change the 2nd line, note that you have to add a newline
 
 # and write everything back
