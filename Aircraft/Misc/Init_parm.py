@@ -62,7 +62,5 @@ C_l_p= -0.632399
 C_h_delta= 0.196066
 b= 7.541
 maxdefl_aileron = 30/180 *m.pi #rad
-V_stall = 32 #m/s
-V_max= 95 #m/s
 alpha_max= 18 #deg
 Fa= 86 #Newton stick force
