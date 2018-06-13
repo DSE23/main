@@ -9,17 +9,16 @@ DONT FORGET TO ADD THE UNITS TO YOUR VARIABLES......
 
 import sys
 sys.path.append('../') # This makes sure the parent directory gets added to the system path
-
+from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import numpy as np
 import scipy as sp
 from scipy import interpolate
 import math as m
-from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 
 
 S = Q_('11.74 m**2')                   # [m^2] Wing Surface
 A = 5.5                     # Aspect Ratio
-b = np.sqrt(S*A)             # [m] Wing Span
+b = np.sqrt(S*A).magnitude * ureg.meter    # [m] Wing Span
 taper = 0.45                # Taper ratio
 c_r = Q_('2.015 m')                 # Root chord
 c_t = c_r * taper           # Tip chord

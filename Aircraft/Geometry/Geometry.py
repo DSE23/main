@@ -40,13 +40,13 @@ class Wing(object):
     Sweep_LE *= Q_('deg')
     Dihedral = Q_('0.0 deg')             # [deg] Dihedral angle
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))   # [m] Mean aerodynamic chord
-    S_wet = S                   # Wetted wing area
+    S_wet = 2*S                   # Wetted wing area
     S_a = Q_('2.677 m**2')                 # Aileron area
     c_a = Q_('0.3828 m')                # Aileron chord
-    delta_a = m.radians(30)     # [rad] max aileron deflection
+    delta_a = Q_("30 deg")     # max aileron deflection
     delta_a *= Q_('rad')
     delta_CL_max_a = 0.8267     # Max lift coeff difference due to aileron deflection
-    
+
 class Fuselage(object):
     
     l_f = Q_("6.22 m")                  # [m] Fuselage length
@@ -56,7 +56,7 @@ class Fuselage(object):
     front_A = Q_("0.98 m**2")              # [m^2] Frontal area
     S_wet_f= Q_("14.94 m**2")              # [m^2] Fuselage wetted area
     cabin_w = Q_("0.6 m")               # [m] cabin width (inside)
-
+    A_max_canopy = Q_(" m**2")          # [m^2], coming from catia
 class H_tail(object):
     
     S = Q_("2.629 m**2")                 # [m^2] Horizontal tail surface
@@ -67,12 +67,13 @@ class H_tail(object):
     c_t = c_r * taper         # [m] H-tail tip chord
     Sweep = Q_("0 deg")                 # [deg] Sweep H-tail
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))  # [m] Mean aerodynamic chord
-    S_wet = S                 # [m^2] Wetted area
+    S_wet = 2*S                 # [m^2] Wetted area
     S_e = Q_("1.3145 m**2")                # Elevator area
     c_e = Q_("0.50829 m")               # Elevator chord
-    delta_e = m.radians(30)     # Max elevator deflection
+    delta_e = Q_("30 deg")     # Max elevator deflection
     X_h = Q_("5.27 m")                  # [m] 0.25C location compared to the nose
     Z_h = Q_("0.55 m")                  # [m] Distance MAC_h and zero lift line wing
+    i_h = Q_("0 rad")                   #incidence angle ht
     
 class V_tail(object):
     
@@ -84,13 +85,13 @@ class V_tail(object):
     c_t = c_r * taper                           # [m] V-tail tip chord
     Sweep = Q_("0 deg")                                   # [deg] Sweep V-tail
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))  # [m] Mean aerodynamic chord
-    S_wet = S                                   # [m^2] Wetted area
+    S_wet = 2*S                                   # [m^2] Wetted area
     S_r = Q_("0.5726 m**2")                                # Rudder area
-    c_r = Q_("0.553 m")                                 # Rudder chord
-    delta_r = m.radians(30)                     # Max rudder deflection
+    c_ru = Q_("0.553 m")                                 # Rudder chord
+    delta_r = Q_("30 deg")                     # Max rudder deflection
     X_v = Q_("5.70 m")                                  # [m] 0.25C location compared to the nose
     Z_v = Q_("0.52 m")                                  # [m] Distance MAC_h and zero lift line wing
-
+    t_c = 0.15                                  # [-] t/c V-tail
     
 class Landing_gear(object):
     
@@ -128,7 +129,7 @@ class CG(object):
     CG_htail = H_tail.X_h + H_tail.MAC * 0.5    # H-tail cg relative to nose
     CG_vtail = V_tail.X_v + V_tail.b * 0.5      # V-tail cg relative to nose
     CG_fus = Q_("2.88 m")                      # CG fuselage relative to nose !!!update!!!
-    CG_lgear = 0.23 * Fuselage.l_f      # CG LG relative to nose !!!update!!!
+    CG_lgear = 0.23 * Fuselage.l_f             # CG LG relative to nose !!!update!!!
     CG_engine = 0.474 * Q_("1.1 m")            # CG of the engine relative to nose
     CG_prop = Q_("-0.1 m")                     # CG propellor !!!update!!!    
     CG_fuelsys = Q_("1.18 m")                  # CG fuel system !!!update!!!
@@ -151,4 +152,4 @@ class CG(object):
                 (Masses.W_OEW+ Masses.W_pilot)
     CG_mtow = (CG_wpilot*(Masses.W_OEW+ Masses.W_pilot)+CG_fuel * Masses.W_fuel)\
               /(Masses.W_MTOW)
-              
+    Z_cg = 0                                    #  Check this!!!!!!!!!!!!!!!
