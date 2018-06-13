@@ -7,7 +7,6 @@ from Geometry import Wing
 from Misc import Init_parm as IP
 
 import math as m
-import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -45,7 +44,7 @@ for V in np.arange(V_stall, V_a, 0.5):
         p = - C_l_delta_a / C_l_p * aileron_deflection * 2 * V / b
         t = t + dt
     #print (aileron_deflection/m.pi*180)
-    print (delta_alpha_a/m.pi*180)
+    #print (delta_alpha_a/m.pi*180)
     p_list.append(p)
     V_list.append(V)
 
