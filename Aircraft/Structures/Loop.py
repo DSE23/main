@@ -44,11 +44,19 @@ while z < b.magnitude+0.1:
     print(Wing.z, NS)
     text_to_search = 'z = ' + str(z)
     z = z + b.magnitude/n
-
     replacement_text = 'z = ' + str(z)
     with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
         for line in file:
             print(line.replace(text_to_search, replacement_text), end='')
+
+    if z > 2.3:
+        text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
+        New_N_stringers = 25
+        replacement_text = 'N_stringers = ' + str(New_N_stringers)
+        with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
+            for line in file:
+                print(line.replace(text_to_search, replacement_text), end='')
+
     importlib.reload(Wing)
     importlib.reload(Inertia)
     importlib.reload(WingStress)
@@ -59,7 +67,11 @@ with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
     for line in file:
         print(line.replace(text_to_search, replacement_text), end='')
 
+'''Random Density variable here'''
+
 Density = Q_('1700 kg / m**3')
+
+
 Weightspar1 = Density *Vol_mat_spar1
 Weightspar2 = Density * Vol_mat_spar2
 Weightskin = Density * Vol_mat_skin
@@ -79,7 +91,6 @@ data[8] = 'Weightskin = Q_(\"' + str(Weightskin) + '\")\n'
 data[9] = 'Weightstring = Q_(\"' + str(Weightstring) + '\")\n'
 data[10] = 'Weightwing = Q_(\"' + str(Weightwing) + '\")\n'
 data[17] = 'Density = Q_(\"' + str(Density) + '\")\n'
-# now change the 2nd line, note that you have to add a newline
 
 # and write everything back
 with open('StrucVal.py', 'w') as file:

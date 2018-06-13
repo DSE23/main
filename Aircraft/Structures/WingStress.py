@@ -51,6 +51,10 @@ while zs > z:                               #zs is measured is m from
     dL = cl * 0.5 * rho * (V**2) * Areaofsection.magnitude * Q_("1 m**2")                #lift of the section
     dD = cd * 0.5 * rho * (V**2) * Areaofsection        #drag of the section
     dM = cm * 0.5 * rho * (V ** 2) * Areaofsection * Wing.length_chord(zs)      #moment of the section
+    if zs < Geometry.Fuselage.b_f:
+        dL = Q_('0 kg * m / s**2')
+        dD = Q_('0 kg * m / s**2')
+        dM = Q_('0 kg * m ** 2 / s**2')
     dL_moment = zs * dL                                 #moment produced by the lift on section
     dD_moment = zs * dD                                 #drag prduced by the drag on the section
     L = L + dL                      #Total lift for one wing
@@ -59,7 +63,7 @@ while zs > z:                               #zs is measured is m from
     L_moment = L_moment + dL_moment     #Total bending moment or
     D_moment = D_moment + dD_moment
 
-    Llist = np.append(Llist, dL)            #put the values in a list so we can plot them
+    Llist = np.append(Llist, L)            #put the values in a list so we can plot them
     Dlist = np.append(Dlist, dD)
     zslist = np.append(zslist, abs(zs))
 
@@ -73,8 +77,8 @@ Dlist *= ureg("N/m")
 #print('L_moment', L_moment)
 #print('D_moment', D_moment)
 #print("Llist=", Llist[0])
-plt.plot(zslist, Llist)
-plt.show()
+# plt.plot(zslist, Llist)
+# plt.show()
 
 
 
@@ -139,7 +143,7 @@ def Torsion(zs, qbase):
     twist_wb_tor_per_m  = const_tor*line_int_tor
     twist_wb_tor = twist_wb_tor_per_m*zs
     return twist_wb_tor
-print("twist =", Torsion(GWing.b/2,0))
+# print("twist =", Torsion(GWing.b/2,0))
 
 # Wing deformation in X-direction
 def deformation_x(zs):
