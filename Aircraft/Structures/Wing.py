@@ -30,7 +30,7 @@ ChordR = Geometry.Wing.c_r         #Length of root (m)
 ThSpar1 = Q_('0.005 m')          #Thickness of Spar 1
 ThSpar2 = Q_('0.005 m')          #Thickness of Spar 2
 ThSkin = Q_('0.003 m')           #Thickness of the skin
-N_stringers = 16                  #Number of stringers
+N_stringers = 20                  #Number of stringers
 
 
 ##Stringers                     # C stringer dimentions
