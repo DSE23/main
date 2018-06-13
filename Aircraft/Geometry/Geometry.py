@@ -67,7 +67,7 @@ class H_tail(object):
     c_t = c_r * taper         # [m] H-tail tip chord
     Sweep = Q_("0 deg")                 # [deg] Sweep H-tail
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))  # [m] Mean aerodynamic chord
-    S_wet = S                 # [m^2] Wetted area
+    S_wet = 2*S                 # [m^2] Wetted area
     S_e = Q_("1.3145 m**2")                # Elevator area
     c_e = Q_("0.50829 m")               # Elevator chord
     delta_e = Q_("30 deg")     # Max elevator deflection
@@ -85,7 +85,7 @@ class V_tail(object):
     c_t = c_r * taper                           # [m] V-tail tip chord
     Sweep = Q_("0 deg")                                   # [deg] Sweep V-tail
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))  # [m] Mean aerodynamic chord
-    S_wet = S                                   # [m^2] Wetted area
+    S_wet = 2*S                                   # [m^2] Wetted area
     S_r = Q_("0.5726 m**2")                                # Rudder area
     c_ru = Q_("0.553 m")                                 # Rudder chord
     delta_r = Q_("30 deg")                     # Max rudder deflection
