@@ -25,7 +25,7 @@ from Inertia import Inertia
 from Performance import Performance
 
 # This file will calculate the ranges for l_h,
-# Xlemac, S_h and S_v in which StefX will havel level 1 flying qualities
+# Xlemac, S_h and S_v in which StefX will have level 1 flying qualities
 
 # Input parameters
 
