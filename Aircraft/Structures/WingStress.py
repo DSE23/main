@@ -93,12 +93,12 @@ shear_modulus = Q_("36 GPa") #G
 
 
 
-def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
+def Normal_stress_due_to_bending(cs, y, zs): # Normal stress due to bending
     denominator_inertia_term = Inertia.Ixx_wb*Inertia.Iyy_wb-Inertia.Ixy_wb**2
     inertia_term_1 = (Inertia.Iyy_wb*y-Inertia.Ixy_wb*cs)/denominator_inertia_term
     inertia_term_2 = (Inertia.Ixx_wb*cs-Inertia.Ixy_wb*y)/denominator_inertia_term
     sigma_zs = D_moment*inertia_term_1 + L_moment*inertia_term_2
-    strain = sigma_zs /youngs_modulus 
+    strain = sigma_zs /youngs_modulus*zs 
     return strain #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
 # print('sigma_zs', Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(Wing.c)))
@@ -107,25 +107,74 @@ def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
 #SHEAR IS NOT FINISHED
 #SHEAR IS NOT FINISHED
 #SHEAR IS NOT FINISHED
+def calc_moment_from_shear(qs, t_sk, t_sp, zs):
+    Moment = 0
+    step = 0.0001
+
+    for x_c in np.arange(0, 1, 2*step):
+        y_c_1 = Wing.airfoilordinate(x_c)
+        y_c_2 = Wing.airfoilordinate(x_c+step)
+        slope = (y_c_2 - y_c_1)/(step)
+        Force_angle = -np.arctan(slope)
+        perim = np.sqrt((step*Wing.length_chord(zs))**2 + ((y_c_2 - y_c_1)*Wing.length_chord(zs))**2)
+        Loc_Force = perim * qs
+
+        Fx = Loc_Force * np.cos(Force_angle)
+        Fy = Loc_Force * np.sin(Force_angle)
+        Moment += -Fx*(y_c_1 + y_c_2)*0.5*Wing.length_chord(zs)
+        Moment += Fy*(x_c + 0.5*step)*Wing.length_chord(zs)
+
+    return Moment
+
 def Shear_wb(zs):
     #section 01
-    section01at1 = Wing.ThSpar1*Wing.HSpar1**2
-    #section12
-    n = 100 #number of sections
-    ds = (Wing.arclength/n)
+    n = 100
+    ds = Wing.HSpar1/n
+    qs1 = np.array([])
+    s1 = np.array([])
+    qs1 = np.append(qs1, 0)
+    s1 = np.append(s1, 0)
     s = 0
-    line_int_skin_wb = section01at1
     for i in range(n):
         s = s + ds
-        dline_int_skin_wb = s * Inertia.get_y_for_perimeter(x)
-        line_int_skin_wb += dline_int_skin_wb
-    section12at2 = Wing.ThSkin * line_int_skin_wb
+        s1 = np.append(s1, s)
+        qs = s**2*Wing.ThSpar1*(-L)/Inertia.Ixx_wb
+        qs1 = np.append(qs1, qs)
+    section01at1 = qs1[-1]
+    #section12
+    n = 100 #number of sections
+    ds = (Wing.length_Skin_x_c(Wing.ChSpar1, Wing.ChSpar2)/n)
+    qs2 = np.array([])
+    s2 = np.array([])
+    qs2 = np.append(qs1, section01at1)
+    s2 = np.append(s1, 0)
+    line_int_skin_wb = section01at1
+    s = 0
+    for i in range(n):
+        s = s + ds
+        s2 = np.append(s2, s)
+        qs = s * Wing.get_xy_from_perim(s/Wing.length_chord(zs))*Wing.length_chord(zs)*Wing.ThSkin*(-L)/Inertia.Ixx_wb
+        qs2 = np.append(qs2, qs)
+    section12at2 =  qs2[-1]
     #section23
-    section23at3 = section12at2 - Wing.ThSpar2*Wing.HSpar2**2
-    qs = -L/Inertia.Ixx_wb*(section01at1+section12at2+section23at3)
-    qbase = Q_("0 N/m") #SHEAR IS NOT FINISHED
+    n = 100
+    ds = Wing.HSpar2/n
+    qs3 = np.array([])
+    s3 = np.array([])
+    qs3 = np.append(qs3, section12at2)
+    s3 = np.append(s3, 0)
+    s = 0
+    for i in range(n):
+        s = s + ds
+        s3 = np.append(s3, s)
+        qs = -s**2*Wing.ThSpar2*(-L)/Inertia.Ixx_wb
+        qs3 = np.append(qs3, qs)
+    section23at3 = qs3[-1]
+    qbase = 2*(""" add moment here from part of midas above, we may not forget to change this, this is why this line exceeds the length limit """ )/Wing.Area_cell()
+    qbase = Q_("0 N/m")
     return qs, qbase
 
+print(Shear_wb(Wing.z))
 
 def Torsion(zs, qbase):
     A_cell = Wing.Area_cell()
