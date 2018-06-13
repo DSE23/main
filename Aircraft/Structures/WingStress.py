@@ -170,7 +170,8 @@ def Shear_wb(zs):
         qs = -s**2*Wing.ThSpar2*(-L)/Inertia.Ixx_wb
         qs3 = np.append(qs3, qs)
     section23at3 = qs3[-1]
-    qbase = Q_("0 N/m") #SHEAR IS NOT FINISHED
+    qbase = 2*(""" add moment here from part of midas above, we may not forget to change this, this is why this line exceeds the length limit """ )/Wing.Area_cell()
+    qbase = Q_("0 N/m")
     return qs, qbase
 
 print(Shear_wb(Wing.z))
