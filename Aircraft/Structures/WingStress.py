@@ -106,6 +106,25 @@ def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
 #SHEAR IS NOT FINISHED
 #SHEAR IS NOT FINISHED
 #SHEAR IS NOT FINISHED
+def calc_moment_from_shear(qs, t_sk, t_sp, zs):
+    Moment = 0
+    step = 0.0001
+
+    for x_c in np.arange(0, 1, 2*step):
+        y_c_1 = Wing.airfoilordinate(x_c)
+        y_c_2 = Wing.airfoilordinate(x_c+step)
+        slope = (y_c_2 - y_c_1)/(step)
+        Force_angle = -np.arctan(slope)
+        perim = np.sqrt((step*Wing.length_chord(zs))**2 + ((y_c_2 - y_c_1)*Wing.length_chord(zs))**2)
+        Loc_Force = perim * qs
+
+        Fx = Loc_Force * np.cos(Force_angle)
+        Fy = Loc_Force * np.sin(Force_angle)
+        Moment += -Fx*(y_c_1 + y_c_2)*0.5*Wing.length_chord(zs)
+        Moment += Fy*(x_c + 0.5*step)*Wing.length_chord(zs)
+
+    return Moment
+
 def Shear_wb(zs):
     #section 01
     section01at1 = Wing.ThSpar1*Wing.HSpar1**2
