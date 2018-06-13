@@ -22,10 +22,23 @@ import matplotlib.pyplot as plt
 import math
 t0 = time.time()
 
+# Variables
+l_a   = Q_("0.2015 m")                                      # Set aileron length
+n_of_disc_w = 30                                            # number of parts wing is discretized
+n_of_disc_h = 10                                            # number of parts HT is discretized
+n_of_disc_v = 10                                            # number of parts VT is discretized
+da    = Q_("30 deg")                                        # aileron deflection
+alpha_nose = Q_("0 deg")                                    # angle of attack of nose
+beta_nose  = Q_("0 deg")                                    # angle of sideslip of nose
+p     = 0./ureg.s                                           # initial roll rate
+
+
 # Definitions
 def local_chord(z,c_r,c_t,half_b):
     # Calculates the chord at location z(distance from center)
     return c_r-(c_r-c_t)/half_b*z
+
+
 def lookup_cl(alpha,da):
     dcl_da = da/38.
     return cl_func(math.degrees(alpha)) + dcl_da
@@ -66,16 +79,13 @@ c_r_v = Geometry.V_tail.c_r
 c_t_v = Geometry.V_tail.c_t
 AR_v  = Geometry.V_tail.A
 t_c_v = Geometry.V_tail.t_c
+Z_v= Geometry.V_tail.Z_v
 
-l_a   = Q_("0.2015 m")                                      # Set aileron length
+
 cabin_width = Geometry.Fuselage.cabin_w + 0.1*ureg.m        # import cabin width 
 vt_width    = t_c_v*c_r_v + 0.1*ureg.m                      # import width of VT
 rho = IP.rho0                                               # import density
 
-# Setup discritization paramters
-n_of_disc_w = 30                # number of parts wing is discretized
-n_of_disc_h = 10                # number of parts HT is discretized
-n_of_disc_v = 10                # number of parts VT is discretized
 
 bloc_w = b_w/n_of_disc_w        # span of each station wing
 bloc_h = b_h/n_of_disc_h        # Span of each station HT
@@ -101,12 +111,7 @@ for l in range(n_chords_h):
     khlst[l]    = bloc_h*l - half_b_h
     khlst[-1-l] = half_b_h - bloc_h*l
 for k in range(n_of_disc_v+1):
-    kvlst[k]   = 0.312*ureg.m-b_v + bloc_v*k
-
-da    = 30.                     # aileron deflection
-alpha_nose = 0.                 # angle of attack of nose
-beta_nose  = 0.                 # angle of sideslip of nose
-p     = 0./ureg.s               # initial roll rate
+    kvlst[k]   = Z_v-b_v + bloc_v*k
 
 Vrange = np.arange(V_s,V_a,1)
 pmax = np.transpose(np.vstack([Vrange,np.zeros((1,len(Vrange)))[0]]))
@@ -222,5 +227,7 @@ while running:
 #plt.plot(tlst,plst)
 plt.plot(tlst,np.degrees(plst))
 plt.plot(tlst,pdlst)
+
+plt.show()
 
 print("Finished in:",round(time.time()-t0,1),"s")

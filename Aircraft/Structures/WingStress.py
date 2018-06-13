@@ -140,10 +140,10 @@ def Shear_wb(zs):
         s1 = np.append(s1, s)
         qs = s**2*Wing.ThSpar1*(-L)/Inertia.Ixx_wb
         qs1 = np.append(qs1, qs)
-    section01at1 = Wing.ThSpar1*Wing.HSpar1**2*(-L)/Inertia.Ixx_wb
+    section01at1 = qs1[-1]
     #section12
     n = 100 #number of sections
-    ds = (Wing.arclength/n)
+    ds = (Wing.length_Skin_x_c(Wing.ChSpar1, Wing.ChSpar2)/n)
     qs2 = np.array([])
     s2 = np.array([])
     qs2 = np.append(qs1, section01at1)
@@ -153,15 +153,13 @@ def Shear_wb(zs):
     for i in range(n):
         s = s + ds
         s2 = np.append(s2, s)
-        qs = s * Inertia.get_y_for_perimeter(x)*Wing.ThSkin*(-L)/Inertia.Ixx_wb
-        qs1 = np.append(qs2, qs)
-        dline_int_skin_wb = s * Inertia.get_y_for_perimeter(x)
-        line_int_skin_wb += dline_int_skin_wb
-    section12at2 = Wing.ThSkin * line_int_skin_wb*(-L)/Inertia.Ixx_wb
+        qs = s * Wing.get_xy_from_perim(s/Wing.length_chord(zs))*Wing.length_chord(zs)*Wing.ThSkin*(-L)/Inertia.Ixx_wb
+        qs2 = np.append(qs2, qs)
+    section12at2 =  qs2[-1]
     #section23
     n = 100
     ds = Wing.HSpar2/n
-    qs3 = array([])
+    qs3 = np.array([])
     s3 = np.array([])
     qs3 = np.append(qs3, section12at2)
     s3 = np.append(s3, 0)
@@ -171,11 +169,12 @@ def Shear_wb(zs):
         s3 = np.append(s3, s)
         qs = -s**2*Wing.ThSpar2*(-L)/Inertia.Ixx_wb
         qs3 = np.append(qs3, qs)
-    section23at3 = section12at2 - Wing.ThSpar2*Wing.HSpar2**2*(-L)/Inertia.Ixx_wb
-    qbase = Q_("0 N/m") #SHEAR IS NOT FINISHED
+    section23at3 = qs3[-1]
+    qbase = 2*(""" add moment here from part of midas above, we may not forget to change this, this is why this line exceeds the length limit """ )/Wing.Area_cell()
+    qbase = Q_("0 N/m")
     return qs, qbase
 
-print(Shear_wb(4))
+print(Shear_wb(Wing.z))
 
 def Torsion(zs, qbase):
     A_cell = Wing.Area_cell()

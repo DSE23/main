@@ -46,7 +46,6 @@ class Wing(object):
     S_a = Q_('2.677 m**2')                 # Aileron area
     c_a = Q_('0.3828 m')                # Aileron chord
     delta_a = Q_("30 deg")     # max aileron deflection
-    delta_a *= Q_('rad')
     delta_CL_max_a = 0.8267     # Max lift coeff difference due to aileron deflection
 
 class Fuselage(object):
@@ -96,7 +95,7 @@ class V_tail(object):
     c_ru = Q_("0.553 m")                                 # Rudder chord
     delta_r = Q_("30 deg")                     # Max rudder deflection
     X_v = Q_("5.70 m")                                  # [m] 0.25C location compared to the nose
-    Z_v = Q_("0.52 m")                                  # [m] Distance MAC_h and zero lift line wing
+    Z_v = Q_("0.312 m")                                  # [m] Distance MAC_v and zero lift line wing
     t_c = 0.15                                  # [-] t/c V-tail
     
 class Landing_gear(object):
