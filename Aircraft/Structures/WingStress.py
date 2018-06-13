@@ -93,12 +93,12 @@ shear_modulus = Q_("36 GPa") #G
 
 
 
-def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
+def Normal_stress_due_to_bending(cs, y, zs): # Normal stress due to bending
     denominator_inertia_term = Inertia.Ixx_wb*Inertia.Iyy_wb-Inertia.Ixy_wb**2
     inertia_term_1 = (Inertia.Iyy_wb*y-Inertia.Ixy_wb*cs)/denominator_inertia_term
     inertia_term_2 = (Inertia.Ixx_wb*cs-Inertia.Ixy_wb*y)/denominator_inertia_term
     sigma_zs = D_moment*inertia_term_1 + L_moment*inertia_term_2
-    strain = sigma_zs /youngs_modulus 
+    strain = sigma_zs /youngs_modulus*zs 
     return strain #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
 # print('sigma_zs', Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(Wing.c)))
@@ -128,20 +128,47 @@ def calc_moment_from_shear(qs, t_sk, t_sp, zs):
 
 def Shear_wb(zs):
     #section 01
-    section01at1 = Wing.ThSpar1*Wing.HSpar1**2
+    n = 100
+    ds = Wing.HSpar1/n
+    qs1 = array([])
+    s1 = np.array([])
+    qs1 = np.append(qs1, 0)
+    s1 = np.append(s1, 0)
+    for i in range(n):
+        s = s + ds
+        s1 = np.append(s1, s)
+        qs = s**2*Wing.ThSpar1*(-L)/Inertia.Ixx_wb
+        qs1 = np.append(qs1, qs)
+    section01at1 = Wing.ThSpar1*Wing.HSpar1**2*(-L)/Inertia.Ixx_wb
     #section12
     n = 100 #number of sections
     ds = (Wing.arclength/n)
-    s = 0
+    qs2 = array([])
+    s2 = np.array([])
+    qs2 = np.append(qs1, section01at1)
+    s2 = np.append(s1, 0)
     line_int_skin_wb = section01at1
     for i in range(n):
         s = s + ds
+        s2 = np.append(s2, s)
+        qs = s * Inertia.get_y_for_perimeter(x)*Wing.ThSkin*(-L)/Inertia.Ixx_wb
+        qs1 = np.append(qs2, qs)
         dline_int_skin_wb = s * Inertia.get_y_for_perimeter(x)
         line_int_skin_wb += dline_int_skin_wb
-    section12at2 = Wing.ThSkin * line_int_skin_wb
+    section12at2 = Wing.ThSkin * line_int_skin_wb*(-L)/Inertia.Ixx_wb
     #section23
-    section23at3 = section12at2 - Wing.ThSpar2*Wing.HSpar2**2
-    qs = -L/Inertia.Ixx_wb*(section01at1+section12at2+section23at3)
+    n = 100
+    ds = Wing.HSpar2/n
+    qs3 = array([])
+    s3 = np.array([])
+    qs3 = np.append(qs3, section12at2)
+    s3 = np.append(s3, 0)
+    for i in range(n):
+        s = s + ds
+        s3 = np.append(s3, s)
+        qs = -s**2*Wing.ThSpar2*(-L)/Inertia.Ixx_wb
+        qs3 = np.append(qs3, qs)
+    section23at3 = section12at2 - Wing.ThSpar2*Wing.HSpar2**2*(-L)/Inertia.Ixx_wb
     qbase = Q_("0 N/m") #SHEAR IS NOT FINISHED
     return qs, qbase
 
