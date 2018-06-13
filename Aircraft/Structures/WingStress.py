@@ -134,8 +134,8 @@ def Torsion(zs, qbase):
     T = M #+ 2*(A_cell*qbase)
     const_tor = T/(4*A_cell**2*shear_modulus) #constant term in twist formula
     line_int_tor  = length_skin/Wing.ThSkin   
-    line_int_tor += length_spar1/Wing.ThSpar1 
-    line_int_tor += length_spar2/Wing.ThSpar2 #result from line integral from torsion formula
+    line_int_tor += length_spar1*Wing.length_chord(zs)/Wing.ThSpar1
+    line_int_tor += length_spar2*Wing.length_chord(zs)/Wing.ThSpar2 #result from line integral from torsion formula
     twist_wb_tor_per_m  = const_tor*line_int_tor
     twist_wb_tor = twist_wb_tor_per_m*zs
     return twist_wb_tor
