@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 
 
 cl, cd, cm = AWing.computeloads()           #Load aerodynamic properties
-n = 20                      #number of the devided sections
+n = 40                      #number of the devided sections
 b = Geometry.Wing.b/2         #Wing span
 b = b.magnitude * ureg.meter
 
@@ -34,36 +34,69 @@ z = Wing.z.magnitude * ureg.meter      #Span wise postion of the wing in m
 ChordR = Geometry.Wing.c_r.magnitude * ureg.meter      #root chord in m
 rho = Performance.rho_c.magnitude * ureg("kg/(m**3)")         #cruise density
 V = Performance.V_cruise.magnitude * ureg("m/s")        #cruise speed
-zs = b - b/(n*2)     #subtract, zodat hij bij de eerste sectie op de helft begint
-sectionlength = b/n
+
+dL_moment = Q_('0 kg * m ** 2 / s**2')
+dD_moment = Q_('0 kg * m**2/s**2')
 L_moment = Q_('0 kg * m ** 2 / s**2')
 D_moment = Q_('0 kg * m ** 2 / s**2')
+
 L = Q_('0 kg * m / s**2')
 D = Q_('0 kg * m / s**2')
 M = Q_('0 kg * m ** 2 / s**2')
+
+Lmomentlist = np.array([])
+Dmomentlist = np.array([])
 dLlist = np.array([])
+dDlist = np.array([])
 Llist = np.array([])
 Dlist = np.array([])
-zslist = np.array([])
 
-while zs > z:                               #zs is measured is m from
+Sectioncenters = np.array([])
+
+sectionlength = b/n
+
+zs = b - (sectionlength/2)
+
+while zs > z:                            #zs is measured is m from
+
     Areaofsection = sectionlength*Wing.length_chord(zs)
-    dL = cl * 0.5 * rho * (V**2) * Areaofsection.magnitude * Q_("1 m**2")                #lift of the section
+
+    Sectioncenters = np.append(Sectioncenters, zs)
+
+    '''Lift drag and moment for the section'''
+    dL = cl * 0.5 * rho * (V**2) * Areaofsection.magnitude * Q_("m**2")                #lift of the section
     dD = cd * 0.5 * rho * (V**2) * Areaofsection        #drag of the section
     dM = cm * 0.5 * rho * (V ** 2) * Areaofsection * Wing.length_chord(zs)      #moment of the section
-    dL_moment = zs * dL                                 #moment produced by the lift on section
-    dD_moment = zs * dD                                 #drag prduced by the drag on the section
-    L = L + dL                      #Total lift for one wing
-    D = D + dD                      #Total drag for one wing
-    M = M + dM                      #Total moment for one wing
-    L_moment = L_moment + dL_moment     #Total bending moment or
-    D_moment = D_moment + dD_moment
 
-    Llist = np.append(Llist, dL)            #put the values in a list so we can plot them
-    Dlist = np.append(Dlist, dD)
-    zslist = np.append(zslist, abs(zs))
+    if zs < Geometry.Fuselage.b_f:
+        dL = Q_('0 kg * m / s**2')
+        dD = Q_('0 kg * m / s**2')
+        dM = Q_('0 kg * m ** 2 / s**2')
 
-    zs = zs - sectionlength                 #Select other section for the next loop
+    dLlist = np.append(dLlist, dL)
+    dDlist = np.append(dDlist, dD)
+
+    '''Total lift, drag and moment for the wing'''
+    L = L + dL  # Total lift for one wing
+    D = D + dD  # Total drag for one wing
+    M = M + dM  # Total moment for one wing
+
+    Llist = np.append(Llist, L)  # put the values in a list so we can plot them
+    Dlist = np.append(Dlist, D)
+
+    zs = zs - sectionlength  # Select other section for the next loop
+
+for i in np.arange(0, len(dLlist)):
+    arm = Sectioncenters[i] - z.magnitude
+    dLmoment = arm * dLlist[i]
+    dDmoment = arm * dDlist[i]
+    L_moment = L_moment.magnitude + dLmoment
+    D_moment = D_moment.magnitude + dDmoment
+    Lmomentlist = np.append(Lmomentlist, L_moment)
+    Dmomentlist = np.append(Dmomentlist, D_moment)
+    L_moment *= Q_('kg * m**2/s**2')
+    D_moment *= Q_('kg * m**2/s**2')
+
 
 Llist *= ureg("N/m")
 Dlist *= ureg("N/m")
@@ -73,8 +106,8 @@ Dlist *= ureg("N/m")
 #print('L_moment', L_moment)
 #print('D_moment', D_moment)
 #print("Llist=", Llist[0])
-plt.plot(zslist, Llist)
-plt.show()
+# plt.plot(Sectioncenters, Lmomentlist)
+# plt.show()
 
 
 
@@ -189,7 +222,7 @@ def Torsion(zs, qbase):
     twist_wb_tor_per_m  = const_tor*line_int_tor
     twist_wb_tor = twist_wb_tor_per_m*zs
     return twist_wb_tor
-print("twist =", Torsion(GWing.b/2,0))
+# print("twist =", Torsion(GWing.b/2,0))
 
 # Wing deformation in X-direction
 def deformation_x(zs):
