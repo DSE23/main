@@ -106,3 +106,7 @@ venv.bak/
 .idea/
 Aircraft/Performance/cp.dat
 Aircraft/Performance/flappedairfoil.dat
+Aircraft/Structures/flappedairfoil.dat
+Aircraft/Structures/Wing.py.bak
+Aircraft/Structures/cp.dat
+Aircraft/Structures/commands.in
