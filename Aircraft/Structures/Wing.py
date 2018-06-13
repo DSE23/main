@@ -177,7 +177,7 @@ def get_xy_from_perim(perim_val, start_x=0, dat_file_name="../Airfoil.dat"):
 
     x_coords = Air_data[:81, 0]  # We only care about 1 half of the airfoil
     x_coords = np.flip(x_coords, 0)  # Flip them so they are in a good order
-    y_coords = Air_data[:81, 1]  # We only care about 1 half of the airfoil
+    y_coords = Air_data[:81, 1]  # We only care about 1 half of the airfoilfs
     y_coords = np.flip(y_coords, 0)  # Flip them so they are in a good order
     p = interp1d(x_coords, y_coords, kind ='cubic')  # Generate a poly spline based on the airfoil points
 
