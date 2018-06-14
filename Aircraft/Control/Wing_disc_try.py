@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 import math
 import pandas as pd
 t0 = time.time()
-
+np.set_printoptions(linewidth=160)
 # Variables
 l_a   = Q_("0.2015 m")                                      # Set aileron length
 n_of_disc_w = 30                                            # number of parts wing is discretized
@@ -44,9 +44,9 @@ def local_chord(z,c_r,c_t,half_b):
 data = pd.read_csv('aerodynamic_data_ms15.dat',' ',header=None).values
 def lookup_data(alpha,ca_c,da):
     alpha = math.degrees(alpha)
-    da = round(da/5.,0)*5
-    ca_c = round(ca_c/0.01,0)*0.01
+    #da = round(da/5.,0)*5
     
+    ca_c = round(ca_c/0.01,0)*0.01
     data_over_da = np.zeros((7,3))
     iterator = 0
     for da_iterate in np.arange(0,31,5):
@@ -63,7 +63,7 @@ def lookup_data(alpha,ca_c,da):
                 raise ValueError("Alpha is out of range")
         if abs(alpha) > max(local_data[:,0]) and alpha<0:
             alpha = -max(local_data[:,0])
-        plt.plot(local_data[:,0],local_data[:,1])         
+        #plt.plot(local_data[:,0],local_data[:,1])         
         Cl_local = interpolate.interp1d(local_data[:,0],local_data[:,1],'linear')
         Cd_local = interpolate.interp1d(local_data[:,0],local_data[:,2],'linear')
 
@@ -143,16 +143,13 @@ for l in range(n_chords_h):
     khlst[l]    = bloc_h*l - half_b_h
     khlst[-1-l] = half_b_h - bloc_h*l
 for k in range(n_of_disc_v+1):
-<<<<<<< HEAD
-    kvlst[k]   = 0.312*ureg.m-b_v + bloc_v*k
+        kvlst[k]   = Z_v-b_v + bloc_v*k
+        #kvlst[k]   = 0.312*ureg.m-b_v + bloc_v*k
 
 da    = 25.                     # aileron deflection
 alpha_nose = 0.                 # angle of attack of nose
 beta_nose  = 0.                 # angle of sideslip of nose
 p     = 0./ureg.s               # initial roll rate
-=======
-    kvlst[k]   = Z_v-b_v + bloc_v*k
->>>>>>> bf214c8522eb6818eabdc43681adb13a85f3be8f
 
 Vrange = np.arange(V_s,V_a,1)
 pmax = np.transpose(np.vstack([Vrange,np.zeros((1,len(Vrange)))[0]]))
@@ -205,12 +202,12 @@ while running:
         Cl, Cd = lookup_data(alpha,ca_c,da_local)
         Lift  = 0.5 * rho * V_inf**2 * Sloc * Cl
         Drag  = 0.5 * rho * V_inf**2 * Sloc * Cd
-        disc_wing_w[i-1][1] = math.degrees(downwash_angle)
-        disc_wing_w[i-1][2] = (p*y_i/V_inf).magnitude
+        disc_wing_w[i-1][1] = alpha
+        disc_wing_w[i-1][2] = Cl
         disc_wing_w[i-1][3] = Lift.magnitude
-        disc_wing_w[i-1][4] = (Drag*y_i).magnitude  # Change to Cd!
+        disc_wing_w[i-1][4] = (ca_c)
         disc_wing_w[i-1][5] = (Lift*y_i).magnitude
-    print (np.degrees(disc_wing_w[:,2]))
+    print (disc_wing_w)
     for i in range(1,len(khlst)):
         # calculate lift and drag for discretized HT
         b1 = khlst[i-1]
