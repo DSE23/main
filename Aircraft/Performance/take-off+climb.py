@@ -6,7 +6,7 @@ sys.path.append('../')    # This makes sure the parent directory gets added to t
 import numpy as np
 from Misc import ureg, Q_
 from Geometry import Geometry as GM
-from Aerodynamics import General as Ageneral
+from Aerodynamics import Aeroprops as Aeroprops
 from Aerodynamics import Wing as AWing
 import Performance as PF
 from Misc import Init_parm as IP
@@ -17,7 +17,7 @@ import math as m
 
 # Get parameters
 P_to = PF.P_to
-C_d_0 = Ageneral.CD_0
+C_d_0 = Aeroprops.CD0_tot
 mass = GM.Masses.W_MTOW
 W = mass * Q_("9.81 m/s**2")
 S = GM.Wing.S
@@ -124,7 +124,7 @@ P_req = T_req * V / eta_prop
 P_ratio = P_req / P_to
 alpha_req.ito(Q_("deg"))
 
-#print(alpha_req, P_ratio)
+print(alpha_req, P_ratio)
 
 # If the power needed is higher than the maximum power of if the AoA is too high, a message has to be shown.
 if P_ratio > 1:
