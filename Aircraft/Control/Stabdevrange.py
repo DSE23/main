@@ -64,7 +64,8 @@ I_xx = Inertia.I_xx
 I_zz = Inertia.I_zz
 K_xx = I_xx/(MTOW*b**2)
 K_zz = I_zz/(MTOW*b**2)
-I_xz = Inertia.I
+I_xz = Inertia.I_xz
+K_xz = 
 CD0_alpha = 0                   # Assumed
 
 # Values from graphs update with changing A and taper!!!
