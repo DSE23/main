@@ -107,24 +107,7 @@ def Normal_stress_due_to_bending(cs, y, zs): # Normal stress due to bending
 #SHEAR IS NOT FINISHED
 #SHEAR IS NOT FINISHED
 #SHEAR IS NOT FINISHED
-def calc_moment_from_shear(qs, t_sk, t_sp, zs):
-    Moment = 0
-    step = 0.0001
 
-    for x_c in np.arange(0, 1, 2*step):
-        y_c_1 = Wing.airfoilordinate(x_c)
-        y_c_2 = Wing.airfoilordinate(x_c+step)
-        slope = (y_c_2 - y_c_1)/(step)
-        Force_angle = -np.arctan(slope)
-        perim = np.sqrt((step*Wing.length_chord(zs))**2 + ((y_c_2 - y_c_1)*Wing.length_chord(zs))**2)
-        Loc_Force = perim * qs
-
-        Fx = Loc_Force * np.cos(Force_angle)
-        Fy = Loc_Force * np.sin(Force_angle)
-        Moment += -Fx*(y_c_1 + y_c_2)*0.5*Wing.length_chord(zs)
-        Moment += Fy*(x_c + 0.5*step)*Wing.length_chord(zs)
-
-    return Moment
 
 def Shear_wb(zs):
     #section 01
@@ -171,9 +154,48 @@ def Shear_wb(zs):
         qs3 = np.append(qs3, qs)
     section23at3 = qs3[-1]
     qbase = Q_("0 N/m") #SHEAR IS NOT FINISHED
-    return qs, qbase
+    shear_arrays = np.array([[qs1, s1], [qs2, s2], [qs3, s3]])
+    return qs, qbase, shear_arrays
 
-print(Shear_wb(Wing.z))
+qs, qbase, shear_arrays = Shear_wb(Wing.z)
+print("q1=", shear_arrays[0,0])
+print("s1=", shear_arrays[0,1])
+print("q2=", shear_arrays[1,0])
+print("s2=", shear_arrays[1,1])
+print("q3=", shear_arrays[2,0])
+print("s3=", shear_arrays[2,1])
+
+def calc_moment_from_shear(qs, t_sk, t_sp, zs, shear_arrays=Shear_wb(Wing.z)[2]):
+    Moment = 0
+    step = 0.0001
+    q_1 = shear_arrays[0, 0]
+    s_1 = shear_arrays[0, 1]
+    q_2 = shear_arrays[1, 0]
+    s_2 = shear_arrays[1, 1]
+    q_3 = shear_arrays[2, 0]
+    s_3 = shear_arrays[2, 1]
+
+    for i in range(0,len(s_2),2):
+        ds = s_2[i+1] - s_2[i]
+        s_loc = (s_2[i+1] + s_2[i])*0.5
+        q_loc = (q_2[i] + q_2[i+1])*0.5
+        y_loc = Wing.get_xy_from_perim(s_loc, Wing.ChSpar1, Wing.ChSpar2)
+
+
+    for x_c in np.arange(0, 1, 2*step):
+        y_c_1 = Wing.airfoilordinate(x_c)
+        y_c_2 = Wing.airfoilordinate(x_c+step)
+        slope = (y_c_2 - y_c_1)/(step)
+        Force_angle = -np.arctan(slope)
+        perim = np.sqrt((step*Wing.length_chord(zs))**2 + ((y_c_2 - y_c_1)*Wing.length_chord(zs))**2)
+        Loc_Force = perim * qs
+
+        Fx = Loc_Force * np.cos(Force_angle)
+        Fy = Loc_Force * np.sin(Force_angle)
+        Moment += -Fx*(y_c_1 + y_c_2)*0.5*Wing.length_chord(zs)
+        Moment += Fy*(x_c + 0.5*step)*Wing.length_chord(zs)
+
+    return Moment
 
 def Torsion(zs, qbase):
     A_cell = Wing.Area_cell()
