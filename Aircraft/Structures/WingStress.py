@@ -101,8 +101,11 @@ for i in np.arange(0, len(dLlist)):
 MTOW = Geometry.Masses.W_MTOW
 Max_20G_N = MTOW * 9.81 * 20
 Tot_L = 2 * L
-fac_20G = Max_20G_N / Tot_L
-fac_20G = fac_20G.magnitude
+if Tot_L.magnitude > 0.:
+    fac_20G = Max_20G_N / Tot_L
+    fac_20G = fac_20G.magnitude
+else:
+    fac_20G = 0
 
 L_moment = L_moment * fac_20G
 D_moment = D_moment * fac_20G

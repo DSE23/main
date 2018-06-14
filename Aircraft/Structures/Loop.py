@@ -32,6 +32,8 @@ Vol_mat_wing = Q_('0 m**3')
 Old_N_stringers = Wing.N_stringers
 
 Lmomentlist = np.array([])
+Ixxlist = np.array([])
+Iyylist = np.array([])
 
 z = 0
 while z < b.magnitude+0.1:
@@ -46,8 +48,12 @@ while z < b.magnitude+0.1:
     Vol_mat_string = Vol_mat_string + Wing.AreaStringers * (b / n)
     Vol_mat_wing = Vol_mat_wing + Wing.Area * (b / n)
     Lmomentlist = np.append(Lmomentlist, WingStress.L_moment)
+    Ixxlist = np.append(Ixxlist, Inertia.Ixx_wb)
+    Iyylist = np.append(Ixxlist, Inertia.Iyy_wb)
+
     print(WingStress.L_moment)
     print(Wing.z, NS, Wing.N_stringers)
+
     text_to_search = 'z = ' + str(z)
     z = z + b.magnitude/n
     replacement_text = 'z = ' + str(z)
@@ -57,7 +63,7 @@ while z < b.magnitude+0.1:
 
     if Geometry.Fuselage.b_f.magnitude < z < 2.0:
         text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
-        New_N_stringers = 10
+        New_N_stringers = 15
         replacement_text = 'N_stringers = ' + str(New_N_stringers)
         with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
             for line in file:
@@ -65,7 +71,7 @@ while z < b.magnitude+0.1:
 
     if 2.0 < z < 2.5:
         text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
-        New_N_stringers = 10
+        New_N_stringers = 18
         replacement_text = 'N_stringers = ' + str(New_N_stringers)
         with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
             for line in file:
@@ -73,7 +79,7 @@ while z < b.magnitude+0.1:
 
     if 2.5 < z < 3.5:
         text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
-        New_N_stringers = 10
+        New_N_stringers = 20
         replacement_text = 'N_stringers = ' + str(New_N_stringers)
         with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
             for line in file:
@@ -81,7 +87,7 @@ while z < b.magnitude+0.1:
 
     if z > 3.5:
         text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
-        New_N_stringers = 10
+        New_N_stringers = 2
         replacement_text = 'N_stringers = ' + str(New_N_stringers)
         with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
             for line in file:
@@ -132,5 +138,21 @@ data[17] = 'Density = Q_(\"' + str(Density) + '\")\n'
 with open('StrucVal.py', 'w') as file:
     file.writelines(data)
 
+
+# plot with various axes scales
+plt.figure(1)
+
+# linear
+plt.subplot(221)
+plt.plot(zarray, Ixxlist)
+
+plt.subplot(222)
+plt.plot(zarray, Iyylist)
+
+plt.subplot(223)
+plt.plot(zarray, Lmomentlist)
+
+plt.subplot(224)
 plt.plot(zarray, Normalstress)
+
 plt.show()
