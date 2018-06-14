@@ -43,5 +43,8 @@ V_stall_hld = np.sqrt((2*g0*mtow)/(cl_max_hld*rho_a*S_wing))   # Man. Veloc. at 
 V_a_hld = V_stall_hld * m.sqrt(n_max)
 V_stall_clean = np.sqrt((2*g0*mtow)/(cl_max_clean*rho_a*S_wing))   # Man. Veloc. clean
 V_a_clean = V_stall_clean * m.sqrt(n_max)
+P_to = Q_("234990 kg*m**2/s**3")
+dp= Q_("2 m")
+eta_prop= 0.865
 
 
