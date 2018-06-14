@@ -271,9 +271,9 @@ I_0yh = K_0 * (I_h - sigmx_h**2/sigm_h)
 dxLE_h = 0.25 * c_rh - 0.25 * c_th
 y_h = (2 * c_th * dxLE_h + c_th**2 + dxLE_h * c_rh +\
        c_th * c_rh + c_rh**2)/(3 * (c_rh + c_th))
-H_rollcoeff = y_h/(b_h/6*((c_rh + 2 * c_th)/(c_rh + c_th)))
+H_rollcoeff = y_h/(b_h/6*((c_rh + 2 * c_th)/(c_rh + c_th))) + 5
 if not 0.95 < H_rollcoeff < 0.97:
-    print(" !!!!Change k_4!!!!!")
+    print('\x1b[3;37;41m' + "Change K_4"  + '\x1b[0m')
 k_4 = 0.88                              # From graphs, dependent on H_rollcoeff
 I_0xh = (W_Htail * b_h**2 * k_4)/24 * ((c_rh+3 * c_th)/(c_rh + c_th))
 I_0zh = I_0yh + I_0xh
@@ -416,19 +416,16 @@ I_xx = I_xxnew
 I_yy = I_yynew
 I_zz = I_zznew
 I_xz = I_xznew
-from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-for i in range(8):
-    ax.scatter(xcgf[i], ycgf[i], zcgf[i])
-for i in range(5):
-    ax.scatter(xcgw[i], ycgw[i], zcgw)
-    ax.scatter(xcgw[i], -ycgw[i], zcgw)
-ax.set_xlim(0, 7)
-ax.set_ylim(-2*(16/9),2*(16/9))
-ax.set_zlim(-2,2)
-#plt.scatter(x_fus, z_fus2)
-#plt.scatter(x_fus, z_fus1)
-#plt.scatter(x_fus, z_fus3)
-plt.show()
+#from matplotlib import pyplot as plt
+#from mpl_toolkits.mplot3d import Axes3D
+#fig = plt.figure()
+#ax = fig.add_subplot(111, projection='3d')
+#for i in range(8):
+#    ax.scatter(xcgf[i], ycgf[i], zcgf[i])
+#for i in range(5):
+#    ax.scatter(xcgw[i], ycgw[i], zcgw)
+#    ax.scatter(xcgw[i], -ycgw[i], zcgw)
+#ax.set_xlim(0, 7)
+#ax.set_ylim(-2*(16/9),2*(16/9))
+#ax.set_zlim(-2,2)
+#plt.show()
