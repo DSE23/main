@@ -54,50 +54,58 @@ F_skin = W_skin/W_wing                            # Skin W fraction
 F_ribs = W_rib/W_wing                             # Ribs W fraction
 
 # Fuselage
-Z_cg = Geometry.CG.Z_cg
+Z_cg = Geometry.CG.ZCG_mtow
 Y_cg = 0                # Symmetry :P
 X_cg = Geometry.CG.CG_mtow
 x_fus = np.linspace(0, 6.2, 16) * Q_("m")
 y_fus1 = [-400, -502, -520, -520, -509, -482, -439, -390, -342, -292,
-          -243, -194, -145, -96, -47, -7.3] * Q_("mm")  # left fuselage y-coord
+          -243, -194, -145, -96, -47, -7.3] * Q_("-1 mm")  # left fuselage y-coord
 y_fus1.ito(Q_("m"))                                   # Centre fuselage y-coord
 y_fus2 = ([0]*16)*Q_("m")
+Z_fus_origin = Geometry.CG.Z_fusorig
 z_fus1 = [595, 714., 783, 812, 836, 843, 826, 801, 775, 749,
           724, 698, 672, 647, 621, 600] * Q_("mm")  # Fuselage Z-coord upper
 z_fus1.ito(Q_("m"))
 z_fus3 = [395, 115, 6.0, 9, 25, 41, 57, 73, 90, 106,
           122, 138, 154, 171, 187, 200] * Q_("mm")  # Fuselage Z-coord lower
 z_fus3.ito(Q_("m"))
+z_fus1 = Z_fus_origin - z_fus1
+z_fus3 = Z_fus_origin - z_fus3
 z_fus2 = (z_fus1 + z_fus3) / 2
+#z_fus2 = ([0]*16)*Q_("m")
 Afusi = abs(y_fus1) * (z_fus1-z_fus2) * np.pi      # Areas of fuselage sections
 SumAfus = sum(Afusi)                                
 W_fus = Geometry.Masses.W_fus
 W_ifus = W_fus * Afusi/SumAfus
 
-rho_12 = 1                                         # Needs update (tomorrow)
-rho_23 = 1
-r2 = rho_12 * np.sqrt((z_fus1-z_fus2)**2+(y_fus2-y_fus1)**2)
-r4 = rho_23 * np.sqrt((z_fus1 - z_fus2)**2 + (y_fus2 - y_fus1)**2)
-r = np.array([[z_fus1.magnitude - z_fus2.magnitude],
+
+theta = np.array([[np.arctan((y_fus2-y_fus1)/(z_fus1-z_fus2))],
+                 [Q_("90 deg") - np.arctan((y_fus2-y_fus1)/(z_fus1-z_fus2))],
+                 [np.arctan((z_fus2-z_fus3)/(y_fus2-y_fus1))],
+                 [Q_("90 deg") - np.arctan((z_fus2-z_fus3)/(y_fus2-y_fus1))],
+                 [Q_("90 deg") - np.arctan((z_fus2-z_fus3)/(y_fus2-y_fus1))],
+                 [np.arctan((z_fus2-z_fus3)/(y_fus2-y_fus1))],
+                 [Q_("90 deg") - np.arctan((y_fus2-y_fus1)/(z_fus1-z_fus2))],
+                 [np.arctan((y_fus2-y_fus1)/(z_fus1-z_fus2))]])
+theta = theta[:, 0, :]
+
+
+r1 = z_fus1 - z_fus2
+r3 = y_fus1 - y_fus2
+r5= z_fus2 - z_fus3
+r2 = (abs(r1)*r3)/(np.sqrt(r1**2*(np.sin(theta[1]))**2+r3**2*(np.cos(theta[1]))**2))
+r4 = (r5*r3)/(np.sqrt(r3**2*(np.sin(theta[3]))**2+r5**2*(np.cos(theta[3]))**2))
+
+r = np.array([[r1.magnitude],
               [r2.magnitude],
-              [y_fus2.magnitude - y_fus1.magnitude],
+              [r3.magnitude],
               [r4.magnitude],
-              [z_fus2.magnitude-z_fus3.magnitude],
+              [r5.magnitude],
               [r4.magnitude],
-              [y_fus2.magnitude - y_fus1.magnitude],
+              [r3.magnitude],
               [r2.magnitude]])
 r *= Q_("m")
-r = r[:, 0]
-theta = np.array([[np.arctan((y_fus2-y_fus1)/(z_fus1-z_fus2))],
-                 [m.radians(90) - np.arctan((y_fus2-y_fus1)/(z_fus1-z_fus2))],
-                 [np.arctan((z_fus2-z_fus3)/(y_fus2-y_fus1))],
-                 [m.radians(90) - np.arctan((z_fus2-z_fus3)/(y_fus2-y_fus1))],
-                 [m.radians(90) - np.arctan((z_fus2-z_fus3)/(y_fus2-y_fus1))],
-                 [np.arctan((z_fus2-z_fus3)/(y_fus2-y_fus1))],
-                 [m.radians(90) - np.arctan((y_fus2-y_fus1)/(z_fus1-z_fus2))],
-                 [np.arctan((y_fus2-y_fus1)/(z_fus1-z_fus2))]])
-theta = theta[:, 0, :] * Q_("rad")
-
+r = np.abs(r[:, 0])
 alpha = np.array([[theta[0]],
                  [(theta[0] + theta[1])/2],
                  [(theta[0] + theta[1])/2],
@@ -107,27 +115,43 @@ alpha = np.array([[theta[0]],
                  [(theta[0] + theta[1])/2],
                  [(theta[0] + theta[1])/2]])
 alpha = alpha[:, 0]
-ycgf = np.array([[y_fus1.magnitude],
+#ycgf = np.array([[y_fus1.magnitude],
+#                [r[1].magnitude*np.cos(theta[1])],
+#                [y_fus2.magnitude - y_fus1.magnitude],
+#                [r[3].magnitude*np.sin(theta[3])],
+#                [y_fus1.magnitude],
+#                [-(r[3].magnitude*np.sin(theta[3]))],
+#                [-(y_fus2.magnitude - y_fus1.magnitude)],
+#                [-(r[1].magnitude*np.cos(theta[1]))]])
+ycgf = np.array([[y_fus2.magnitude],
                 [r[1].magnitude*np.cos(theta[1])],
                 [y_fus2.magnitude - y_fus1.magnitude],
                 [r[3].magnitude*np.sin(theta[3])],
-                [y_fus1.magnitude],
+                [y_fus2.magnitude],
                 [-(r[3].magnitude*np.sin(theta[3]))],
                 [-(y_fus2.magnitude - y_fus1.magnitude)],
                 [-(r[1].magnitude*np.cos(theta[1]))]])
+
 ycgf = ycgf[:, 0, :] * Q_("m")
 zcgf = np.array([[z_fus1.magnitude],
-                [z_fus2.magnitude + r[1].magnitude*np.sin(theta[1, 0])],
+                [z_fus2.magnitude - r[1].magnitude*np.sin(theta[1])],
                 [z_fus2.magnitude],
-                [z_fus2.magnitude - r[3].magnitude*np.cos(theta[3, 0])],
+                [z_fus2.magnitude + r[3].magnitude*np.cos(theta[3])],
+                [z_fus3.magnitude],
+                [z_fus2.magnitude + r[3].magnitude*np.cos(theta[3])],
                 [z_fus2.magnitude],
-                [z_fus2.magnitude - r[3].magnitude*np.cos(theta[3, 0])],
-                [z_fus2.magnitude],
-                [z_fus2.magnitude + r[1].magnitude*np.sin(theta[1, 0])]])
+                [z_fus2.magnitude - r[1].magnitude*np.sin(theta[1])]])
+
 zcgf = zcgf[:, 0, :] * Q_("m")
+
 xcgf = np.tile(x_fus, (8, 1)) * Q_("m")
 s_pm = r * alpha
 mpm = W_ifus * s_pm/(sum(s_pm))
+
+zcgf_complete = (np.sum(np.sum(zcgf*mpm)))/(np.sum(np.sum(mpm)))
+Z_CGF = Geometry.CG.ZCG_fus
+if not abs(0.9*zcgf_complete) < abs(Z_CGF) < abs(1.1*zcgf_complete):
+    print("Update ZCGf in Geometry to ", zcgf_complete)
 
 I_xxpmf = mpm * ((ycgf - Y_cg)**2 + (zcgf - Z_cg)**2)     
 I_yypmf = mpm * ((zcgf - Z_cg)**2 + (xcgf - X_cg)**2)
@@ -391,3 +415,19 @@ I_xx = I_xxnew
 I_yy = I_yynew
 I_zz = I_zznew
 I_xz = I_xznew
+from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+for i in range(8):
+    ax.scatter(xcgf[i], ycgf[i], zcgf[i])
+for i in range(5):
+    ax.scatter(xcgw[i], ycgw[i], zcgw)
+    ax.scatter(xcgw[i], -ycgw[i], zcgw)
+ax.set_xlim(0, 7)
+ax.set_ylim(-2*(16/9),2*(16/9))
+ax.set_zlim(-2,2)
+#plt.scatter(x_fus, z_fus2)
+#plt.scatter(x_fus, z_fus1)
+#plt.scatter(x_fus, z_fus3)
+plt.show()
