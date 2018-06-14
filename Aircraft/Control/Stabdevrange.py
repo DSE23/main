@@ -31,7 +31,7 @@ from Performance import Performance
 
 A = Geometry.Wing.A
 test = []           
-Z_cg = Geometry.CG.Z_cg
+Z_cg = Geometry.CG.ZCG_mtow
 CL_alpha = Aero_wing.CL_alpha
 MTOW = Geometry.Masses.W_MTOW
 S_wing = Geometry.Wing.S
@@ -64,6 +64,7 @@ I_xx = Inertia.I_xx
 I_zz = Inertia.I_zz
 K_xx = I_xx/(MTOW*b**2)
 K_zz = I_zz/(MTOW*b**2)
+I_xz = Inertia.I
 CD0_alpha = 0                   # Assumed
 
 # Values from graphs update with changing A and taper!!!
@@ -229,10 +230,10 @@ for XLEMAC in (np.linspace(1.1, 2.5, 20)*Q_("m")):
             for j in range(n_Sv):
                 CAPi = CAP[i,j]
                 T_cari = T_car
-                Damping_phi = Damping_ph[i, j]
+                Re_phi = Re_ph[i, j]
                 RE_dri = RE_dr[i, j]
 #                test.append(Damping_phi.magnitude)
-                if 0.28 < CAPi.magnitude < 3.6 and T_cari.magnitude < 1.0 and RE_dri.magnitude < 0 and Damping_phi > 0.004:
+                if 0.28 < CAPi.magnitude < 3.6 and T_cari.magnitude < 1.0 and RE_dri.magnitude < 0 and Re_phi.magnitude < 0 :
                     Sv = S_v[i,j]
                     Sh = S_h[i,j]                  
                     r_allowed.append([Sv.magnitude, Sh.magnitude, X_h.magnitude, XLEMAC.magnitude])
