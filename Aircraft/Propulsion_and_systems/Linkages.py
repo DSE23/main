@@ -101,14 +101,24 @@ print("Maximum yaw force on rudder cables: {}".format(f_y_max))
 # Buckling calculation of pushrods
 # Define dimensions
 # Elevator pushrod diameter
-d_pushrod_e = Q_("10 cm")
+d_pushrod_e = Q_("30 mm")
 # Elevator pushrod length
-l_pushrod_e = Q_("3 m")
+l_pushrod_e = Q_("3 m")  # DUMMY
 
 # Calculate critical moment of inertia for buckling
-i_xx_e = (f_p_max*l_pushrod_e)/(np.pi**2*StrucVal.youngs_modulus)
+i_xx_e = (f_p_b_max*2*l_pushrod_e**2)/(np.pi**2*StrucVal.youngs_modulus)
+i_xx_e.ito(ureg("mm**4"))
+#print(i_xx_e)
 
 # Calculate skin thickness needed for critical moment of inertia
-t_pushrod_e = d_pushrod_e/2 - (i_xx_e*4/np.pi - (d_pushrod_e/2)**4)**(1/4)
+t_pushrod_e = d_pushrod_e/2 - (-i_xx_e*4/np.pi + (d_pushrod_e/2)**4)**(1/4)
 
 print("Minimum skin thickness needed to prevent buckling at {} diameter: {}".format(d_pushrod_e,t_pushrod_e))
+
+density_carbon = Q_("1.6 g/cm**3")
+area_pushrod = np.pi*(d_pushrod_e/2)**2 - np.pi*(d_pushrod_e/2-t_pushrod_e)**2
+print(area_pushrod)
+volume_pushrod = area_pushrod*l_pushrod_e
+mass_pushrod = volume_pushrod * density_carbon
+mass_pushrod.ito(ureg.kg)
+print("Pushrod weight: {}".format(mass_pushrod))
