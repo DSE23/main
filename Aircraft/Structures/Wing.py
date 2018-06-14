@@ -181,22 +181,22 @@ def get_xy_from_perim(perim_val, start_x=0, dat_file_name="../Airfoil.dat"):
         Returns: perim (Perimiter value)
     """
 
-    Air_data = np.genfromtxt(dat_file_name)  # Imports datapoints from airfoil data file
-
-    x_coords = Air_data[:81, 0]  # We only care about 1 half of the airfoil
-    x_coords = np.flip(x_coords, 0)  # Flip them so they are in a good order
-    y_coords = Air_data[:81, 1]  # We only care about 1 half of the airfoilfs
-    y_coords = np.flip(y_coords, 0)  # Flip them so they are in a good order
-    p = interp1d(x_coords, y_coords, kind ='cubic')  # Generate a poly spline based on the airfoil points
+    #Air_data = np.genfromtxt(dat_file_name)  # Imports datapoints from airfoil data file
+#
+    #x_coords = Air_data[:81, 0]  # We only care about 1 half of the airfoil
+    #x_coords = np.flip(x_coords, 0)  # Flip them so they are in a good order
+    #y_coords = Air_data[:81, 1]  # We only care about 1 half of the airfoilfs
+    #y_coords = np.flip(y_coords, 0)  # Flip them so they are in a good order
+    #p = interp1d(x_coords, y_coords, kind ='cubic')  # Generate a poly spline based on the airfoil points
 
     perim = 0  # Set initial perimiter size to 0
-    step = 0.0001  # Step size for algorithm: increase will lead to faster computing times
+    step = 0.001  # Step size for algorithm: increase will lead to faster computing times
     min_val = 10
     for x_c in np.arange(start_x, 1, step):
-        perim += np.sqrt((step) ** 2 + (p(x_c + step) - p(x_c)) ** 2)
+        perim += np.sqrt((step) ** 2 + (airfoilordinate(x_c + step) - airfoilordinate(x_c)) ** 2)
         if abs(perim - perim_val) < min_val:
             x_coord = 0.5 * (x_c + x_c + step)
-            y_coord = 0.5 * (p(x_c) + p(x_c + step))
+            y_coord = 0.5 * (airfoilordinate(x_c) + airfoilordinate(x_c + step))
             min_val = abs(perim - perim_val)
         else:
             break
