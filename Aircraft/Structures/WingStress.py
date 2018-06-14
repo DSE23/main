@@ -139,6 +139,8 @@ youngs_modulus = Q_("95 GPa") #E
 yield_strength = Q_("23 MPa") #tensile
 compr_strength = Q_("247 MPa") #compression
 shear_modulus = Q_("36 GPa") #G
+poisson = 0.31 # maximum 0.33
+tau_max = Q_("35 MPa")
 
 
 
@@ -174,7 +176,7 @@ def Shear_wb(zs, L):
         s1 = np.append(s1, s)
         qs = s**2*Wing.ThSpar1*(-L)/Inertia.Ixx_wb
         qs1 = np.append(qs1, qs)
-    section01at1 = np.sum(qs1)
+    section01at1 = qs1
     #section12
     n = 100 #number of sections
     ds = (Wing.length_Skin_x_c(Wing.ChSpar1, Wing.ChSpar2)/n)
@@ -301,10 +303,11 @@ def Tsia_Wu(sigma_zs, shearforce):
     F12 = -1/2*np.sqrt(F11*F22)
     F1 = 1/(yield_strength)-1/(compr_strength)
     F2 = 1/(yield_strength)-1/(compr_strength)
-    #F44 = 1
-    #F66 = 1
-    F = F11 *F22*F12*F1*F2 #klopt niet
-    return sigma_zs
+    F44 = 1/tau_max**2
+    F66 = 1/tau_max**2 
+    F = F11 *F22*F12*F1*F2*F44*F66 #klopt niet
+    return F
+
 
 
 

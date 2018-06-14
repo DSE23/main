@@ -80,9 +80,10 @@ P = P_to
 flight_path_angle = Q_("0 deg")
 flight_path_angle.ito(Q_("rad"))
 
-print(h)
-print("Take-off ground run",x, "time to do this:", t)
 
+print("Take-off ground run",round(x,2), " reached in ", round(t,2))
+
+h_screen = False
 
 # In this part the aircraft climbs with full power and CL max, until a climb angle of 45 deg is obtained.
 while flight_path_angle < Q_(" 45 deg "):
@@ -102,6 +103,10 @@ while flight_path_angle < Q_(" 45 deg "):
 
     x += V * np.cos(flight_path_angle) * dt
     h += V * np.sin(flight_path_angle) * dt
+
+    if h > Q_("15 m") and h_screen == False:
+        print("Take-off run until screen height", round(x,2), " reached in:", round(t,2))
+        h_screen = True
 
     V += V_dot * dt
     flight_path_angle += flight_path_angle_dot * dt
@@ -124,7 +129,7 @@ P_req = T_req * V / eta_prop
 P_ratio = P_req / P_to
 alpha_req.ito(Q_("deg"))
 
-print(alpha_req, P_ratio)
+#print(alpha_req, P_ratio)
 
 # If the power needed is higher than the maximum power of if the AoA is too high, a message has to be shown.
 if P_ratio > 1:
