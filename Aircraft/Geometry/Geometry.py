@@ -131,17 +131,23 @@ class CG(object):
     # Locations in here are referencd to the nose in x and the crankshaft of the
     # engine in z, unless stated otherwise, For Z downward == positive, for x
     # is to the tail positive
-    CG_wing_mac = 0.5                   # CG location of wing as percentage of MAC
+    CG_wing_mac = 0.46385                   # CG location of wing as percentage of MAC
     XLEMAC = Q_("1.24 m")               # LEMAC position
     CG_wing = CG_wing_mac*Wing.MAC + XLEMAC     # Wing CG position relative to nose
-    ZCG_wing = Q_("0 m")
-    CG_htail = H_tail.X_h + H_tail.MAC * 0.5    # H-tail cg relative to nose
+    ZCG_wing = Q_("0.0 m")
+    YCG_wing = Q_("0 m")
+    CG_htail_mac = 0.5618
+    CG_htail = H_tail.X_h + H_tail.MAC * CG_htail_mac   # H-tail cg relative to nose
     ZCG_htail = Q_("-0.094 m")
-    CG_vtail = V_tail.X_v + V_tail.b * 0.5      # V-tail cg relative to nose
-    ZCG_vtail = Q_("0.31m") - V_tail.MAC * 0.5
-    CG_fus = Q_("2.88 m")                      # CG fuselage relative to nose !!!update!!!
+    YCG_vtail = Q_("0 m")
+    CG_vtail_mac = 0.58799
+    CG_vtail = V_tail.X_v + V_tail.MAC * CG_vtail_mac      # V-tail cg relative to nose
+    ZCG_vtail = Q_("0.31m") - V_tail.b * 0.5
+    YCG_vtail = Q_("0 m")
+    CG_fus = Q_("2.16 m")                      # CG fuselage relative to nose !!!update!!!
     Z_fusorig = Q_("0.487 m")                  # Origin of fuselage in Z (lowest point)
     ZCG_fus = Q_("-0.0617m") #Inertia.ZCG_f                    # Complete fuselage Z-cg location
+    YCG_fus = Q_("0 m")
     CG_lgear = 0.23 * Fuselage.l_f             # CG LG relative to nose !!!update!!!
     ZCG_lgear = Q_("0.69 m")
     CG_engine = Engine.xcg                     # CG of the engine relative to nose
