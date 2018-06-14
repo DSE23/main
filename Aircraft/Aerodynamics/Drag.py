@@ -2,7 +2,7 @@
 """
 Name: DATCOM Drag
 Department: Aerodynamics
-Last updated: 08/06/2018 16:53 by Emma
+Last updated: 13/06/2018 11:00 by Emma
 """
 
 #Imports
@@ -21,20 +21,20 @@ import Aeroprops
 #Input variables, to be filled in by user
 
 
-AoA = Q_("0 deg") #fill in angle of attack flight condition drag to be known
+AoA = Q_("2 deg") #fill in angle of attack flight condition drag to be known
+AoA = AoA.to(ureg.rad)
 Rwb = 1.05#Read in DATCOM p1164, wing body interference factor
 Rhtb = 1.05
 Rvtb= 1.05
-CL_trim = 1#lift coefficient needed to trim aircraft
+CL_trim = 0#lift coefficient needed to trim aircraft
 
-Temp = 288.15# Temperature in Kelvin
-Temp *= Q_('K')
+height = Q_('100 m') # height in m
 velocity = Q_('94  m/s') #velocity in m/s
 loc_max_tc_wing = 0 # 0 if t/c max is < 30%c, 1 if t/c max is >= 30%c
 loc_max_tc_ht = 0 # 0 if t/c max is < 30%c, 1 if t/c max is >= 30%c
 loc_max_tc_vt = 0 # 0 if t/c max is < 30%c, 1 if t/c max is >= 30%c
 Sref = Geometry.Wing.S
-CL_wing = Aeroprops.CL_alpha_wing * AoA.to(ureg("rad")) #max lift coefficient
+CL_wing = Aeroprops.CL_alpha_wing * AoA #max lift coefficient
 AR_wing = Geometry.Wing.A
 ih = Geometry.H_tail.i_h #incidende angle HT
 CL_ht = Aeroprops.CL_alpha_ht * AoA.to(ureg.rad) - Aeroprops.de_da * \
@@ -57,6 +57,7 @@ Temp0 = Q_('288.15 K')
 g = Q_('9.80665 m / s**2')
 R = Q_('287.05 m**2 * K / s**2')
 lam = Q_('0.0065 K / m')
+Temp = Temp0 - lam * height
 Rls_para = 1.07 #obtained from DATCOM, won't change with slight aircraft redesign
 
 
@@ -186,7 +187,7 @@ print('fineness',fin_ratio)
 #zero lift body drag
 
 CD0_fus = C_skinfric_fus * (1  +  60 / (fin_ratio**3)  +  0.0025 * fin_ratio)  * \
-S_wet_fus / fus_cs_area 
+S_wet_fus / Sref
 
 print('fuselage zero lift drag', CD0_fus)
 
@@ -200,20 +201,39 @@ print('cdotot', CD0_tot)
 #trim drag
 downwash = Aeroprops.de_da * AoA
 Delta_CD_trim = ((CD0_array[1] + CL_trim**2 / m.pi / AR_ht / 0.5) * \
-                 np.cos(downwash) + CL_ht * np.sin(downwash)) * \
+                 np.cos(downwash) + CL_trim * np.sin(downwash)) * \
                  Sht / Sref * Aeroprops.q_qinf_ratio
                  
         
 #miscellaneous drag
-CD_canopy = 0.04 * Geometry.Fuselage.A_max_canopy
-CD_lg = 0.458 * Geometry.Landing_gear.lg_wheel_d * Geometry.Landing_gear.lg_wheel_w
+CD_canopy = Q_('0.04 m**-2') * Geometry.Fuselage.A_max_canopy
+print(CD_canopy,'cap')
+CD_lg = Q_('0.458 m**-2') * Geometry.Landing_gear.lg_wheel_d * Geometry.Landing_gear.lg_wheel_w
+print('landing gear',CD_lg)
 
 
 #total drag calculation
 
 CD_tot = CD0_tot + CD_canopy + CD_lg + Delta_CD_trim + CDi_array[0] + CDi_array[1]  
+
+Drag = 0.5 * density * velocity**2 * CD_tot * Sref
     
 
+#printing stuff to reference file
+with open('Aeroprops.py', 'r') as file:
+    # read a list of lines into data
+    data = file.readlines()
+
+data[20] = 'CD0_wing = Q_(\"' + str(CD0_array[0]) + '\")\n'
+data[21] = 'CD0_ht = Q_(\"' + str(CD0_array[1]) + '\")\n'
+data[22] = 'CD0_vt = Q_(\"' + str(CD0_array[2]) + '\")\n'
+data[23] = 'CD_canopy = Q_(\"' + str(CD_canopy) + '\")\n'
+data[24] = 'CD_lg = Q_(\"' + str(CD_lg) + '\")\n'
+data[25] = 'CD0_tot = Q_(\"' + str(CD0_tot) + '\")\n'
+
+# and write everything back
+with open('Aeroprops.py', 'w') as file:
+    file.writelines(data)
 
 
 
