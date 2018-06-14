@@ -74,11 +74,3 @@ plt.ylabel('Velocity  [m/s]')
 plt.xlabel('time [s] ')
 
 plt.show()
-
-
-
-
-
-
-
-

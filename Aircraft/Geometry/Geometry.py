@@ -128,24 +128,44 @@ class Masses(object):                    # !!!Structures should watch this!!!
 
 
 class CG(object):
+    # Locations in here are referencd to the nose in x and the crankshaft of the
+    # engine in z, unless stated otherwise, For Z downward == positive, for x
+    # is to the tail positive
     CG_wing_mac = 0.5                   # CG location of wing as percentage of MAC
     XLEMAC = Q_("1.24 m")               # LEMAC position
     CG_wing = CG_wing_mac*Wing.MAC + XLEMAC     # Wing CG position relative to nose
+    ZCG_wing = Q_("0 m")
     CG_htail = H_tail.X_h + H_tail.MAC * 0.5    # H-tail cg relative to nose
+    ZCG_htail = Q_("-0.094 m")
     CG_vtail = V_tail.X_v + V_tail.b * 0.5      # V-tail cg relative to nose
+    ZCG_vtail = Q_("0.31m") - V_tail.MAC * 0.5
     CG_fus = Q_("2.88 m")                      # CG fuselage relative to nose !!!update!!!
+    Z_fusorig = Q_("0.487 m")                  # Origin of fuselage in Z (lowest point)
+    ZCG_fus = Q_("-0.0617m") #Inertia.ZCG_f                    # Complete fuselage Z-cg location
     CG_lgear = 0.23 * Fuselage.l_f             # CG LG relative to nose !!!update!!!
+    ZCG_lgear = Q_("0.69 m")
     CG_engine = Engine.xcg                     # CG of the engine relative to nose
-    CG_prop = Q_("-0.1 m")                     # CG propellor !!!update!!!    
+    CG_prop = Q_("-0.1 m")                     # CG propellor !!!update!!! 
+    ZCG_prop = Q_("0 m")
+    ZCG_engine = Engine.zcg
     CG_fuelsys = Q_("1.18 m")                  # CG fuel system !!!update!!!
+    ZCG_fuelsys = Q_("0 m")
     CG_hydraulics = Q_("1.115 m")              # CG hydraulics !!!update!!!
+    ZCG_hydraulics = Q_("0 m")
     CG_flightcon = Q_("2.035 m")               # CG flight controls !!!update!!!
+    ZCG_flightcon = Q_("0.21 m")
     CG_avionics = Q_("2.035 m")                # CG Avionics !!!update!!!
+    ZCG_avionics = Q_("0 m")
     CG_elecsys = Q_("1.935 m")                 # CG electronic system !!!update!!!
+    ZCG_elecsys = Q_("0 m")
     CG_lehld = XLEMAC                          # CG leading edge HLD's
+    ZCG_lehld = Q_("0 m")
     CG_flaperons = XLEMAC + Wing.MAC           # CG Flaperons
+    ZCG_flaperons = Q_("0 m")
     CG_pilot = Q_("2.235 m")                   # CG Pilot relative to nose
+    ZCG_pilot = Q_("-0.22 m")
     CG_fuel = Q_("1.18 m")                     # CG fuel
+    ZCG_fuel = Q_("0 m")
     CG_OEW = (Masses.W_wing * CG_wing + Masses.W_htail * CG_htail + Masses.W_vtail\
               * CG_vtail + Masses.W_fus * CG_fus + Masses.W_gear * CG_lgear\
               + Masses.W_engine * CG_engine + Masses.W_prop * CG_prop\
@@ -157,4 +177,14 @@ class CG(object):
                 (Masses.W_OEW+ Masses.W_pilot)
     CG_mtow = (CG_wpilot*(Masses.W_OEW+ Masses.W_pilot)+CG_fuel * Masses.W_fuel)\
               /(Masses.W_MTOW)
-    Z_cg = 0                                    #  Check this!!!!!!!!!!!!!!!
+    ZCG_OEW = (Masses.W_wing * ZCG_wing + Masses.W_htail * ZCG_htail + Masses.W_vtail\
+              * ZCG_vtail + Masses.W_fus * ZCG_fus + Masses.W_gear * ZCG_lgear\
+              + Masses.W_engine * ZCG_engine + Masses.W_prop * ZCG_prop\
+              + Masses.W_fuelsys * ZCG_fuelsys + Masses.W_hydraulic * ZCG_hydraulics\
+              + Masses.W_elecsys * ZCG_elecsys + Masses.W_flightcontrol *\
+              ZCG_flightcon + Masses.W_avionics * ZCG_avionics + Masses.W_lehld *\
+              ZCG_lehld + Masses.W_flaperons * ZCG_flaperons)/Masses.W_OEW
+    ZCG_wpilot = (ZCG_OEW * Masses.W_OEW + Masses.W_pilot * ZCG_pilot)/\
+                (Masses.W_OEW+ Masses.W_pilot)
+    ZCG_mtow = (ZCG_wpilot*(Masses.W_OEW+ Masses.W_pilot)+ZCG_fuel * Masses.W_fuel)\
+              /(Masses.W_MTOW)
