@@ -188,7 +188,7 @@ def Shear_wb(zs, L):
     for i in range(n):
         s = s + ds
         s2 = np.append(s2, s)
-        qs = s * Wing.get_xy_from_perim(s/Wing.length_chord(zs))*Wing.length_chord(zs)*Wing.ThSkin*(-L)/Inertia.Ixx_wb
+        qs = s * Wing.get_xy_from_perim(s/Wing.length_chord(zs))[1]*Wing.length_chord(zs)*Wing.ThSkin*(-L)/Inertia.Ixx_wb
         qs2 = np.append(qs2, qs)
     section12at2 =  np.sum(qs2)
     #section23
@@ -204,7 +204,7 @@ def Shear_wb(zs, L):
         s3 = np.append(s3, s)
         qs = -s**2*Wing.ThSpar2*(-L)/Inertia.Ixx_wb
         qs3 = np.append(qs3, qs)
-    qbase = 2#*(""" add moment here from part of midas above, we may not forget to change this, this is why this line exceeds the length limit """ )/Wing.Area_cell()
+    qbase = 2 #*(Moment """+ hier moet nog iets bij""")/Wing.Area_cell()
     qs1 *= ureg("N/m")
     qs2 *= ureg("N/m")
     qs3 *= ureg("N/m")
@@ -223,14 +223,13 @@ print("q3=", shear_arrays[2,0])
 print("s3=", shear_arrays[2,1])
 
 def calc_moment_from_shear(zs, shear_arrays=Shear_wb(Wing.z, L)[2]):
-    Moment = 0
     q_1 = shear_arrays[0, 0]
     s_1 = shear_arrays[0, 1]
     q_2 = shear_arrays[1, 0]
     s_2 = shear_arrays[1, 1]
     q_3 = shear_arrays[2, 0]
     s_3 = shear_arrays[2, 1]
-    M = 0
+    Moment = 0
     print(zs)
     if (len(q_2) != len(s_2)):
         raise ValueError("ERROR, ARRAY LENGTH NOT EQUAL!")
@@ -251,11 +250,13 @@ def calc_moment_from_shear(zs, shear_arrays=Shear_wb(Wing.z, L)[2]):
         print("Angle=", force_angle)
         Fx = q_loc*ds*np.cos(force_angle)
         Fy = q_loc*ds*np.sin(force_angle)
-        M += -Fx*(y_loc_1+y_loc_2)*0.5
-        M += Fy*(x_loc_1+x_loc_2)*0.5
+        Moment += -Fx*(y_loc_1+y_loc_2)*0.5
+        Moment += Fy*(x_loc_1+x_loc_2)*0.5
 
-    return M
+    return Moment
+
 print(calc_moment_from_shear(z, shear_arrays))
+
 def Torsion(zs, qbase):
     A_cell = Wing.Area_cell()
     length_skin = Wing.Area/Wing.ThSkin
