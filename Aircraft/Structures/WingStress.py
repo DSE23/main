@@ -176,7 +176,7 @@ def Shear_wb(zs, L):
         s1 = np.append(s1, s)
         qs = s**2*Wing.ThSpar1*(-L)/Inertia.Ixx_wb
         qs1 = np.append(qs1, qs)
-    section01at1 = qs1
+    section01at1 = qs1[-1]
     #section12
     n = 100 #number of sections
     ds = (Wing.length_Skin_x_c(Wing.ChSpar1, Wing.ChSpar2)/n)
@@ -184,14 +184,13 @@ def Shear_wb(zs, L):
     s2 = np.array([])
     qs2 = np.append(qs2, section01at1)
     s2 = np.append(s2, 0)
-    line_int_skin_wb = section01at1
     s = 0
     for i in range(n):
         s = s + ds
         s2 = np.append(s2, s)
-        qs = s * Wing.get_xy_from_perim(s/Wing.length_chord(zs))[1]*Wing.length_chord(zs)*Wing.ThSkin*(-L)/Inertia.Ixx_wb
+        qs = s * Wing.get_xy_from_perim(s/Wing.length_chord(zs))[1]*Wing.length_chord(zs)*Wing.ThSkin*(-L)/Inertia.Ixx_wb + section01at1
         qs2 = np.append(qs2, qs)
-    section12at2 =  np.sum(qs2)
+    section12at2 =  qs2[-1]
     #section23
     n = 100
     ds = Wing.HSpar2/n
