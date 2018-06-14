@@ -203,6 +203,12 @@ def Shear_wb(zs):
         qs3 = np.append(qs3, qs)
     section23at3 = qs3[-1]
     qbase = 2#*(""" add moment here from part of midas above, we may not forget to change this, this is why this line exceeds the length limit """ )/Wing.Area_cell()
+    qs1 *= ureg("N/m")
+    qs2 *= ureg("N/m")
+    qs3 *= ureg("N/m")
+    s1 *= ureg("m")
+    s2 *= ureg("m")
+    s3 *= ureg("m")
     shear_arrays = np.array([[qs1, s1], [qs2, s2], [qs3, s3]])
     return qs, qbase, shear_arrays
 
@@ -224,18 +230,22 @@ def calc_moment_from_shear(qs, t_sk, t_sp, zs, shear_arrays=Shear_wb(Wing.z)[2])
     q_3 = shear_arrays[2, 0]
     s_3 = shear_arrays[2, 1]
     M = 0
+    print(zs)
     for i in range(0,len(s_2),2):
         ds = s_2[i+1] - s_2[i]
         q_loc = (q_2[i] + q_2[i+1])*0.5
-
-        x_loc_1, y_loc_1 = Wing.get_xy_from_perim(s_2[i], Wing.ChSpar1, Wing.ChSpar2)
-        x_loc_2, y_loc_2 = Wing.get_xy_from_perim(s_2[i+1], Wing.ChSpar1, Wing.ChSpar2)
+        #print(s_2[i])
+        x_loc_1, y_loc_1 = Wing.get_xy_from_perim(s_2[i]/Wing.length_chord(zs), Wing.ChSpar1)
+        x_loc_2, y_loc_2 = Wing.get_xy_from_perim(s_2[i+1]/Wing.length_chord(zs), Wing.ChSpar1)
         x_loc_1 *= Wing.length_chord(zs)
         y_loc_1 *= Wing.length_chord(zs)
         x_loc_2 *= Wing.length_chord(zs)
         y_loc_2 *= Wing.length_chord(zs)
         slope = (y_loc_2 - y_loc_1)/(x_loc_2 - x_loc_1)
         force_angle = -np.arctan(slope)
+        print("q=", q_loc)
+        print("ds=", ds)
+        print("Angle=", force_angle)
         Fx = q_loc*ds*np.cos(force_angle)
         Fy = q_loc*ds*np.sin(force_angle)
         M += -Fx*(y_loc_1+y_loc_2)*0.5
