@@ -98,7 +98,6 @@ for i in np.arange(0, len(dLlist)):
     D_moment *= Q_('kg * m**2/s**2')
 
 
-print('print L', L)
 '''For the 20G manoeuver'''
 MTOW = Geometry.Masses.W_MTOW
 Max_20G_N = MTOW * 9.81 * 20
@@ -115,7 +114,6 @@ L = L * fac_20G
 D = D * fac_20G
 M = M * fac_20G
 
-print('print L', L)
 
 Llist *= ureg("N/m")
 Dlist *= ureg("N/m")
@@ -304,7 +302,7 @@ def Tsia_Wu(sigma_zs, shearforce):
     F1 = 1/(yield_strength)-1/(compr_strength)
     F2 = 1/(yield_strength)-1/(compr_strength)
     #F44 = 1
-    #F66 = 1 
+    #F66 = 1
     F = F11 *F22*F12*F1*F2 #klopt niet
     return sigma_zs
 
@@ -323,3 +321,4 @@ data[18] = 'youngs_modulus = Q_(\"' + str(youngs_modulus) + '\")\n'
 # and write everything back
 with open('StrucVal.py', 'w') as file:
     file.writelines(data)
+
