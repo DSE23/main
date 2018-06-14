@@ -14,7 +14,7 @@ import math as m
 from Geometry import Geometry
 
 #Manual inputs
-chordlength = .1  #determine part of chord used for slats
+chordlength = .05 #determine part of chord used for slats
 slatwidth = Geometry.Wing.b #width of the slats
 h = Q_('100 m') #altitude of flight
 Velocity = Q_(' 30 m/s') #aircraft velocity at which slats are deployed
@@ -57,9 +57,9 @@ print('Slat force required =', P)
 
 
 #electric actuator size + stroke length
-x_length = (chordlength - 0.008) * Geometry.Wing.c_avg.magnitude
+x_length = (chordlength - 0.01) * Geometry.Wing.c_avg.magnitude
 print('x',x_length)
-y_length = (Geometry.Wing.T_Cmax / 2 - 0.04) * Geometry.Wing.c_avg.magnitude
+y_length = (Geometry.Wing.T_Cmax / 2 - 0.03) * Geometry.Wing.c_avg.magnitude
 print('y',y_length)
 angle = m.degrees(m.atan(y_length/x_length))
 print(angle,' = angle')
