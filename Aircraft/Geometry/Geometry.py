@@ -141,7 +141,7 @@ class CG(object):
     ZCG_vtail = Q_("0.31m") - V_tail.MAC * 0.5
     CG_fus = Q_("2.88 m")                      # CG fuselage relative to nose !!!update!!!
     Z_fusorig = Q_("0.487 m")                  # Origin of fuselage in Z (lowest point)
-    ZCG_fus = Q_("-0.04144m") #Inertia.ZCG_f                    # Complete fuselage Z-cg location
+    ZCG_fus = Q_("-0.0617m") #Inertia.ZCG_f                    # Complete fuselage Z-cg location
     CG_lgear = 0.23 * Fuselage.l_f             # CG LG relative to nose !!!update!!!
     ZCG_lgear = Q_("0.69 m")
     CG_engine = Engine.xcg                     # CG of the engine relative to nose

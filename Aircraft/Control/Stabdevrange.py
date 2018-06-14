@@ -20,7 +20,7 @@ from Geometry import Geometry
 from Aerodynamics import Wing as Aero_wing
 from Aerodynamics import HT as Aero_HT
 from Aerodynamics import VT as Aero_VT
-from Aerodynamics import General as Aero_gen
+from Aerodynamics import Aeroprops as Aero_gen
 from Inertia import Inertia
 from Performance import Performance
 
@@ -59,12 +59,13 @@ Vv_V = Aero_VT.Vv_V
 S_v = Geometry.V_tail.S
 Z_v = Geometry.V_tail.Z_v
 X_v = Geometry.V_tail.X_v
-CD0 = Aero_gen.CD_0
+CD0 = Aero_gen.CD0_tot
 I_xx = Inertia.I_xx
 I_zz = Inertia.I_zz
 K_xx = I_xx/(MTOW*b**2)
 K_zz = I_zz/(MTOW*b**2)
-I_xz = Inertia.I
+I_xz = Inertia.I_xz
+K_xz = I_xz/(b**2*MTOW)
 CD0_alpha = 0                   # Assumed
 
 # Values from graphs update with changing A and taper!!!

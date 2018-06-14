@@ -149,9 +149,9 @@ s_pm = r * alpha
 mpm = W_ifus * s_pm/(sum(s_pm))
 
 zcgf_complete = (np.sum(np.sum(zcgf*mpm)))/(np.sum(np.sum(mpm)))
-Z_CGF = Geometry.CG.ZCG_fus
+Z_CGF = Geometry.CG.ZCG_fus 
 if not abs(0.9*zcgf_complete) < abs(Z_CGF) < abs(1.1*zcgf_complete):
-    print("Update ZCGf in Geometry to ", zcgf_complete)
+    print('\x1b[3;37;41m' + "Update ZCGf in Geometry to " + str(zcgf_complete) + '\x1b[0m')
 
 I_xxpmf = mpm * ((ycgf - Y_cg)**2 + (zcgf - Z_cg)**2)     
 I_yypmf = mpm * ((zcgf - Z_cg)**2 + (xcgf - X_cg)**2)
@@ -209,7 +209,8 @@ xcgw = np.array([[(xapexw + L1/2 * chordw).magnitude],
 xcgw = xcgw[:, 0, :] * Q_("m")
 ycgw = np.tile(ycgw, (5, 1))
 ycgw = ycgw * Q_("m")
-zcgw = np.zeros(N_stw) * Q_("m")
+ZCG_W = Geometry.CG.ZCG_wing
+zcgw = np.ones(N_stw) * ZCG_W
 a = -W_wing*(((c_rw*(1-taper_w))/sum(chordw))/N_stw)**2
 C1 = 2/b.magnitude * (W_wing.magnitude/2 - b.magnitude**2/8 * a.magnitude)
 C1 = C1 * Q_("m * kg")
@@ -272,12 +273,12 @@ y_h = (2 * c_th * dxLE_h + c_th**2 + dxLE_h * c_rh +\
        c_th * c_rh + c_rh**2)/(3 * (c_rh + c_th))
 H_rollcoeff = y_h/(b_h/6*((c_rh + 2 * c_th)/(c_rh + c_th)))
 if not 0.95 < H_rollcoeff < 0.97:
-    print(" !!!!Change k_4!!!!!")
+    print('\x1b[3;37;41m' + "Change K_4"  + '\x1b[0m')
 k_4 = 0.88                              # From graphs, dependent on H_rollcoeff
 I_0xh = (W_Htail * b_h**2 * k_4)/24 * ((c_rh+3 * c_th)/(c_rh + c_th))
 I_0zh = I_0yh + I_0xh
 ycgh = 0
-zcgh = Geometry.H_tail.Z_h          # Symmetric wing, so cg in middle of height
+zcgh = Geometry.CG.ZCG_htail             # Symmetric wing, so cg in middle of height
 xcgh = Geometry.CG.CG_htail             # CG location in x-axis of the H-tail
 I_xxh = I_0xh + W_Htail * ((ycgh - Y_cg)**2 + (zcgh - Z_cg)**2)
 I_yyh = I_0yh + W_Htail * ((xcgh - X_cg)**2 + (zcgh - Z_cg)**2)
@@ -312,14 +313,14 @@ z_vbar = (2*c_tv* dxLE_v + c_tv**2 + dxLE_v * c_rv +\
 V_rollcoef = z_vbar/((b_v/3)*(c_rv + 2* c_tv)/(c_rv + c_tv))
 k_5 = 1.4
 if not 1.6 < V_rollcoef < 1.65:
-    print(" !!!! Change K_5!!!!!")
+    print('\x1b[3;37;41m' + "Change K_5"  + '\x1b[0m')
 I_0xv = (W_Vtail * b_v**2 * k_5)/18 * (1+ (2 * c_rv * c_tv)/(c_rv + c_tv)**2)
 sigmx_v = sum(yv1 * vdx1 * x_v1) + sum(yv2 * vdx2 * x_v2) + sum(yv3 * vdx3 * x_v3)
 sigm_v = sum(yv1 * vdx1) + sum(yv2 * vdx2) + sum(yv3 * vdx3)
 I_0zv = K_0 * (I_v - sigmx_v**2/sigm_v)
 I_0yv = I_0zv + I_0xv
 ycgv = 0
-zcgv = z_vbar
+zcgv = Geometry.CG.ZCG_vtail
 xcgv = Geometry.CG.CG_vtail
 I_xxv = I_0xv + W_Vtail * ((ycgv - Y_cg)**2 + (zcgv - Z_cg)**2)
 I_yyv = I_0yv + W_Vtail * ((xcgv - X_cg)**2 + (zcgv - Z_cg)**2)
@@ -332,7 +333,7 @@ W_engine = Engine.mass
 I_0xe = Engine.ixg
 I_0ye = Engine.iyg
 I_0ze = Engine.izg
-zcge = Q_("0 m")
+zcge = Geometry.CG.ZCG_engine
 ycge = Q_("0 m")
 xcge = Geometry.CG.CG_engine
 I_xxe = I_0xe + W_engine * ((ycge - Y_cg)**2 + (zcge - Z_cg)**2)
@@ -345,7 +346,7 @@ I_xze = W_engine * (xcge - X_cg) * (zcge - Z_cg)
 
 W_fuel = Geometry.Masses.W_fuel
 xcgfuel = Geometry.CG.CG_fuel
-zcgfuel = Q_("0 m")
+zcgfuel = Geometry.CG.ZCG_fuel
 ycgfuel = Q_("0 m")
 I_xxfuel = W_fuel * ((ycgfuel - Y_cg)**2 + (zcgfuel - Z_cg)**2)
 I_yyfuel = W_fuel * ((xcgfuel - X_cg)**2 + (zcgfuel - Z_cg)**2)
@@ -356,7 +357,7 @@ I_xzfuel = W_fuel * (xcgfuel - X_cg) * (zcgfuel - Z_cg)
 
 W_pilot = Geometry.Masses.W_pilot
 xcgp = Geometry.CG.CG_pilot
-zcgp = Q_("0 m")
+zcgp = Geometry.CG.ZCG_pilot
 ycgp = Q_("0 m")
 I_xxp = W_pilot * ((ycgp - Y_cg)**2 + (zcgp - Z_cg)**2)
 I_yyp = W_pilot * ((xcgp - X_cg)**2 + (zcgp - Z_cg)**2)
@@ -368,7 +369,7 @@ I_xzp = W_pilot * (xcgp - X_cg) * (zcgp - Z_cg)
 W_lg = Geometry.Masses.W_gear
 xcglg = Geometry.CG.CG_lgear
 ycglg = Q_("0 m")
-zcglg = Q_("0.5 m")
+zcglg = Geometry.CG.ZCG_lgear
 I_xxlg = W_lg * ((ycglg - Y_cg)**2 + (zcglg - Z_cg)**2)
 I_yylg = W_lg * ((xcglg - X_cg)**2 + (zcglg - Z_cg)**2)
 I_zzlg = W_lg * ((xcglg - X_cg)**2 + (ycglg - Y_cg)**2)
@@ -378,7 +379,7 @@ I_xzlg = W_lg * (xcglg - X_cg) * (zcglg - Z_cg)
 
 W_elec = Geometry.Masses.W_elecsys
 xcgel = Geometry.CG.CG_elecsys
-zcgel = Q_("0 m")
+zcgel = Geometry.CG.ZCG_elecsys
 ycgel = Q_("0 m")
 I_xxel = W_elec * ((ycgel - Y_cg)**2 + (zcgel - Z_cg)**2)
 I_yyel = W_elec * ((xcgel - X_cg)**2 + (zcgel - Z_cg)**2)
@@ -389,7 +390,7 @@ I_xzel = W_elec * (xcgel - X_cg) * (zcgel - Z_cg)
 
 W_fcon = Geometry.Masses.W_flightcontrol
 xcgc = Geometry.CG.CG_flightcon
-zcgc = Q_("0 m")
+zcgc = Geometry.CG.ZCG_flightcon
 ycgc = Q_("0 m")
 I_xxc = W_fcon * ((ycgc - Y_cg)**2 + (zcgc - Z_cg)**2)
 I_yyc = W_fcon * ((xcgc - X_cg)**2 + (zcgc - Z_cg)**2)
@@ -407,27 +408,24 @@ I_zznew = I_zzf + I_zzw + I_zzv + I_zzh + I_zze + I_zzfuel + I_zzp + I_zzlg +\
           I_zzel + I_zzc
 I_xznew = I_xzf + I_xzw + I_xzv + I_xzh + I_xze + I_xzfuel + I_xzp + I_xzlg +\
           I_xzel + I_xzc
-print(I_xxnew, "instead of", I_xx)
-print(I_yynew, "instead of", I_yy)
-print(I_zznew, "instead of", I_zz)
-print(I_xznew, "instead of", 0)
+#print(I_xxnew, "instead of", I_xx)
+#print(I_yynew, "instead of", I_yy)
+#print(I_zznew, "instead of", I_zz)
+#print(I_xznew, "instead of", 0)
 I_xx = I_xxnew
 I_yy = I_yynew
 I_zz = I_zznew
 I_xz = I_xznew
-from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-for i in range(8):
-    ax.scatter(xcgf[i], ycgf[i], zcgf[i])
-for i in range(5):
-    ax.scatter(xcgw[i], ycgw[i], zcgw)
-    ax.scatter(xcgw[i], -ycgw[i], zcgw)
-ax.set_xlim(0, 7)
-ax.set_ylim(-2*(16/9),2*(16/9))
-ax.set_zlim(-2,2)
-#plt.scatter(x_fus, z_fus2)
-#plt.scatter(x_fus, z_fus1)
-#plt.scatter(x_fus, z_fus3)
-plt.show()
+#from matplotlib import pyplot as plt
+#from mpl_toolkits.mplot3d import Axes3D
+#fig = plt.figure()
+#ax = fig.add_subplot(111, projection='3d')
+#for i in range(8):
+#    ax.scatter(xcgf[i], ycgf[i], zcgf[i])
+#for i in range(5):
+#    ax.scatter(xcgw[i], ycgw[i], zcgw)
+#    ax.scatter(xcgw[i], -ycgw[i], zcgw)
+#ax.set_xlim(0, 7)
+#ax.set_ylim(-2*(16/9),2*(16/9))
+#ax.set_zlim(-2,2)
+#plt.show()
