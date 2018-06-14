@@ -149,9 +149,9 @@ s_pm = r * alpha
 mpm = W_ifus * s_pm/(sum(s_pm))
 
 zcgf_complete = (np.sum(np.sum(zcgf*mpm)))/(np.sum(np.sum(mpm)))
-Z_CGF = Geometry.CG.ZCG_fus
+Z_CGF = Geometry.CG.ZCG_fus 
 if not abs(0.9*zcgf_complete) < abs(Z_CGF) < abs(1.1*zcgf_complete):
-    print("Update ZCGf in Geometry to ", zcgf_complete)
+    print('\x1b[3;37;41m' + "Update ZCGf in Geometry to " + str(zcgf_complete) + '\x1b[0m')
 
 I_xxpmf = mpm * ((ycgf - Y_cg)**2 + (zcgf - Z_cg)**2)     
 I_yypmf = mpm * ((zcgf - Z_cg)**2 + (xcgf - X_cg)**2)
@@ -271,7 +271,7 @@ I_0yh = K_0 * (I_h - sigmx_h**2/sigm_h)
 dxLE_h = 0.25 * c_rh - 0.25 * c_th
 y_h = (2 * c_th * dxLE_h + c_th**2 + dxLE_h * c_rh +\
        c_th * c_rh + c_rh**2)/(3 * (c_rh + c_th))
-H_rollcoeff = y_h/(b_h/6*((c_rh + 2 * c_th)/(c_rh + c_th))) + 5
+H_rollcoeff = y_h/(b_h/6*((c_rh + 2 * c_th)/(c_rh + c_th)))
 if not 0.95 < H_rollcoeff < 0.97:
     print('\x1b[3;37;41m' + "Change K_4"  + '\x1b[0m')
 k_4 = 0.88                              # From graphs, dependent on H_rollcoeff
@@ -313,7 +313,7 @@ z_vbar = (2*c_tv* dxLE_v + c_tv**2 + dxLE_v * c_rv +\
 V_rollcoef = z_vbar/((b_v/3)*(c_rv + 2* c_tv)/(c_rv + c_tv))
 k_5 = 1.4
 if not 1.6 < V_rollcoef < 1.65:
-    print(" !!!! Change K_5!!!!!")
+    print('\x1b[3;37;41m' + "Change K_5"  + '\x1b[0m')
 I_0xv = (W_Vtail * b_v**2 * k_5)/18 * (1+ (2 * c_rv * c_tv)/(c_rv + c_tv)**2)
 sigmx_v = sum(yv1 * vdx1 * x_v1) + sum(yv2 * vdx2 * x_v2) + sum(yv3 * vdx3 * x_v3)
 sigm_v = sum(yv1 * vdx1) + sum(yv2 * vdx2) + sum(yv3 * vdx3)
@@ -408,10 +408,10 @@ I_zznew = I_zzf + I_zzw + I_zzv + I_zzh + I_zze + I_zzfuel + I_zzp + I_zzlg +\
           I_zzel + I_zzc
 I_xznew = I_xzf + I_xzw + I_xzv + I_xzh + I_xze + I_xzfuel + I_xzp + I_xzlg +\
           I_xzel + I_xzc
-print(I_xxnew, "instead of", I_xx)
-print(I_yynew, "instead of", I_yy)
-print(I_zznew, "instead of", I_zz)
-print(I_xznew, "instead of", 0)
+#print(I_xxnew, "instead of", I_xx)
+#print(I_yynew, "instead of", I_yy)
+#print(I_zznew, "instead of", I_zz)
+#print(I_xznew, "instead of", 0)
 I_xx = I_xxnew
 I_yy = I_yynew
 I_zz = I_zznew
