@@ -224,7 +224,6 @@ print("s3=", shear_arrays[2,1])
 
 def calc_moment_from_shear(zs, shear_arrays=Shear_wb(Wing.z, L)[2]):
     Moment = 0
-    step = 0.0001
     q_1 = shear_arrays[0, 0]
     s_1 = shear_arrays[0, 1]
     q_2 = shear_arrays[1, 0]
@@ -234,8 +233,8 @@ def calc_moment_from_shear(zs, shear_arrays=Shear_wb(Wing.z, L)[2]):
     M = 0
     print(zs)
     if (len(q_2) != len(s_2)):
-        print("ERROR, TOBIAS MESSED UP!")
-    for i in range(0,len(s_2),2):
+        raise ValueError("ERROR, ARRAY LENGTH NOT EQUAL!")
+    for i in range(0,len(s_2)-1,2):
         ds = s_2[i+1] - s_2[i]
         q_loc = (q_2[i] + q_2[i+1])*0.5
         #print(s_2[i])
