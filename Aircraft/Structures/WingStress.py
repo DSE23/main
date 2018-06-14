@@ -137,8 +137,9 @@ Dlist *= ureg("N/m")
 #Material properties of the chosen material.
 #Current chosen material:
 #Carbon fiber reinforced carbon matrix composite (Vf:50%)
-youngs_modulus = Q_("95 GPa")
-yield_strength = Q_("18 MPa")
+youngs_modulus = Q_("95 GPa") #E
+yield_strength = Q_("23 MPa") #tensile
+compr_strength = Q_("247 MPa") #compression
 shear_modulus = Q_("36 GPa") #G
 
 
@@ -295,7 +296,17 @@ def deformation_y(zs):
 #print("deformation_y=", deformation_y(GWing.b/2))
 
 
-#Von Mises Yield stress criterion
+#Tsia-Wu Failure criterion
+def Tsia_Wu(sigma_zs, shearforce):
+    F11=1/(yield_strength*compr_strength)
+    F22 = F11
+    F12 = -1/2*np.sqrt(F11*F22)
+    F1 = 1/(yield_strength)-1/(compr_strength)
+    F2 = 1/(yield_strength)-1/(compr_strength)
+    #F44 = 1
+    #F66 = 1 
+    F = F11 *F22*F12*F1*F2 #klopt niet
+    return sigma_zs
 
 
 
