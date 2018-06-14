@@ -97,6 +97,7 @@ for i in np.arange(0, len(dLlist)):
     L_moment *= Q_('kg * m**2/s**2')
     D_moment *= Q_('kg * m**2/s**2')
 
+
 '''For the 20G manoeuver'''
 MTOW = Geometry.Masses.W_MTOW
 Max_20G_N = MTOW * 9.81 * 20
@@ -129,8 +130,6 @@ Dlist *= ureg("N/m")
 
 
 
-
-
 #Material properties of the chosen material.
 #Current chosen material:
 #Carbon fiber reinforced carbon matrix composite (Vf:50%)
@@ -150,142 +149,142 @@ def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
     strain = sigma_zs /youngs_modulus
     return sigma_zs #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
-# print('sigma_zs', Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(Wing.c)))
-#SHEAR IS NOT FINISHED
-#SHEAR IS NOT FINISHED
-#SHEAR IS NOT FINISHED
-#SHEAR IS NOT FINISHED
-#SHEAR IS NOT FINISHED
+# # print('sigma_zs', Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(Wing.c)))
+
+# #SHEAR IS NOT FINISHED
+
+# print('Wat duurt zo lang?')
+
+# def Shear_wb(zs):
+#     #section 01
+#     n = 100
+#     ds = Wing.HSpar1/n
+#     qs1 = np.array([])
+#     s1 = np.array([])
+#     qs1 = np.append(qs1, 0)
+#     s1 = np.append(s1, 0)
+#     s = 0
+#     for i in range(n):
+#         s = s + ds
+#         s1 = np.append(s1, s)
+#         qs = s**2*Wing.ThSpar1*(-L)/Inertia.Ixx_wb
+#         qs1 = np.append(qs1, qs)
+#     section01at1 = qs1[-1]
+#     #section12
+#     n = 100 #number of sections
+#     ds = (Wing.length_Skin_x_c(Wing.ChSpar1, Wing.ChSpar2)/n)
+#     qs2 = np.array([])
+#     s2 = np.array([])
+#     qs2 = np.append(qs1, section01at1)
+#     s2 = np.append(s1, 0)
+#     line_int_skin_wb = section01at1
+#     s = 0
+#     for i in range(n):
+#         s = s + ds
+#         s2 = np.append(s2, s)
+#         qs = s * Wing.get_xy_from_perim(s/Wing.length_chord(zs))*Wing.length_chord(zs)*Wing.ThSkin*(-L)/Inertia.Ixx_wb
+#         qs2 = np.append(qs2, qs)
+#     section12at2 =  qs2[-1]
+#     #section23
+#     n = 100
+#     ds = Wing.HSpar2/n
+#     qs3 = np.array([])
+#     s3 = np.array([])
+#     qs3 = np.append(qs3, section12at2)
+#     s3 = np.append(s3, 0)
+#     s = 0
+#     for i in range(n):
+#         s = s + ds
+#         s3 = np.append(s3, s)
+#         qs = -s**2*Wing.ThSpar2*(-L)/Inertia.Ixx_wb
+#         qs3 = np.append(qs3, qs)
+#     section23at3 = qs3[-1]
+#     qbase = 2#*(""" add moment here from part of midas above, we may not forget to change this, this is why this line exceeds the length limit """ )/Wing.Area_cell()
+#     shear_arrays = np.array([[qs1, s1], [qs2, s2], [qs3, s3]])
+#     return qs, qbase, shear_arrays
+# print('Dit?')
+# #qs, qbase, shear_arrays = Shear_wb(Wing.z)
 
 
-def Shear_wb(zs):
-    #section 01
-    n = 100
-    ds = Wing.HSpar1/n
-    qs1 = np.array([])
-    s1 = np.array([])
-    qs1 = np.append(qs1, 0)
-    s1 = np.append(s1, 0)
-    s = 0
-    for i in range(n):
-        s = s + ds
-        s1 = np.append(s1, s)
-        qs = s**2*Wing.ThSpar1*(-L)/Inertia.Ixx_wb
-        qs1 = np.append(qs1, qs)
-    section01at1 = qs1[-1]
-    #section12
-    n = 100 #number of sections
-    ds = (Wing.length_Skin_x_c(Wing.ChSpar1, Wing.ChSpar2)/n)
-    qs2 = np.array([])
-    s2 = np.array([])
-    qs2 = np.append(qs1, section01at1)
-    s2 = np.append(s1, 0)
-    line_int_skin_wb = section01at1
-    s = 0
-    for i in range(n):
-        s = s + ds
-        s2 = np.append(s2, s)
-        qs = s * Wing.get_xy_from_perim(s/Wing.length_chord(zs))*Wing.length_chord(zs)*Wing.ThSkin*(-L)/Inertia.Ixx_wb
-        qs2 = np.append(qs2, qs)
-    section12at2 =  qs2[-1]
-    #section23
-    n = 100
-    ds = Wing.HSpar2/n
-    qs3 = np.array([])
-    s3 = np.array([])
-    qs3 = np.append(qs3, section12at2)
-    s3 = np.append(s3, 0)
-    s = 0
-    for i in range(n):
-        s = s + ds
-        s3 = np.append(s3, s)
-        qs = -s**2*Wing.ThSpar2*(-L)/Inertia.Ixx_wb
-        qs3 = np.append(qs3, qs)
-    section23at3 = qs3[-1]
-    qbase = 2*(""" add moment here from part of midas above, we may not forget to change this, this is why this line exceeds the length limit """ )/Wing.Area_cell()
-    shear_arrays = np.array([[qs1, s1], [qs2, s2], [qs3, s3]])
-    return qs, qbase, shear_arrays
+# #print("q1=", shear_arrays[0,0])
+# #print("s1=", shear_arrays[0,1])
+# #print("q2=", shear_arrays[1,0])
+# #print("s2=", shear_arrays[1,1])
+# #print("q3=", shear_arrays[2,0])
+# #print("s3=", shear_arrays[2,1])
+# print('Dit')
+# def calc_moment_from_shear(qs, t_sk, t_sp, zs, shear_arrays=Shear_wb(Wing.z)[2]):
+#     Moment = 0
+#     step = 0.0001
+#     q_1 = shear_arrays[0, 0]
+#     s_1 = shear_arrays[0, 1]
+#     q_2 = shear_arrays[1, 0]
+#     s_2 = shear_arrays[1, 1]
+#     q_3 = shear_arrays[2, 0]
+#     s_3 = shear_arrays[2, 1]
 
-qs, qbase, shear_arrays = Shear_wb(Wing.z)
-print("q1=", shear_arrays[0,0])
-print("s1=", shear_arrays[0,1])
-print("q2=", shear_arrays[1,0])
-print("s2=", shear_arrays[1,1])
-print("q3=", shear_arrays[2,0])
-print("s3=", shear_arrays[2,1])
+    # for i in range(0,len(s_2),2):
+    #     ds = s_2[i+1] - s_2[i]
+    #     s_loc = (s_2[i+1] + s_2[i])*0.5
+    #     q_loc = (q_2[i] + q_2[i+1])*0.5
+    #     y_loc = Wing.get_xy_from_perim(s_loc, Wing.ChSpar1, Wing.ChSpar2)
 
-def calc_moment_from_shear(qs, t_sk, t_sp, zs, shear_arrays=Shear_wb(Wing.z)[2]):
-    Moment = 0
-    step = 0.0001
-    q_1 = shear_arrays[0, 0]
-    s_1 = shear_arrays[0, 1]
-    q_2 = shear_arrays[1, 0]
-    s_2 = shear_arrays[1, 1]
-    q_3 = shear_arrays[2, 0]
-    s_3 = shear_arrays[2, 1]
+#     print('Dit?')
+# # print(Shear_wb(Wing.z))
+#     for x_c in np.arange(0, 1, 2*step):
+#         y_c_1 = Wing.airfoilordinate(x_c)
+#         y_c_2 = Wing.airfoilordinate(x_c+step)
+#         slope = (y_c_2 - y_c_1)/(step)
+#         Force_angle = -np.arctan(slope)
+#         perim = np.sqrt((step*Wing.length_chord(zs))**2 + ((y_c_2 - y_c_1)*Wing.length_chord(zs))**2)
+#         Loc_Force = perim * qs
 
-    for i in range(0,len(s_2),2):
-        ds = s_2[i+1] - s_2[i]
-        s_loc = (s_2[i+1] + s_2[i])*0.5
-        q_loc = (q_2[i] + q_2[i+1])*0.5
-        y_loc = Wing.get_xy_from_perim(s_loc, Wing.ChSpar1, Wing.ChSpar2)
+        # Fx = Loc_Force * np.cos(Force_angle)
+        # Fy = Loc_Force * np.sin(Force_angle)
+        # Moment += -Fx*(y_c_1 + y_c_2)*0.5*Wing.length_chord(zs)
+        # Moment += Fy*(x_c + 0.5*step)*Wing.length_chord(zs)
 
+#     return Moment
+# print('Dit')
+# def Torsion(zs, qbase):
+#     A_cell = Wing.Area_cell()
+#     length_skin = Wing.Area/Wing.ThSkin
+#     length_spar1 = Wing.airfoilordinate(Wing.ChSpar1)
+#     length_spar2 = Wing.airfoilordinate(Wing.ChSpar2)
+#     T = M #+ 2*(A_cell*qbase)
+#     const_tor = T/(4*A_cell**2*shear_modulus) #constant term in twist formula
+#     line_int_tor  = length_skin/Wing.ThSkin
+#     line_int_tor += length_spar1*Wing.length_chord(zs)/Wing.ThSpar1
+#     line_int_tor += length_spar2*Wing.length_chord(zs)/Wing.ThSpar2 #result from line integral from torsion formula
+#     twist_wb_tor_per_m  = const_tor*line_int_tor
+#     twist_wb_tor = twist_wb_tor_per_m*zs
+#     return twist_wb_tor
+# # print("twist =", Torsion(GWing.b/2,0))
+# print('Dit?')
+# # Wing deformation in X-direction
+# def deformation_x(zs):
+#     deformation_temp = Dlist[-1]/24*(zs)**4 #-Geometry.Fuselage.D_fus_max/2
+#     deformation_temp += -((Dlist[-1]-Dlist[0])/(GWing.b/2))/120*(zs)**5 #-Geometry.Fuselage.D_fus_max/2
+#     deformation_x = -deformation_temp/(youngs_modulus*Inertia.Ixx_wb)
+#     #deformation_x += D_moment/2*Geometry.Fuselage.D_fus_max**2/(youngs_modulus*Inertia.Ixx_wb)
+#     return deformation_x
 
-# print(Shear_wb(Wing.z))
-    for x_c in np.arange(0, 1, 2*step):
-        y_c_1 = Wing.airfoilordinate(x_c)
-        y_c_2 = Wing.airfoilordinate(x_c+step)
-        slope = (y_c_2 - y_c_1)/(step)
-        Force_angle = -np.arctan(slope)
-        perim = np.sqrt((step*Wing.length_chord(zs))**2 + ((y_c_2 - y_c_1)*Wing.length_chord(zs))**2)
-        Loc_Force = perim * qs
+# #print("deformation_x=", deformation_x(GWing.b/2))
+# print('Dit')
 
-        Fx = Loc_Force * np.cos(Force_angle)
-        Fy = Loc_Force * np.sin(Force_angle)
-        Moment += -Fx*(y_c_1 + y_c_2)*0.5*Wing.length_chord(zs)
-        Moment += Fy*(x_c + 0.5*step)*Wing.length_chord(zs)
+# # Wing deformation in Y-direction
+# def deformation_y(zs):
+#     deformation_temp = Llist[-1]/24*(zs)**4 #-Geometry.Fuselage.D_fus_max/2
+#     deformation_temp += -((Llist[-1]-Llist[0])/(GWing.b/2))/120*(zs-Geometry.Fuselage.D_fus_max/2)**5 #-Geometry.Fuselage.D_fus_max/2
+#     deformation_y = -deformation_temp/(youngs_modulus*Inertia.Iyy_wb)
+#     #deformation_y += L_moment/2*Geometry.Fuselage.D_fus_max**2/(youngs_modulus*Inertia.Iyy_wb)
+#     return deformation_y.to(ureg("meter"))
 
-    return Moment
-
-def Torsion(zs, qbase):
-    A_cell = Wing.Area_cell()
-    length_skin = Wing.Area/Wing.ThSkin
-    length_spar1 = Wing.airfoilordinate(Wing.ChSpar1)
-    length_spar2 = Wing.airfoilordinate(Wing.ChSpar2)
-    T = M #+ 2*(A_cell*qbase)
-    const_tor = T/(4*A_cell**2*shear_modulus) #constant term in twist formula
-    line_int_tor  = length_skin/Wing.ThSkin
-    line_int_tor += length_spar1*Wing.length_chord(zs)/Wing.ThSpar1
-    line_int_tor += length_spar2*Wing.length_chord(zs)/Wing.ThSpar2 #result from line integral from torsion formula
-    twist_wb_tor_per_m  = const_tor*line_int_tor
-    twist_wb_tor = twist_wb_tor_per_m*zs
-    return twist_wb_tor
-# print("twist =", Torsion(GWing.b/2,0))
-
-# Wing deformation in X-direction
-def deformation_x(zs):
-    deformation_temp = Dlist[-1]/24*(zs)**4 #-Geometry.Fuselage.D_fus_max/2
-    deformation_temp += -((Dlist[-1]-Dlist[0])/(GWing.b/2))/120*(zs)**5 #-Geometry.Fuselage.D_fus_max/2
-    deformation_x = -deformation_temp/(youngs_modulus*Inertia.Ixx_wb)
-    #deformation_x += D_moment/2*Geometry.Fuselage.D_fus_max**2/(youngs_modulus*Inertia.Ixx_wb)
-    return deformation_x
-
-#print("deformation_x=", deformation_x(GWing.b/2))
+# print('Dit')
+# #print("deformation_y=", deformation_y(GWing.b/2))
 
 
-# Wing deformation in Y-direction
-def deformation_y(zs):
-    deformation_temp = Llist[-1]/24*(zs)**4 #-Geometry.Fuselage.D_fus_max/2
-    deformation_temp += -((Llist[-1]-Llist[0])/(GWing.b/2))/120*(zs-Geometry.Fuselage.D_fus_max/2)**5 #-Geometry.Fuselage.D_fus_max/2
-    deformation_y = -deformation_temp/(youngs_modulus*Inertia.Iyy_wb)
-    #deformation_y += L_moment/2*Geometry.Fuselage.D_fus_max**2/(youngs_modulus*Inertia.Iyy_wb)
-    return deformation_y.to(ureg("meter"))
-
-
-#print("deformation_y=", deformation_y(GWing.b/2))
-
-
-#Von Mises Yield stress criterion
+# #Von Mises Yield stress criterion
 
 
 
@@ -302,3 +301,4 @@ data[18] = 'youngs_modulus = Q_(\"' + str(youngs_modulus) + '\")\n'
 # and write everything back
 with open('StrucVal.py', 'w') as file:
     file.writelines(data)
+

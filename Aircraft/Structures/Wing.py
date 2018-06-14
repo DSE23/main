@@ -27,10 +27,12 @@ Spar2T = 1-0.33                     #Chordwise location of second spar at the ti
 Spar1R = 0.15                   #Chordwise location of first spar at the root
 Spar1T = 0.15                   #Chordwise location of first spar at the tip
 ChordR = Geometry.Wing.c_r         #Length of root (m)
-ThSpar1 = Q_('0.003 m')          #Thickness of Spar 1
-ThSpar2 = Q_('0.002 m')          #Thickness of Spar 2
-ThSkin = Q_('0.0025 m')           #Thickness of the skin
-N_stringers = 15                  #Number of stringers
+ThSpar1 = Q_('0.002 m')          #Thickness of Spar 1
+ThSpar2 = Q_('0.0015 m')          #Thickness of Spar 2
+ThSkin = Q_('0.0018 m')           #Thickness of the skin
+N_stringers = 8                  #Number of stringers
+ClampH = Q_('0.03 m')           #height of the clamps at the top of the spars
+ClampW = Q_('0.03 m')           #width of the clamps at the top of the spars
 
 
 ##Stringers                     # C stringer dimentions
@@ -39,7 +41,7 @@ w_str = Q_('0.025 m')            #width of the stringer
 t_str = Q_('0.003 m')            #thickness of the stringer
 
 
-z = 0                           #spanwise posotion in meters
+z = 0                          #spanwise posotion in meters
 z *= Q_('meter')
 c = 0                                               #Chord wise postion in ratio
 
@@ -77,8 +79,8 @@ def Chord_loc_Spar(zs,SparR,SparT):             #input spanwise location in m an
     return ChSpar
 
 
-ChSpar1 = Chord_loc_Spar(z,Spar1R,Spar1T)
-ChSpar2 = Chord_loc_Spar(z,Spar2R,Spar2T)
+ChSpar1 = Chord_loc_Spar(z, Spar1R, Spar1T)
+ChSpar2 = Chord_loc_Spar(z, Spar2R, Spar2T)
 
 # print(ChSpar1)
 # print(ChSpar2)
@@ -114,6 +116,9 @@ def Angle(cs):                          #input chord ratio
 #Area of Spars
 AreaSpar1 = HSpar1 * ThSpar1
 AreaSpar2 = HSpar2 * ThSpar2
+
+#Area additional clamps on spar 1
+AreaClamps = ClampH * ClampW * 2                #Because there is a clamp on top as well as the bottom
 
 ## AREA OF STIFFENERS:
 def calc_stringer_Area(w_str, h_str, t_str):
@@ -159,6 +164,9 @@ AreaStringers = A_stringer * N_stringers                #total area of stringer
 #For the spars
 AreaSpar1xc = AreaSpar1 * ChSpar1 * Chordlength
 AreaSpar2xc = AreaSpar2 * ChSpar2 * Chordlength
+
+#For the clamps
+AreaClampsxc = AreaClamps * ChSpar1 * Chordlength
 
 def get_xy_from_perim(perim_val, start_x=0, dat_file_name="../Airfoil.dat"):
     """
@@ -344,8 +352,8 @@ def Area_cell():
 
 x_y_angle_coords = get_coord_from_perim(N_stringers/2, ChSpar1, ChSpar2, Chordlength)
 X_cen_strs, A_stringer_x_c = stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str)
-Area_x_c = AreaSpar1xc + AreaSpar2xc + Area_Skin_x_c(ChSpar1, ChSpar2) + A_stringer_x_c
-Area = AreaSpar1 + AreaSpar2 + Area_Skin(ChSpar1, ChSpar2)+ AreaStringers
+Area_x_c = AreaSpar1xc + AreaSpar2xc + Area_Skin_x_c(ChSpar1, ChSpar2) + A_stringer_x_c + AreaClampsxc
+Area = AreaSpar1 + AreaSpar2 + Area_Skin(ChSpar1, ChSpar2)+ AreaStringers + AreaClamps
 
 centroidspars= (AreaSpar1xc + AreaSpar2xc)/(AreaSpar1 + AreaSpar2)
 centroidskin=Area_Skin_x_c(ChSpar1, ChSpar2)/Area_Skin(ChSpar1, ChSpar2)
