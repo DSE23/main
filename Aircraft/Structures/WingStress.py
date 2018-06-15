@@ -193,6 +193,7 @@ def Shear_wb(zs, L):
         qs = s * Wing.get_xy_from_perim(s/Wing.length_chord(zs))[1]*Wing.length_chord(zs)*Wing.ThSkin*(-L)/Inertia.Ixx_wb + section01at1
         qs2 = np.append(qs2, qs)
     section12at2 =  qs2[-1]
+    section12at2 *= Q_("N/m")
     #section23
     n = 100
     ds = Wing.HSpar2/n
@@ -204,7 +205,7 @@ def Shear_wb(zs, L):
     for i in range(n):
         s = s + ds
         s3 = np.append(s3, s)
-        qs = -s**2*Wing.ThSpar2*(-L)/Inertia.Ixx_wb
+        qs = -s**2*Wing.ThSpar2*(-L)/Inertia.Ixx_wb + section12at2
         qs3 = np.append(qs3, qs)
     #qbase = 2*(Moment)/Wing.Area_cell()
     qs1 *= ureg("N/m")
@@ -227,6 +228,7 @@ qs, s1, s2, s3, qs1, qs2, qs3 = Shear_wb(Wing.z, L)
 def calc_moment_from_shear(zs, s_1, s_2, s_3, q_1, q_2, q_3):
 
     Moment = 0
+    Momentz = np.array([])
     print(zs)
     if (len(q_2) != len(s_2)):
         raise ValueError("ERROR, ARRAY LENGTH NOT EQUAL!")
@@ -243,23 +245,34 @@ def calc_moment_from_shear(zs, s_1, s_2, s_3, q_1, q_2, q_3):
         y_loc_2 *= Wing.length_chord(zs)
         slope = (y_loc_2 - y_loc_1)/(x_loc_2 - x_loc_1)
         force_angle = np.arctan(slope)
+        print("q_loc=", q_loc)
+        print("ds=", ds)
         Fx = q_loc*ds*np.cos(force_angle)
         Fy = q_loc*ds*np.sin(force_angle)
+        print("Fx=", Fx)
+        print("Fy=", Fy)
         Moment += -Fx*(y_loc_1+y_loc_2)*0.5
         Moment += Fy*(x_loc_1+x_loc_2)*0.5
+        Momentz = np.append(Momentz, Moment)
 
     for i in range(0, len(s_3)-2, 2):
         ds = s_3[i + 1] - s_3[i]
         q_loc = (q_3[i] + q_3[i + 1]) * 0.5
         x_loc = Wing.ChSpar2*Wing.length_chord(zs)
+        print("q_loc=", q_loc)
+        print("ds=", ds)
+        print("Fy=", q_loc * ds)
         Moment += -x_loc * q_loc * ds
+        Momentz = np.append(Momentz, Moment)
 
+    plt.plot(Momentz)
+    plt.show()
     return Moment
 
 Moment_from_shear = calc_moment_from_shear(z,s1, s2, s3, qs1, qs2, qs3)
 
-def calc_qbase(Moment_from_shear):
-    qbase = 2*(Moment_from_shear)/Wing.Area_cell()
+def calc_qbase(Moment_from_shear, L, zs):
+    qbase = (1/(2*Wing.Area_cell()))*(L*(Wing.ChSpar1-0.25)*Wing.length_chord(zs) + Moment_from_shear)
     print(qbase)
     return qbase
 
@@ -268,7 +281,7 @@ def Torsion(zs, qbase, M):
     length_skin = Wing.Area/Wing.ThSkin
     length_spar1 = Wing.airfoilordinate(Wing.ChSpar1)
     length_spar2 = Wing.airfoilordinate(Wing.ChSpar2)
-    T = M + 2*(Wing.Area_cell()*qbase)
+    T = M + 2*(Wing.Area_cell()*qbase) #M + 2*(Wing.Area_cell()*qbase)
     const_tor = T/(4*A_cell**2*shear_modulus) #constant term in twist formula
     line_int_tor  = length_skin/Wing.ThSkin
     line_int_tor += length_spar1*Wing.length_chord(zs)/Wing.ThSpar1
@@ -277,7 +290,7 @@ def Torsion(zs, qbase, M):
     return twist_wb_tor_per_m
 
 
-print("twist =", Torsion(Geometry.Wing.b/2,calc_qbase(Moment_from_shear), M))
+print("twist =", Torsion(Geometry.Wing.b/2,calc_qbase(Moment_from_shear, L, z), M))
 
 # Wing deformation in X-direction
 def deformation_x(zs):
@@ -316,8 +329,8 @@ def Tsia_Wu(sigma_zs, shearforce):
 
 
 
-plt.plot(s2, qs2)
-plt.show()
+#plt.plot(s3, qs3)
+#plt.show()
 
 # with is like your try .. finally block in this case
 with open('StrucVal.py', 'r') as file:
