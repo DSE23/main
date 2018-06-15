@@ -177,6 +177,8 @@ def Shear_wb(zs, L):
         qs = s**2*Wing.ThSpar1*(-L)/Inertia.Ixx_wb
         qs1 = np.append(qs1, qs)
     section01at1 = qs1[-1]
+    section01at1 *= Q_("N/m")
+
     #section12
     n = 100 #number of sections
     ds = (Wing.length_Skin_x_c(Wing.ChSpar1, Wing.ChSpar2)/n)
