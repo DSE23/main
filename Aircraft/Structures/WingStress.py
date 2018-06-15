@@ -27,6 +27,7 @@ cl, cd, cm = AWing.computeloads()           #Load aerodynamic properties
 n = 10                      #number of the devided sections
 b = Wing.s         #Wing span
 b = b.magnitude * ureg.meter
+z = Wing.z
 
 ChordR = Geometry.Wing.c_r.magnitude * ureg.meter      #root chord in m
 rho = Performance.rho_c.magnitude * ureg("kg/(m**3)")         #cruise density
@@ -151,6 +152,11 @@ def computeloads(z):
     return L, D, M, L_moment, D_moment
 
 #5L, D, M, L_moment, D_moment = computeloads(z)
+
+L, D, M, L_moment, D_moment = computeloads(z)
+print('L', L)
+print('D', D)
+
 print('M', M)
 #
 #
