@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 N = 40                         # Number of panels to be used in total
-alpha = m.radians(10)
+alpha = m.radians(4)
 Vspeed = 60
 Vvector = Vspeed*np.array([m.cos(alpha),0,m.sin(alpha)])
 unitx = np.array([1,0,0])
@@ -34,7 +34,7 @@ def matrixconstructor(normallist,vortexlist,controllist):
         for j in range(N):
             r = controllist[i]-vortexlist[j]
             rnorm = np.linalg.norm(r)
-            matrix[i,j] = ((np.cross(unity,r)/(2*m.pi))/rnorm**2).dot(normallist[i])
+            matrix[i,j] = ((np.cross(-unity,r)/(2*m.pi))/rnorm**2).dot(normallist[i])
     return matrix
 
 def righthandsideconstructor(normallist):
@@ -83,7 +83,7 @@ da = m.radians(30)
 
 ### Create panel coordinates for the aileron
 thetaaileron = np.linspace(0, m.pi,Naileron+1,endpoint=False)
-xaileron = aileroncenter + aileronlength * np.cos(thetaaileron)/2
+xaileron = aileroncenter - aileronlength * np.cos(thetaaileron)/2
 yaileron = np.zeros(Naileron+1)
 zaileron = airfoilcamberline(xaileron)
 hingeline = np.array([xhingeline,0,airfoilcamberline(xhingeline)])
@@ -91,17 +91,23 @@ points = transformaileron(xaileron,yaileron,zaileron,da,hingeline)
 xaileron = points[:,0]
 yaileron = points[:,1]
 zaileron = points[:,2]
+print(xaileron)
 
 ### Airfoil geometry
 airfoillength = 1 - aileronlength
 airfoilcenter = airfoillength/2
 Nairfoil = int(airfoillength*N)
 
+
 ### Create panel coordinates for the airfoil
 thetaairfoil = np.linspace(0, m.pi,Nairfoil+1,endpoint=False)
-xairfoil = airfoilcenter + airfoillength * np.cos(thetaairfoil)/2
+xairfoil = airfoilcenter - airfoillength * np.cos(thetaairfoil)/2
 yairfoil = np.zeros(Nairfoil+1)
 zairfoil = airfoilcamberline(xairfoil)
+
+print(xairfoil)
+
+
 
 panelarray = np.empty((N,7,3))
 panelarray[0:Nairfoil,0:2,:] = np.dstack((np.column_stack((xairfoil[0:Nairfoil],xairfoil[1:Nairfoil+1])),
@@ -122,12 +128,17 @@ panelarray[Nairfoil:N,4,:] = np.cross(panelarray[Nairfoil:N,3,:],unity)
 panelarray[Nairfoil:N,5,:] = 0.25*panelarray[Nairfoil:N,0,:] + 0.75*panelarray[Nairfoil:N,1,:]
 panelarray[Nairfoil:N,6,:] = 0.75*panelarray[Nairfoil:N,0,:] + 0.25*panelarray[Nairfoil:N,1,:]
 
+print(panelarray)
+
 A = matrixconstructor(panelarray[:,4,:],panelarray[:,5,:],panelarray[:,6,:])
+# print(A)
 RHS = righthandsideconstructor(panelarray[:,4,:])
 
-Gammalist = np.linalg.solve(A,RHS)
+Gammalist = np.linalg.solve(A.transpose(),RHS)
 
 Cl = np.sum(Gammalist)/(0.5*Vspeed)
+
+print(Cl)
 
 cpressureupperlist = np.zeros(N)
 cpressurelowerlist = np.zeros(N)
