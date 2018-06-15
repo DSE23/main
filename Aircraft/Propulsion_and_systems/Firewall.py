@@ -11,7 +11,7 @@ sys.path.append('../')
 from Misc import ureg, Q_
 # Imports the unit registry from the Misc folder
 
-import Engine
+from Propulsion_and_systems import Engine
 
 # Coordinate system:
 # Origin is in propeller attachment to engine

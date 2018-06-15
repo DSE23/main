@@ -44,6 +44,7 @@ t = Q_("0 s")
 # inputs
 n = 1.1     # Load factor at landing
 dt = Q_("0.01 s")
+mu = 0.4
 
 # Empty lists
 t_list =[]
@@ -102,7 +103,7 @@ flight_path_angle_dot = flight_path_angle / t2
 
 
 print("The change of flight path angle needed for the flare is " , round(flight_path_angle_dot,2), ". The flare takes ", round(-t2,2))
-print("The distance covered from screen height to touchdown is" , round(x,2))
+
 
 while flight_path_angle < Q_("0 deg"):
 
@@ -116,8 +117,31 @@ while flight_path_angle < Q_("0 deg"):
     h_list.append(h.magnitude)
     x_list.append(x.magnitude)
 
+print("The distance covered from screen height to touchdown is", round(x,2))
+
+while V > Q_("1 m/s"):
+    T = 0 # min(P_to * eta_prop / V, Tmax)
+    C_d = C_d_0
+    D = C_d * 0.5 * rho * V ** 2 * S + mu * (W)
+
+    Fx = T-D
+    Fy = 0
+
+    acceleration_x = Fx/mass
+    acceleration_y = 0
+
+    V += acceleration_x* dt
+    x += V* dt + 0.5 * acceleration_x * dt**2
+    h = Q_("0 m ")
+
+    t += dt
+    V_list.append(V.magnitude)
+    t_list.append(t.magnitude)
+    h_list.append(h.magnitude)
+    x_list.append(x.magnitude)
 
 
+print(x)
 plt.figure(1)
 plt.plot(t_list, h_list)
 plt.ylabel('height [m]')
@@ -127,7 +151,13 @@ plt.figure(2)
 plt.plot(x_list, h_list)
 plt.ylabel('height [m]')
 plt.xlabel('distance [m] ')
-plt.xlim(200,300)
-plt.ylim(0,100)
+
+plt.figure(3)
+plt.plot(x_list, V_list)
+plt.ylabel('velocity [m/s]')
+plt.xlabel('distance [m] ')
+
+#plt.xlim(200,300)
+#plt.ylim(0,100)
 
 plt.show()
