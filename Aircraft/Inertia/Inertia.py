@@ -228,7 +228,7 @@ A_airfoili = np.array([[(AreaAfoil(x_c0, x_c1, chordw)).magnitude],
                        [(AreaAfoil(x_c3, x_c4, chordw)).magnitude],
                        [(AreaAfoil(x_c4, x_c5-1*10**-10, chordw)).magnitude]])
 A_airfoilfrac = A_airfoili/sum(A_airfoili)
-N_windex = np.linspace(1, N_stw, N_stw)
+N_windex = np.arange(N_stw)
 mpmw = np.array([[((L1 * F_skin + A_airfoilfrac[0]*F_ribs)*(A1+par*(N_windex-1))).magnitude],
                  [(((L2 - L1) * F_skin + A_airfoilfrac[1] * F_ribs + F_fs)*(A1 + par*(N_windex-1))).magnitude],
                  [(((L3 - L2) * F_skin + A_airfoilfrac[2] * F_ribs)*(A1 + par*(N_windex-1))).magnitude],
