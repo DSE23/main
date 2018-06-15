@@ -13,24 +13,22 @@ import numpy as np
 from scipy import interpolate
 import math as m
 from Geometry import Geometry
-from Geometry import Wing as GWing
-import Wing
+# from Geometry import Wing as GWing
+# import Wing
 from Structures import Inertia
 from Structures import Wing
 from Aerodynamics import Wing as AWing
 from Performance import Performance
 import matplotlib.pyplot as plt
-
+import time
 
 
 cl, cd, cm = AWing.computeloads()           #Load aerodynamic properties
-n = 40                      #number of the devided sections
+n = 10                      #number of the devided sections
 b = Geometry.Wing.b/2         #Wing span
 b = b.magnitude * ureg.meter
+z = Wing.z
 
-
-
-z = Wing.z.magnitude * ureg.meter      #Span wise postion of the wing in m
 ChordR = Geometry.Wing.c_r.magnitude * ureg.meter      #root chord in m
 rho = Performance.rho_c.magnitude * ureg("kg/(m**3)")         #cruise density
 V = Performance.V_cruise.magnitude * ureg("m/s")        #cruise speed
@@ -53,77 +51,117 @@ Dlist = np.array([])
 
 Sectioncenters = np.array([])
 
-sectionlength = b/n
+sectionlength = (b.magnitude-0*Geometry.Fuselage.b_f.magnitude)/n*ureg.meter
 
 zs = b - (sectionlength/2)
 
-while zs > z:                            #zs is measured is m from
-
-    Areaofsection = sectionlength*Wing.length_chord(zs)
+while zs.magnitude > 0:  # zs is measured is m from
+    Areaofsection = sectionlength * Wing.length_chord(zs)
 
     Sectioncenters = np.append(Sectioncenters, zs)
 
     '''Lift drag and moment for the section'''
-    dL = cl * 0.5 * rho * (V**2) * Areaofsection.magnitude * Q_("m**2")                #lift of the section
-    dD = cd * 0.5 * rho * (V**2) * Areaofsection        #drag of the section
-    dM = cm * 0.5 * rho * (V ** 2) * Areaofsection * Wing.length_chord(zs)      #moment of the section
+    dL = cl * 0.5 * rho * (V ** 2) * Areaofsection.magnitude * Q_("m**2")  # lift of the section
 
-    if zs < Geometry.Fuselage.b_f:
+    if zs < Geometry.Fuselage.b_f * 0:
         dL = Q_('0 kg * m / s**2')
-        dD = Q_('0 kg * m / s**2')
-        dM = Q_('0 kg * m ** 2 / s**2')
-
-    dLlist = np.append(dLlist, dL)
-    dDlist = np.append(dDlist, dD)
 
     '''Total lift, drag and moment for the wing'''
     L = L + dL  # Total lift for one wing
-    D = D + dD  # Total drag for one wing
-    M = M + dM  # Total moment for one wing
-
-    Llist = np.append(Llist, L)  # put the values in a list so we can plot them
-    Dlist = np.append(Dlist, D)
 
     zs = zs - sectionlength  # Select other section for the next loop
 
-for i in np.arange(0, len(dLlist)):
-    arm = Sectioncenters[i] - z.magnitude
-    dLmoment = arm * dLlist[i]
-    dDmoment = arm * dDlist[i]
-    L_moment = L_moment.magnitude + dLmoment
-    D_moment = D_moment.magnitude + dDmoment
-    Lmomentlist = np.append(Lmomentlist, L_moment)
-    Dmomentlist = np.append(Dmomentlist, D_moment)
-    L_moment *= Q_('kg * m**2/s**2')
-    D_moment *= Q_('kg * m**2/s**2')
+totallift = L
 
 
-'''For the 20G manoeuver'''
-MTOW = Geometry.Masses.W_MTOW
-Max_20G_N = MTOW * 9.81 * 20
-Tot_L = 2 * L
-if Tot_L.magnitude > 0.:
-    fac_20G = Max_20G_N / Tot_L
-    fac_20G = fac_20G.magnitude
-else:
-    fac_20G = 0
+def computeloads(z):
+    Sectioncenters = np.array([])
+    dLlist = np.array([])
+    dDlist = np.array([])
+    L = 0
+    D = 0
+    M = 0
+    L_moment = 0
+    D_moment = 0
+    Llist = np.array([])
+    Dlist = np.array([])
+    Lmomentlist = np.array([])
+    Dmomentlist = np.array([])
+    L_momentlist = np.array([])
+    zs = b - (sectionlength / 2)
+    while zs > z:                            #zs is measured is m from
 
-L_moment = L_moment * fac_20G
-D_moment = D_moment * fac_20G
-L = L * fac_20G
-D = D * fac_20G
-M = M * fac_20G
+        Areaofsection = sectionlength*Wing.length_chord(zs)
 
+        Sectioncenters = np.append(Sectioncenters, zs)
 
-Llist *= ureg("N/m")
-Dlist *= ureg("N/m")
-#print('L sum ', L)                  #print the values
-#print('D sum ', D)
-#print('M sum ', M)
-#print('L_moment', L_moment)
-#print('D_moment', D_moment)
-#print("Llist=", Llist[0])
-# plt.plot(Sectioncenters, Lmomentlist)
+        '''Lift drag and moment for the section'''
+        dL = (cl * 0.5 * rho * (V**2) * Areaofsection).magnitude              #lift of the section
+        dD = (cd * 0.5 * rho * (V**2) * Areaofsection).magnitude     #drag of the section
+        dM = (cm * 0.5 * rho * (V ** 2) * Areaofsection * Wing.length_chord(zs)).magnitude     #moment of the section
+
+        if zs < Geometry.Fuselage.b_f*0:
+            dL = 0
+            dD = 0
+            dM = 0
+
+        dLlist = np.append(dLlist, dL)
+        dDlist = np.append(dDlist, dD)
+
+        '''Total lift, drag and moment for the wing'''
+        L = L + dL  # Total lift for one wing
+        D = D + dD  # Total drag for one wing
+        M = M + dM  # Total moment for one wing
+
+        Llist = np.append(Llist, L)  # put the values in a list so we can plot them
+        Dlist = np.append(Dlist, D)
+
+        zs = zs - sectionlength  # Select other section for the next loop
+
+    for i in range(0, len(Sectioncenters)):
+        arm = (Sectioncenters[i] - z.magnitude)
+        dLmoment = (arm * dLlist[i])
+        dDmoment = (arm * dDlist[i])
+        L_moment = L_moment + dLmoment
+        D_moment = D_moment + dDmoment
+        Lmomentlist = np.append(Lmomentlist, L_moment)
+        Dmomentlist = np.append(Dmomentlist, D_moment)
+
+    '''For the 20G manoeuver'''
+    MTOW = Geometry.Masses.W_MTOW
+    Max_20G_N = MTOW * 9.81 * 20
+    Tot_L = 2 * totallift
+    if Tot_L.magnitude > 0.:
+        fac_20G = Max_20G_N / Tot_L
+        fac_20G = fac_20G.magnitude
+    else:
+        fac_20G = 0
+
+    L_moment = L_moment * fac_20G
+    D_moment = D_moment * fac_20G
+    L = L * fac_20G
+    D = D * fac_20G
+    M = M * fac_20G
+
+    L *= Q_('kg * m / s**2')
+    D *= Q_('kg * m / s**2')
+    M *= Q_('kg * m ** 2 / s**2')
+    L_moment *= Q_('kg * m ** 2 / s**2')
+    D_moment *= Q_('kg * m ** 2 / s**2')
+
+    return L, D, M, L_moment, D_moment
+
+L, D, M, L_moment, D_moment = computeloads(z)
+#
+#
+# Llist *= ureg("N/m")
+# Dlist *= ureg("N/m")
+# # print('L sum ', L)                  #print the values
+# # print('D sum ', D)
+# # print('M sum ', M)
+# # print('D_moment', D_moment)
+# # print("Llist=", Llist[0])
+# plt.plot(zlist, L_momentlist)
 # plt.show()
 
 
@@ -164,6 +202,7 @@ def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
 
 def Shear_wb(zs, L):
     #section 01
+    print("L=", L)
     n = 100
     ds = Wing.HSpar1/n
     qs1 = np.array([])
@@ -193,6 +232,7 @@ def Shear_wb(zs, L):
         qs = s * Wing.get_xy_from_perim(s/Wing.length_chord(zs))[1]*Wing.length_chord(zs)*Wing.ThSkin*(-L)/Inertia.Ixx_wb + section01at1
         qs2 = np.append(qs2, qs)
     section12at2 =  qs2[-1]
+    section12at2 *= Q_("N/m")
     #section23
     n = 100
     ds = Wing.HSpar2/n
@@ -204,7 +244,7 @@ def Shear_wb(zs, L):
     for i in range(n):
         s = s + ds
         s3 = np.append(s3, s)
-        qs = -s**2*Wing.ThSpar2*(-L)/Inertia.Ixx_wb
+        qs = -s**2*Wing.ThSpar2*(-L)/Inertia.Ixx_wb + section12at2
         qs3 = np.append(qs3, qs)
     #qbase = 2*(Moment)/Wing.Area_cell()
     qs1 *= ureg("N/m")
@@ -213,12 +253,12 @@ def Shear_wb(zs, L):
     s1 *= ureg("m")
     s2 *= ureg("m")
     s3 *= ureg("m")
-    print("s1=,", s1)
-    print("q1=", qs1)
-    print("s2=,", s2)
-    print("q2=", qs2)
-    print("s3=,", s3)
-    print("q3=", qs3)
+    # print("s1=,", s1)
+    # print("q1=", qs1)
+    # print("s2=,", s2)
+    # print("q2=", qs2)
+    # print("s3=,", s3)
+    # print("q3=", qs3)
     return qs, s1, s2, s3, qs1, qs2, qs3
 
 qs, s1, s2, s3, qs1, qs2, qs3 = Shear_wb(Wing.z, L)
@@ -227,6 +267,7 @@ qs, s1, s2, s3, qs1, qs2, qs3 = Shear_wb(Wing.z, L)
 def calc_moment_from_shear(zs, s_1, s_2, s_3, q_1, q_2, q_3):
 
     Moment = 0
+    Momentz = np.array([])
     print(zs)
     if (len(q_2) != len(s_2)):
         raise ValueError("ERROR, ARRAY LENGTH NOT EQUAL!")
@@ -243,24 +284,35 @@ def calc_moment_from_shear(zs, s_1, s_2, s_3, q_1, q_2, q_3):
         y_loc_2 *= Wing.length_chord(zs)
         slope = (y_loc_2 - y_loc_1)/(x_loc_2 - x_loc_1)
         force_angle = np.arctan(slope)
+        # print("q_loc=", q_loc)
+        # print("ds=", ds)
         Fx = q_loc*ds*np.cos(force_angle)
         Fy = q_loc*ds*np.sin(force_angle)
+        # print("Fx=", Fx)
+        # print("Fy=", Fy)
         Moment += -Fx*(y_loc_1+y_loc_2)*0.5
         Moment += Fy*(x_loc_1+x_loc_2)*0.5
+        Momentz = np.append(Momentz, Moment)
 
     for i in range(0, len(s_3)-2, 2):
         ds = s_3[i + 1] - s_3[i]
         q_loc = (q_3[i] + q_3[i + 1]) * 0.5
         x_loc = Wing.ChSpar2*Wing.length_chord(zs)
+        # print("q_loc=", q_loc)
+        # print("ds=", ds)
+        # print("Fy=", q_loc * ds)
         Moment += -x_loc * q_loc * ds
+        Momentz = np.append(Momentz, Moment)
 
+    # plt.plot(Momentz)
+    # plt.show()
     return Moment
 
-Moment_from_shear = calc_moment_from_shear(z,s1, s2, s3, qs1, qs2, qs3)
+Moment_from_shear = calc_moment_from_shear(Wing.z,s1, s2, s3, qs1, qs2, qs3)
 
-def calc_qbase(Moment_from_shear):
-    qbase = 2*(Moment_from_shear)/Wing.Area_cell()
-    print(qbase)
+def calc_qbase(Moment_from_shear, L, zs):
+    qbase = (1/(2*Wing.Area_cell()))*(L*(Wing.ChSpar1-0.25)*Wing.length_chord(zs) + Moment_from_shear)
+    # print(qbase)
     return qbase
 
 def Torsion(zs, qbase, M):
@@ -268,7 +320,7 @@ def Torsion(zs, qbase, M):
     length_skin = Wing.Area/Wing.ThSkin
     length_spar1 = Wing.airfoilordinate(Wing.ChSpar1)
     length_spar2 = Wing.airfoilordinate(Wing.ChSpar2)
-    T = M + 2*(Wing.Area_cell()*qbase)
+    T = M + 2*(Wing.Area_cell()*qbase) #M + 2*(Wing.Area_cell()*qbase)
     const_tor = T/(4*A_cell**2*shear_modulus) #constant term in twist formula
     line_int_tor  = length_skin/Wing.ThSkin
     line_int_tor += length_spar1*Wing.length_chord(zs)/Wing.ThSpar1
@@ -277,7 +329,7 @@ def Torsion(zs, qbase, M):
     return twist_wb_tor_per_m
 
 
-print("twist =", Torsion(Geometry.Wing.b/2,calc_qbase(Moment_from_shear), M))
+# print("twist =", Torsion(Geometry.Wing.b/2,calc_qbase(Moment_from_shear, L, z), M))
 
 # Wing deformation in X-direction
 def deformation_x(zs):
@@ -316,8 +368,8 @@ def Tsia_Wu(sigma_zs, shearforce):
 
 
 
-plt.plot(s2, qs2)
-plt.show()
+#plt.plot(s3, qs3)
+#plt.show()
 
 # with is like your try .. finally block in this case
 with open('StrucVal.py', 'r') as file:
