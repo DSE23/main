@@ -78,12 +78,12 @@ def lookup_data(alpha, ca_c, da, chord):
         Cd = Cd_local(-alpha)
         Cm = Cm_local(-alpha)
     
-    Cm0 = Cm_local(0.)
-    if Cl == 0.:
-        Cp = 0.
+    Cn = Cl*math.cos(alpha) + Cd*math.sin(alpha)
+    if Cn == 0.:
+        xcp = 0.
     else:
-        Cp = (Cm-Cm0)/(Cl*chord) + 0.25/ureg.m
-    return Cl, Cd, Cp
+        xcp = 0.25-Cm/Cn
+    return Cl, Cd, xcp
 
 # Import other forces
 T = 0.*ureg.N
