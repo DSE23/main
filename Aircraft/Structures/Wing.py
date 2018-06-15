@@ -41,7 +41,7 @@ w_str = Q_('0.025 m')            #width of the stringer
 t_str = Q_('0.003 m')            #thickness of the stringer
 
 
-z = 0                        #spanwise posotion in meters
+z = 0.8035546029984522                        #spanwise posotion in meters
 z *= Q_('meter')
 c = 0                                               #Chord wise postion in ratio
 
