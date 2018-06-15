@@ -183,7 +183,7 @@ def AreaAfoil(x1, x2, chord):
     return area_cell
 
 
-N_stw = 30
+N_stw = 50
 ycgw = []
 chordw = []
 xapexw = []
@@ -442,16 +442,16 @@ I_xx = I_xxnew
 I_yy = I_yynew
 I_zz = I_zznew
 I_xz = I_xznew
-from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-for i in range(8):
-    ax.scatter(xcgf[i], ycgf[i], zcgf[i])
-for i in range(5):
-    ax.scatter(xcgw[i], ycgw[i], zcgw)
-    ax.scatter(xcgw[i], -ycgw[i], zcgw)
-ax.set_xlim(0, 7)
-ax.set_ylim(-2*(16/9),2*(16/9))
-ax.set_zlim(-2,2)
-plt.show()
+#from matplotlib import pyplot as plt
+#from mpl_toolkits.mplot3d import Axes3D
+#fig = plt.figure()
+#ax = fig.add_subplot(111, projection='3d')
+#for i in range(8):
+#    ax.scatter(xcgf[i], ycgf[i], zcgf[i], c=mpm[i], cmap="jet")
+#for i in range(5):
+#    ax.scatter(xcgw[i], ycgw[i], zcgw, c=mpmw[i], cmap="jet")
+#    ax.scatter(xcgw[i], -ycgw[i], zcgw, c=mpmw[i], cmap="jet")
+#ax.set_xlim(0, 7)
+#ax.set_ylim(-2*(16/9),2*(16/9))
+#ax.set_zlim(-2,2)
+#plt.show()
