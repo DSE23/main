@@ -1,7 +1,7 @@
 """                  
 Name: Wing_Stress_Calculations 
 Department: Structures 
-Last updated: 08/06/2018 12:38 by Boris 
+Last updated: 15/06/2018 11:17 by Midas
 """
 
 ## Forces
@@ -27,7 +27,6 @@ cl, cd, cm = AWing.computeloads()           #Load aerodynamic properties
 n = 10                      #number of the devided sections
 b = Wing.s         #Wing span
 b = b.magnitude * ureg.meter
-z = Wing.z
 
 ChordR = Geometry.Wing.c_r.magnitude * ureg.meter      #root chord in m
 rho = Performance.rho_c.magnitude * ureg("kg/(m**3)")         #cruise density
@@ -330,7 +329,7 @@ def Torsion(zs, qbase, M):
     return twist_wb_tor_per_m
 
 
-# print("twist =", Torsion(Geometry.Wing.b/2,calc_qbase(Moment_from_shear, L, z), M))
+# print("twist =", Torsion(Geometry.Wing.b/2,calc_qbase(Moment_from_shear, L, Wing.z), M).to("rad/m"))
 
 # Wing deformation in X-direction
 def deformation_x(zs):
