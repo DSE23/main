@@ -47,3 +47,6 @@ xcg = Q_("-20 cm")  # DUMMY VALUE, NOT KNOWN YET, negative because in front of d
 
 # Mass moment of inertia
 ixg = Q_("0.9 kg * m**2")  # Based on slightly different propeller
+
+#Propeller Diameter
+D_prop = Q_("1.90 m")
