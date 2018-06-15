@@ -134,6 +134,7 @@ class CG(object):
     CG_wing_mac = 0.46385                   # CG location of wing as percentage of MAC
     XLEMAC = Q_("1.24 m")               # LEMAC position
     CG_wing = CG_wing_mac*Wing.MAC + XLEMAC     # Wing CG position relative to nose
+    X_wing = XLEMAC + 0.25 * Wing.MAC
     ZCG_wing = Q_("0.0 m")
     YCG_wing = Q_("0 m")
     CG_htail_mac = 0.5618
