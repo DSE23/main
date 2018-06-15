@@ -101,7 +101,7 @@ while flight_path_angle < Q_(" 45 deg "):
     V_dot = Fx / mass
     flight_path_angle_dot = Fy / (mass * V)
 
-    x += V * np.cos(flight_path_angle) * dt
+    x += V * np.cos(flight_path_angle) *dt
     h += V * np.sin(flight_path_angle) * dt
 
     if h > Q_("15 m") and h_screen == False:

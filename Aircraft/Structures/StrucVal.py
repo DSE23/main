@@ -4,11 +4,11 @@ Boris
 import sys
 sys.path.append('../') # This makes sure the parent directory gets added to the system path
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
-Weightspar1 = Q_("3.292566436500379 kilogram")
-Weightspar2 = Q_("0.8920683541709266 kilogram")
-Weightskin = Q_("24.04722808805463 kilogram")
-Weightstring = Q_("10.593662108630093 kilogram")
-Weightwing = Q_("52.34934895581998 kilogram")
+Weightspar1 = Q_("3.169641382339247 kilogram")
+Weightspar2 = Q_("0.8587637716008492 kilogram")
+Weightskin = Q_("23.14944610790085 kilogram")
+Weightstring = Q_("4.264683881790768 kilogram")
+Weightwing = Q_("44.46145911209566 kilogram")
 
 
 

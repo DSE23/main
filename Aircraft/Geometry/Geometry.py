@@ -18,13 +18,17 @@ from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import math as m
 import numpy as np
 from Structures import StrucVal
+from Propulsion_and_systems import Firewall
 from Propulsion_and_systems import Engine
+from Propulsion_and_systems import Propeller
+
 class Wing(object):
     
     S = Q_('11.74 m**2')                   # [m^2] Wing Surface
     A = 5.5                     # Aspect Ratio
     b = np.sqrt(S*A)             # [m] Wing Span
-    taper = 0.45                # Taper ratio
+    taper = 0.45     # Taper ratio
+    horn = Q_('0.15 m ')
     c_r = Q_("2.015 m")                 # Root chord
     c_t = c_r * taper           # Tip chord
     c_avg = (c_r + c_t)/2       #Average chord
@@ -52,6 +56,7 @@ class Fuselage(object):
     
     l_f = Q_("6.22 m")                  # [m] Fuselage length
     D_fus_max = Q_("1.044 m")           # [m] Maximum fuselage diameter
+    R_fus_firewall = Q_("0.50")         # [m] Fuselage radius at the Firewall
     b_f = Q_("1.044 m")                 # [m] Fuselage width
     h_f = Q_("1.1 m")                   # [m] Fuselage height
     front_A = Q_("0.98 m**2")              # [m^2] Frontal area
@@ -99,19 +104,25 @@ class V_tail(object):
     t_c = 0.15                                  # [-] t/c V-tail
     
 class Landing_gear(object):
-    
+    Prop_clear_req = Q_("0.23 m")                   # Required prop clearance CS23
+    Prop_length = Propeller.D_prop/2
+    Z_mainlg = Prop_clear_req + Prop_length       # [m] Z_location bottom main L_G
+    Tip_angle = Q_("12 deg")                        # Should be between 10 and 15
+    X_mainlg = Firewall.xcg
+    X_taillg = Fuselage.l_f
+    Z_tailg = Z_mainlg - (X_mainlg-X_taillg) * np.tan(Tip_angle)
+    Y_mainlg = Z_mainlg/(np.tan(Q_("25 deg")))
     lg_wheel_d = Q_("0.4445 m")                     # [m] Landing gear wheel diameter
     lg_wheel_w = Q_("0.16 m")                       # [m] Lg wheel width
-
-
+    
 class Masses(object):                    # !!!Structures should watch this!!!
     W_wing = StrucVal.Weightwing * 2     # Weight of the wing
     W_htail = Q_("18 kg")                # [kg] Mass of H_tail
     W_vtail = Q_("6 kg")                 # [kg] Mass of V_tail
     W_fus = Q_("82 kg")                  # [kg] Mass of Fuselage
     W_gear = Q_("58 kg")                 # [kg] Mass of landing gear
-    W_engine = Engine.mass              # [kg] Mass of engine
-    W_prop = Q_("0 kg")                  # [kg] Mass of propellor
+    W_engine = Engine.mass               # [kg] Mass of engine
+    W_prop = Propeller.mass              # [kg] Mass of propellor
     W_fuelsys = Q_("10 kg")              # [kg] Mass of fuel system
     W_hydraulic = Q_("1 kg")             # [kg] Mass of hydraulics
     W_flightcontrol = Q_("20 kg")        # [kg] Mass of flight control
@@ -134,6 +145,7 @@ class CG(object):
     CG_wing_mac = 0.46385                   # CG location of wing as percentage of MAC
     XLEMAC = Q_("1.24 m")               # LEMAC position
     CG_wing = CG_wing_mac*Wing.MAC + XLEMAC     # Wing CG position relative to nose
+    X_wing = XLEMAC + 0.25 * Wing.MAC
     ZCG_wing = Q_("0.0 m")
     YCG_wing = Q_("0 m")
     CG_htail_mac = 0.5618
@@ -151,7 +163,7 @@ class CG(object):
     CG_lgear = 0.23 * Fuselage.l_f             # CG LG relative to nose !!!update!!!
     ZCG_lgear = Q_("0.69 m")
     CG_engine = Engine.xcg                     # CG of the engine relative to nose
-    CG_prop = Q_("-0.1 m")                     # CG propellor !!!update!!! 
+    CG_prop = Propeller.xcg                    # CG propellor !!!update!!! 
     ZCG_prop = Q_("0 m")
     ZCG_engine = Engine.zcg
     CG_fuelsys = Q_("1.18 m")                  # CG fuel system !!!update!!!
