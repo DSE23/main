@@ -300,7 +300,7 @@ def calc_moment_from_shear(zs, s_1, s_2, s_3, q_1, q_2, q_3):
     plt.show()
     return Moment
 
-Moment_from_shear = calc_moment_from_shear(z,s1, s2, s3, qs1, qs2, qs3)
+Moment_from_shear = calc_moment_from_shear(Wing.z,s1, s2, s3, qs1, qs2, qs3)
 
 def calc_qbase(Moment_from_shear, L, zs):
     qbase = (1/(2*Wing.Area_cell()))*(L*(Wing.ChSpar1-0.25)*Wing.length_chord(zs) + Moment_from_shear)
