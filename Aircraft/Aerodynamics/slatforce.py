@@ -127,6 +127,22 @@ for r in rod:
             
         
 
+#%% Forces in the fuselage
+
+#principle of work to do forces in fuselage
+
+rodangle = m.radians(86.3265)#choose from a printed value above
+work_slat = P * stroke / 2 #work = force times displacement 2 actuator for this force
+work_slat *= Q_('N * m')
+F_act = Q_('500 N') #electric actuator force
+displ_fus = work_slat / F_act
+print('linear displacement rod =', displ_fus)
+fus_rod_length = (2 * (displ_fus * m.sin(rodangle))**2)
+print('rod in fuselage has a length of', fus_rod_length)
+rod2 = fus_rod_length - fus_rod_length * m.cos(rodangle/2)
+print('small rod = ', rod2)
+
+
 
 
 
