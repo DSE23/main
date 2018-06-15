@@ -1,7 +1,7 @@
 """                  
 Name: Wing_Stress_Calculations 
 Department: Structures 
-Last updated: 08/06/2018 12:38 by Boris 
+Last updated: 15/06/2018 11:17 by Midas
 """
 
 ## Forces
