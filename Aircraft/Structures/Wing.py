@@ -19,7 +19,7 @@ from Misc import ureg, Q_ # Imports the unit registry from the Misc folder
 
 A = Geometry.Wing.A                         #Estimate aspect ratio
 t = Geometry.Wing.taper                         #Estimate taper
-s = Geometry.Wing.b/2                #Estimate span (m)
+s = Geometry.Wing.b/2-Geometry.Wing.horn                #Estimate span (m)
 Lambda25 = 0                    #Quarter chord sweep
 CtoT = 0.15                     #Max Chord to thickness ratio
 Spar2R = 1-0.18                      #Chordwise location of second spar at the root
@@ -41,7 +41,7 @@ w_str = Q_('0.025 m')            #width of the stringer
 t_str = Q_('0.003 m')            #thickness of the stringer
 
 
-z = 0.8035546029984522                        #spanwise posotion in meters
+z = 0                        #spanwise posotion in meters
 z *= Q_('meter')
 c = 0                                               #Chord wise postion in ratio
 

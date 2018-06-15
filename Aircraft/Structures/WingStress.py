@@ -25,7 +25,7 @@ import time
 
 cl, cd, cm = AWing.computeloads()           #Load aerodynamic properties
 n = 10                      #number of the devided sections
-b = Geometry.Wing.b/2         #Wing span
+b = Wing.s         #Wing span
 b = b.magnitude * ureg.meter
 z = Wing.z
 
@@ -152,6 +152,7 @@ def computeloads(z):
     return L, D, M, L_moment, D_moment
 
 L, D, M, L_moment, D_moment = computeloads(z)
+print('M', M)
 #
 #
 # Llist *= ureg("N/m")
