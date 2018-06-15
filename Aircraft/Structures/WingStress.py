@@ -88,7 +88,7 @@ def computeloads(z):
     Dmomentlist = np.array([])
     L_momentlist = np.array([])
     zs = b - (sectionlength / 2)
-    while zs.magnitude > z:                            #zs is measured is m from
+    while zs > z:                            #zs is measured is m from
 
         Areaofsection = sectionlength*Wing.length_chord(zs)
 
@@ -118,7 +118,7 @@ def computeloads(z):
         zs = zs - sectionlength  # Select other section for the next loop
 
     for i in range(0, len(Sectioncenters)):
-        arm = (Sectioncenters[i] - z)
+        arm = (Sectioncenters[i] - z.magnitude)
         dLmoment = (arm * dLlist[i])
         dDmoment = (arm * dDlist[i])
         L_moment = L_moment + dLmoment
@@ -142,8 +142,15 @@ def computeloads(z):
     D = D * fac_20G
     M = M * fac_20G
 
+    L *= Q_('kg * m / s**2')
+    D *= Q_('kg * m / s**2')
+    M *= Q_('kg * m ** 2 / s**2')
+    L_moment *= Q_('kg * m ** 2 / s**2')
+    D_moment *= Q_('kg * m ** 2 / s**2')
+
     return L, D, M, L_moment, D_moment
 
+L, D, M, L_moment, D_moment = computeloads(z)
 #
 #
 # Llist *= ureg("N/m")
@@ -245,12 +252,12 @@ def Shear_wb(zs, L):
     s1 *= ureg("m")
     s2 *= ureg("m")
     s3 *= ureg("m")
-    print("s1=,", s1)
-    print("q1=", qs1)
-    print("s2=,", s2)
-    print("q2=", qs2)
-    print("s3=,", s3)
-    print("q3=", qs3)
+    # print("s1=,", s1)
+    # print("q1=", qs1)
+    # print("s2=,", s2)
+    # print("q2=", qs2)
+    # print("s3=,", s3)
+    # print("q3=", qs3)
     return qs, s1, s2, s3, qs1, qs2, qs3
 
 qs, s1, s2, s3, qs1, qs2, qs3 = Shear_wb(Wing.z, L)
@@ -276,12 +283,12 @@ def calc_moment_from_shear(zs, s_1, s_2, s_3, q_1, q_2, q_3):
         y_loc_2 *= Wing.length_chord(zs)
         slope = (y_loc_2 - y_loc_1)/(x_loc_2 - x_loc_1)
         force_angle = np.arctan(slope)
-        print("q_loc=", q_loc)
-        print("ds=", ds)
+        # print("q_loc=", q_loc)
+        # print("ds=", ds)
         Fx = q_loc*ds*np.cos(force_angle)
         Fy = q_loc*ds*np.sin(force_angle)
-        print("Fx=", Fx)
-        print("Fy=", Fy)
+        # print("Fx=", Fx)
+        # print("Fy=", Fy)
         Moment += -Fx*(y_loc_1+y_loc_2)*0.5
         Moment += Fy*(x_loc_1+x_loc_2)*0.5
         Momentz = np.append(Momentz, Moment)
@@ -290,21 +297,21 @@ def calc_moment_from_shear(zs, s_1, s_2, s_3, q_1, q_2, q_3):
         ds = s_3[i + 1] - s_3[i]
         q_loc = (q_3[i] + q_3[i + 1]) * 0.5
         x_loc = Wing.ChSpar2*Wing.length_chord(zs)
-        print("q_loc=", q_loc)
-        print("ds=", ds)
-        print("Fy=", q_loc * ds)
+        # print("q_loc=", q_loc)
+        # print("ds=", ds)
+        # print("Fy=", q_loc * ds)
         Moment += -x_loc * q_loc * ds
         Momentz = np.append(Momentz, Moment)
 
-    plt.plot(Momentz)
-    plt.show()
+    # plt.plot(Momentz)
+    # plt.show()
     return Moment
 
 Moment_from_shear = calc_moment_from_shear(Wing.z,s1, s2, s3, qs1, qs2, qs3)
 
 def calc_qbase(Moment_from_shear, L, zs):
     qbase = (1/(2*Wing.Area_cell()))*(L*(Wing.ChSpar1-0.25)*Wing.length_chord(zs) + Moment_from_shear)
-    print(qbase)
+    # print(qbase)
     return qbase
 
 def Torsion(zs, qbase, M):
@@ -321,7 +328,7 @@ def Torsion(zs, qbase, M):
     return twist_wb_tor_per_m
 
 
-print("twist =", Torsion(Geometry.Wing.b/2,calc_qbase(Moment_from_shear, L, Wing.z), M).to("rad/m"))
+# print("twist =", Torsion(Geometry.Wing.b/2,calc_qbase(Moment_from_shear, L, Wing.z), M).to("rad/m"))
 
 # Wing deformation in X-direction
 def deformation_x(zs):
