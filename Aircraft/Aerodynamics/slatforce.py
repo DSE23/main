@@ -101,6 +101,11 @@ print('area',slatarea)
 P = 0.5 * density * Velocity**2 * slatarea #F = pressure times area
 print('Slat force required =', P)
 
+#suction peak calculation
+cp_file = np.genfromtxt('../Cp_slat.dat')
+#for coor in len(cp_file):
+    
+
 
 #%% electric actuator size + stroke length
 stroke = gapslat / m.cos(defl_angle)
