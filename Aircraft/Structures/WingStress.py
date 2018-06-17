@@ -203,8 +203,10 @@ def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
 #SHEAR IS NOT FINISHED
 
 
-def Shear_wb(zs, L):
+def Shear_wb(zs, dL, dD, dM):
     #section 01
+    qtorque = dM/(2*Wing.Area_cell())
+    print("L=", dL)
     n = 100
     ds = Wing.HSpar1/n
     qs1 = np.array([])
@@ -215,7 +217,9 @@ def Shear_wb(zs, L):
     for i in range(n):
         s = s + ds
         s1 = np.append(s1, s)
-        qs = s**2*Wing.ThSpar1*(-L)/Inertia.Ixx_wb
+        qs = s**2*Wing.ThSpar1*(-dL)/Inertia.Ixx_wb
+        qs += s*Wing.ChSpar1*Wing.ThSpar1*(-dD)/Inertia.Iyy_wb
+        qs += qtorque
         qs1 = np.append(qs1, qs)
     section01at1 = qs1[-1]
     section01at1 *= Q_("N/m")
@@ -231,7 +235,9 @@ def Shear_wb(zs, L):
     for i in range(n):
         s = s + ds
         s2 = np.append(s2, s)
-        qs = s * Wing.get_xy_from_perim(s/Wing.length_chord(zs))[1]*Wing.length_chord(zs)*Wing.ThSkin*(-L)/Inertia.Ixx_wb + section01at1
+        qs = s * Wing.get_xy_from_perim(s/Wing.length_chord(zs))[1]*Wing.length_chord(zs)*Wing.ThSkin*(-dL)/Inertia.Ixx_wb
+        qs += s * Wing.get_xy_from_perim(s/Wing.length_chord(zs))[2]*Wing.length_chord(zs)*Wing.ThSkin*(-dD)/Inertia.Iyy_wb
+        qs +=  section01at1
         qs2 = np.append(qs2, qs)
     section12at2 =  qs2[-1]
     section12at2 *= Q_("N/m")
@@ -246,7 +252,9 @@ def Shear_wb(zs, L):
     for i in range(n):
         s = s + ds
         s3 = np.append(s3, s)
-        qs = -s**2*Wing.ThSpar2*(-L)/Inertia.Ixx_wb + section12at2
+        qs = -s**2*Wing.ThSpar2*(-dL)/Inertia.Ixx_wb
+        qs += -s*Wing.ChSpar2*Wing.ThSpar1*(-dD)/Inertia.Iyy_wb
+        qs += section12at2
         qs3 = np.append(qs3, qs)
     #qbase = 2*(Moment)/Wing.Area_cell()
     qs1 *= ureg("N/m")
@@ -263,7 +271,7 @@ def Shear_wb(zs, L):
     # print("q3=", qs3)
     return qs, s1, s2, s3, qs1, qs2, qs3
 
-qs, s1, s2, s3, qs1, qs2, qs3 = Shear_wb(Wing.z, L)
+#qs, s1, s2, s3, qs1, qs2, qs3 = Shear_wb(Wing.z, L)
 
 
 def calc_moment_from_shear(zs, s_1, s_2, s_3, q_1, q_2, q_3):
@@ -310,23 +318,20 @@ def calc_moment_from_shear(zs, s_1, s_2, s_3, q_1, q_2, q_3):
     # plt.show()
     return Moment
 
-Moment_from_shear = calc_moment_from_shear(Wing.z,s1, s2, s3, qs1, qs2, qs3)
+#Moment_from_shear = calc_moment_from_shear(Wing.z,s1, s2, s3, qs1, qs2, qs3)
 
-def calc_qbase(Moment_from_shear, L, zs):
+def calc_qbase(Moment_from_shear, dL, zs):
     qbase = (1/(2*Wing.Area_cell()))*(L*(Wing.ChSpar1-0.25)*Wing.length_chord(zs) + Moment_from_shear)
     # print(qbase)
     return qbase
 
-def Torsion(zs, qbase, M):
+def Torsion(dM, dL, shearcentre_x):
     A_cell = Wing.Area_cell()
-    length_skin = Wing.Area/Wing.ThSkin
-    length_spar1 = Wing.airfoilordinate(Wing.ChSpar1)
-    length_spar2 = Wing.airfoilordinate(Wing.ChSpar2)
-    T = M + 2*(Wing.Area_cell()*qbase) #M + 2*(Wing.Area_cell()*qbase)
+    T = dM + dL*shearcentre_x  #+ 2*(Wing.Area_cell()*qbase)
     const_tor = T/(4*A_cell**2*shear_modulus) #constant term in twist formula
-    line_int_tor  = length_skin/Wing.ThSkin
-    line_int_tor += length_spar1*Wing.length_chord(zs)/Wing.ThSpar1
-    line_int_tor += length_spar2*Wing.length_chord(zs)/Wing.ThSpar2 #result from line integral from torsion formula
+    line_int_tor  = 2*Wing.length_Skin_x_c(Wing.ChSpar1, Wing.ChSpar2)/Wing.ThSkin
+    line_int_tor += Wing.HSpar1*Wing.length_chord(zs)/Wing.ThSpar1
+    line_int_tor += Wing.HSpar2*Wing.length_chord(zs)/Wing.ThSpar2 #result from line integral from torsion formula
     twist_wb_tor_per_m  = const_tor*line_int_tor
     return twist_wb_tor_per_m
 
