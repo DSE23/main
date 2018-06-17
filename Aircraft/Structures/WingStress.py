@@ -205,7 +205,6 @@ def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
 
 def Shear_wb(zs, L):
     #section 01
-    print("L=", L)
     n = 100
     ds = Wing.HSpar1/n
     qs1 = np.array([])
