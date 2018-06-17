@@ -27,7 +27,8 @@ class Wing(object):
     S = Q_('11.74 m**2')                   # [m^2] Wing Surface
     A = 5.5                     # Aspect Ratio
     b = np.sqrt(S*A)             # [m] Wing Span
-    taper = 0.45                # Taper ratio
+    taper = 0.45     # Taper ratio
+    horn = Q_('0.15 m ')
     c_r = Q_("2.015 m")                 # Root chord
     c_t = c_r * taper           # Tip chord
     c_avg = (c_r + c_t)/2       #Average chord
