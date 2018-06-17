@@ -373,8 +373,13 @@ def Tsia_Wu(sigma_zs, shearforce):
     F2 = 1/(yield_strength)-1/(compr_strength)
     F44 = 1/tau_max**2
     F66 = 1/tau_max**2 
-    F = F11 *F22*F12*F1*F2*F44*F66 #klopt niet
-    return F
+    F = F11 *sigma1**2+F22*(sigma2**2+sigma3**2)+sigma2*sigma3*(2*F22-F44)
+    F += 2*F12*sigma1*(sigma3+sigma2)+F1*(sigma1+sigma2) + F2*sigma3
+    F += F44*tau23**2 + F66*(tau13**2+tau12**2)
+    if F < 1:
+        print("No failure occurs")
+    else:
+        print("Failure occurs")
 
 
 
