@@ -20,9 +20,11 @@ from Propulsion_and_systems import Propeller
 
 #Contracted slipstream diameter
 V0 = 30 #free stream velocity
-data = Propeller.Thrustcalc(V0)[-1]
-Dia = 1
+data = Propeller.Thrustcalc(V0)
+Dia = Geometry.Prop.Diameter.magnitude
+Sref = Geometry.Wing.S.magnitude
+CT = data[1].magnitude / 0.5 / 1.225 / V0**2 / Sref
 
-#DeltaV = V0 * (m.sqrt(1 + CT * (S / (Dia**2 / 4 * m.pi)) - 1)
+DeltaV = V0 * (m.sqrt(1 + CT * (Sref / (Dia**2 / 4 * m.pi)) - 1))
 
-#D_contract = Dia * m.sqrt((V0 + DeltaV / 2)/(V0 + DeltaV))
+# D_con = Dia * m.sqrt((V0 + DeltaV / 2)/(V0 + DeltaV))
