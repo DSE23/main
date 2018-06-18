@@ -69,12 +69,8 @@ N_main = (-N_force * (X_taillg - X_cgmtow)/Wheel_base - M_lift/Wheel_base)/2
 N_tail = N_force * (X_mainlg - X_cgmtow)/Wheel_base + M_lift/Wheel_base
 Max_allow_p = Q_("35 psi") / g0
 Max_allow_p.ito("kg/cm**2")
-print(Max_allow_p)
-print(Stat_load_main / g0)
-print(Stat_load_tail / g0)
 Max_load = Q_("270 lbs")
 Max_load.ito(Q_("kg"))
-print(Max_load)
 t_end = Q_("30 s")
 dt = Q_("0.01 s")
 Psy = Q_("0 deg")                             # Initial heading
