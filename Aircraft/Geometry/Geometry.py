@@ -28,7 +28,7 @@ class Wing(object):
     A = 5.5                     # Aspect Ratio
     b = np.sqrt(S*A)             # [m] Wing Span
     taper = 0.45     # Taper ratio
-    horn = Q_('0.15 m ')
+    horn = Q_('0.0 m ')
     c_r = Q_("2.015 m")                 # Root chord
     c_t = c_r * taper           # Tip chord
     c_avg = (c_r + c_t)/2       #Average chord
@@ -150,6 +150,7 @@ class CG(object):
     YCG_wing = Q_("0 m")
     CG_htail_mac = 0.5618
     CG_htail = H_tail.X_h + H_tail.MAC * CG_htail_mac   # H-tail cg relative to nose
+    X_htail = H_tail.X_h + H_tail.MAC * 0.25
     ZCG_htail = Q_("-0.094 m")
     YCG_vtail = Q_("0 m")
     CG_vtail_mac = 0.58799

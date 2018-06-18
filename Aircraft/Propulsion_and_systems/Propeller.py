@@ -21,7 +21,7 @@ def Thrustcalc(V0):
     D = 1.9                             #Diameter of the propeller
     R = D/2                             #Radius of the propeller
     Rhub = 0.20                         #Radius of the hub. Optimal at 0.31
-    Elements = 1000                     #Number of elements on the blade
+    Elements = 10                     #Number of elements on the blade
     RPM = 2700                          #constant speed prop
     Omega = RPM/60*2*np.pi              #rotational speed, rad/s
     TotalTwist = 33.6/180*np.pi         #Total twist of the propeller blade
@@ -33,6 +33,7 @@ def Thrustcalc(V0):
     Thrustlst = []
     efflist = []
     BetaHublst = []
+    Rvel = []
 
     for i in PitchRange:
         BetaHub = i / 180 * np.pi
@@ -56,8 +57,8 @@ def Thrustcalc(V0):
         Propspeed = Omega * r                                   # Velocity from rotation for every element
         VR = np.sqrt(V0 ** 2 + Propspeed ** 2)
         VE = VR * np.cos(Alphai)
-
-
+        
+        
         count = 0
 
         # flow angels
@@ -109,9 +110,10 @@ def Thrustcalc(V0):
 
         if Power >= 235000 and Power <= 250000 and running:
             running = False
-            Final = [efflist[-1],Thrustlst[-1],i,w,Alphai]
+            Final = [efflist[-1],Thrustlst[-1],i,w,Alphai,VR[-Elements:-1]]
         efflist.append(etaP)
         Thrustlst.append(Thrust)
+        Rvel.append(VR)
     return Final
 
 
