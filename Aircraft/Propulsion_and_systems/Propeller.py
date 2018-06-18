@@ -119,12 +119,14 @@ def Thrustcalc(V0):
 # For Alphai: w cos(Alphai+phi) is in airflow direction. w sin(Alphai + phi) is naar buiten.
 
 
+D = 1.90            #Diameter of the propeller
+R = D/2             #Radius of the propeller
+Rhub = 0.20         #Radius of the huboptimal at 0.31
+Elements = 1000
+P = 235000
+rho = 1.225
 
-
-
-
-
-
+Tstatic = 0.85*P**(2/3)*(2*rho*R**2*np.pi)**(1/3)*(1-Rhub**2/(R**2))    #Maximum static thrust.
 
 
 
