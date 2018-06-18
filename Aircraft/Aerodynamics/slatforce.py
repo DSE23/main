@@ -19,7 +19,7 @@ slatwidth = Geometry.Wing.b  #width of the slats
 h = Q_('100 m') #altitude of flight
 Velocity = Q_(' 30 m/s') #aircraft velocity at which slats are deployed
 GMAC = Geometry.Wing.c_avg
-
+mass_sys = 20 #mass of slat system
 #%% Slat sizing for optimal max lift increase
 
 # optimization arrays:
@@ -101,6 +101,19 @@ print('area',slatarea)
 P = 0.5 * density * Velocity**2 * slatarea #F = pressure times area
 print('Slat force required =', P)
 
+#suction peak calculation
+cp_file = np.genfromtxt('../Cp_slat.dat')
+cp_array = np.array([])
+for coor in np.arange(0,len(cp_file)):
+    if cp_file[coor,0] <= chordslat and cp_file[coor,1] > 0:
+        cp_array = np.append(cp_array, cp_file[coor,2])
+    
+cp_ave = np.average(cp_array)
+F = 0.5 * density * Velocity**2 * cp_ave * slatarea
+
+acc = F.magnitude / mass_sys
+time = m.sqrt(gapslat/-acc)
+
 
 #%% electric actuator size + stroke length
 stroke = gapslat / m.cos(defl_angle)
@@ -126,6 +139,22 @@ for r in rod:
                   length of ', r, ' is need')
             
         
+
+#%% Forces in the fuselage
+
+#principle of work to do forces in fuselage
+
+rodangle = m.radians(86.3265)#choose from a printed value above
+work_slat = P * stroke / 2 #work = force times displacement 2 actuator for this force
+work_slat *= Q_('N * m')
+F_act = Q_('500 N') #electric actuator force
+displ_fus = work_slat / F_act
+print('linear displacement rod =', displ_fus)
+fus_rod_length = (2 * (displ_fus * m.sin(rodangle))**2)
+print('rod in fuselage has a length of', fus_rod_length)
+rod2 = fus_rod_length - fus_rod_length * m.cos(rodangle/2)
+print('small rod = ', rod2)
+
 
 
 

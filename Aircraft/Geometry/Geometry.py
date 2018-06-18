@@ -27,7 +27,8 @@ class Wing(object):
     S = Q_('11.74 m**2')                   # [m^2] Wing Surface
     A = 5.5                     # Aspect Ratio
     b = np.sqrt(S*A)             # [m] Wing Span
-    taper = 0.45                # Taper ratio
+    taper = 0.45     # Taper ratio
+    horn = Q_('0.15 m ')
     c_r = Q_("2.015 m")                 # Root chord
     c_t = c_r * taper           # Tip chord
     c_avg = (c_r + c_t)/2       #Average chord
@@ -141,7 +142,7 @@ class CG(object):
     # Locations in here are referencd to the nose in x and the crankshaft of the
     # engine in z, unless stated otherwise, For Z downward == positive, for x
     # is to the tail positive
-    CG_wing_mac = 0.46385                   # CG location of wing as percentage of MAC
+    CG_wing_mac = 0.45                   # CG location of wing as percentage of MAC
     XLEMAC = Q_("1.24 m")               # LEMAC position
     CG_wing = CG_wing_mac*Wing.MAC + XLEMAC     # Wing CG position relative to nose
     X_wing = XLEMAC + 0.25 * Wing.MAC
