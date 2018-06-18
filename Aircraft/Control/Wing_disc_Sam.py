@@ -82,9 +82,16 @@ data = pd.read_csv('aerodynamic_data_ms15.dat', ' ', header=None).values
 def lookup_data(alpha, ca_c, da, chord):
     # Looksup and interpolates Cl and Cd based on alpha, ca_c and da
     alpha = math.degrees(alpha)
-    indexda = abs(da)//5
     indexca_c = int(100*ca_c)-1
-    localdata = data[int(indexda*50*51+indexca_c*51):int(indexda*50*51+(indexca_c+1)*51),:]
+    if da % 5 ==0:
+        indexda = abs(da)//5
+        localdata = data[int(indexda*50*51+indexca_c*51):int(indexda*50*51+(indexca_c+1)*51),:]
+    else:
+        index1da = abs(da)//5
+        index2da = abs(da)//5 + 1
+        localdata1 = data[int(index1da*50*51+indexca_c*51):int(index1da*50*51+(indexca_c+1)*51),:]
+        localdata2 = data[int(index2da*50*51+indexca_c*51):int(index2da*50*51+(indexca_c+1)*51),:]
+        localdata = (localdata2 - localdata1)/5 * da
     non_zero_max = max(np.argwhere(localdata[:, 0]))[0]  # last non-zero row
     localdata = localdata[:non_zero_max+1,:]
     Cl_local = interpolate.interp1d(localdata[:,0], localdata[:,1], 'linear', fill_value='extrapolate')
