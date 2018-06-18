@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 N = 40                         # Number of panels to be used in total
-alpha = m.radians(-2.862405226)
+alpha = m.radians(0)
 Vspeed = 60
 Vvector = Vspeed*np.array([m.cos(alpha),0,m.sin(alpha)])
 unitx = np.array([1,0,0])
@@ -49,7 +49,6 @@ def computevelocityupper(tangentlist,vortexlist,controlpoint,gammalist):
         r = controlpoint - vortexlist[i] + np.array([0,0,0])
         rnorm = np.linalg.norm(r)
         V1 = ((np.cross(-unity, r) / (2 * m.pi)) / rnorm ** 2)
-        print(V1)
         V += V1*gammalist[i]
     return V
 
@@ -80,7 +79,7 @@ aileroncenter = (2-aileronlength)/2
 Naileron = int(aileronlength*N)
 hingelocation = 1.0
 xhingeline = aileroncenter + (hingelocation-0.5) * aileronlength
-da = m.radians(0)
+da = m.radians(2)
 
 ### Create panel coordinates for the aileron
 thetaaileron = np.linspace(0, m.pi,Naileron+1,endpoint=False)
@@ -105,8 +104,9 @@ xairfoil = airfoilcenter - airfoillength * np.cos(thetaairfoil)/2
 yairfoil = np.zeros(Nairfoil+1)
 zairfoil = airfoilcamberline(xairfoil)
 
-
-
+transformationmatrix =     transformationmatrix = np.array([[m.cos(da),0,-m.sin(da)],
+                                     [0,1,0],
+                                     [m.sin(da),0,m.cos(da)]])
 
 panelarray = np.empty((N,7,3))
 panelarray[0:Nairfoil,0:2,:] = np.dstack((np.column_stack((xairfoil[0:Nairfoil],xairfoil[1:Nairfoil+1])),
@@ -123,7 +123,7 @@ panelarray[Nairfoil:N,0:2,:] = np.dstack((np.column_stack((xaileron[0:Naileron],
                                np.column_stack((zaileron[0:Naileron],zaileron[1:Naileron+1]))))
 panelarray[Nairfoil:N,2,:] = panelarray[Nairfoil:N,1,:] - panelarray[Nairfoil:N,0,:]
 panelarray[Nairfoil:N,3,:] = panelarray[Nairfoil:N,2,:]/(np.sqrt((panelarray[Nairfoil:N,2,:]*panelarray[Nairfoil:N,2,:]).sum(axis=1)).reshape(-1,1))
-panelarray[Nairfoil:N,4,:] = np.cross(panelarray[Nairfoil:N,3,:],unity)
+panelarray[Nairfoil:N,4,:] = np.cross(panelarray[Nairfoil:N,3,:],unity)#.dot(transformationmatrix)
 panelarray[Nairfoil:N,5,:] = 0.25*panelarray[Nairfoil:N,0,:] + 0.75*panelarray[Nairfoil:N,1,:]      #Control points
 panelarray[Nairfoil:N,6,:] = 0.75*panelarray[Nairfoil:N,0,:] + 0.25*panelarray[Nairfoil:N,1,:]      #Vortex points
 
@@ -136,7 +136,6 @@ Gammalist = np.linalg.solve(A,RHS)
 
 Cl = np.sum(Gammalist)/(0.5*Vspeed)
 print(Cl)
-print(Gammalist)
 
 cpressureupperlist = np.zeros((N,3))
 cpressurelowerlist = np.zeros((N,3))
