@@ -22,7 +22,6 @@ from Performance import Performance
 import matplotlib.pyplot as plt
 import time
 
-z = Wing.z
 cl, cd, cm = AWing.computeloads()           #Load aerodynamic properties
 n = 10                      #number of the devided sections
 b = Wing.s         #Wing span
@@ -233,7 +232,7 @@ def Shear_wb(zs, dL, dD, dM):
     for i in range(n):
         s = s + ds
         s2 = np.append(s2, s)
-        qs = s * Wing.get_xy_from_perim(s/Wing.length_chord(zs))[0]*Wing.length_chord(zs)*Wing.ThSkin*(-dL)/Inertia.Ixx_wb
+        qs = s * (Wing.get_xy_from_perim(s/Wing.length_chord(zs))[0]-Wing.ChSpar1)*Wing.length_chord(zs)*Wing.ThSkin*(-dL)/Inertia.Ixx_wb
         qs += s * Wing.get_xy_from_perim(s/Wing.length_chord(zs))[1]*Wing.length_chord(zs)*Wing.ThSkin*(-dD)/Inertia.Iyy_wb
         qs +=  section01at1
         qs2 = np.append(qs2, qs)
@@ -272,7 +271,7 @@ def Shear_wb(zs, dL, dD, dM):
 
 
 def calc_qs0(Shear_wb, dL, zs, dD, dM):
-    n = 100
+    n = 101
     ds = Wing.HSpar1/n
     s1 = Shear_wb(zs, dL, dD, dM)[0]
     s2 = Shear_wb(zs, dL, dD, dM)[1]
