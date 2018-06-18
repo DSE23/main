@@ -369,11 +369,6 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     Fx = T - m.cos(beta_nose)*(Sum_Dw + Sum_Dh + D_fus_gear) - W*m.sin(Theta)
     Fy = Sideforce*m.cos(beta_nose) - m.sin(beta_nose)*(Sum_Dw + Sum_Dh + D_fus_gear) + W*m.sin(Theta)
     Fz = - Sum_Lw - Sum_Lh + W*m.cos(Phi)
-<<<<<<< HEAD
-=======
-
-    
->>>>>>> d190ef18666a154232aff9729332538eaa224fdd
     u_dot = Fx/(mtow)
     u += u_dot*dt
     w_dot = Fz/(mtow)
