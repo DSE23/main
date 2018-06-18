@@ -12,13 +12,13 @@ from Misc import ureg, Q_
 # Imports the unit registry from the Misc folder
 
 import numpy as np
-
+from Geometry import Geometry
 
 # Returns the propeller efficiency, thrust and pitch at the hub for the maximum power value, for a given airspeed inbetween 15m/s and 200m/s.
 
 def Thrustcalc(V0):
     #Required values
-    D = 1.9                             #Diameter of the propeller
+    D = Geometry.Prop.Diameter          #Diameter of the propeller
     R = D/2                             #Radius of the propeller
     Rhub = 0.20                         #Radius of the hub. Optimal at 0.31
     Elements = 10                     #Number of elements on the blade

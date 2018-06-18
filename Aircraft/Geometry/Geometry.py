@@ -207,3 +207,6 @@ class CG(object):
                 (Masses.W_OEW+ Masses.W_pilot)
     ZCG_mtow = (ZCG_wpilot*(Masses.W_OEW+ Masses.W_pilot)+ZCG_fuel * Masses.W_fuel)\
               /(Masses.W_MTOW)
+              
+class Prop(object):
+    Diameter = Q_('1.9 m')

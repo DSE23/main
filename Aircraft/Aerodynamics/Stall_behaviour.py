@@ -15,7 +15,7 @@ import scipy as sp
 from Geometry import Geometry
 from pint import UnitRegistry
 import Aeroprops
-import Propeller
+from Propulsion_and_systems import Propeller
 
 
 #Contracted slipstream diameter
