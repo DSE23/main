@@ -22,7 +22,7 @@ from Performance import Performance
 import matplotlib.pyplot as plt
 import time
 
-
+z = Wing.z
 cl, cd, cm = AWing.computeloads()           #Load aerodynamic properties
 n = 10                      #number of the devided sections
 b = Geometry.Wing.b/2         #Wing span
@@ -328,7 +328,7 @@ def Torsion(zs, qbase, M):
     return twist_wb_tor_per_m
 
 
-# print("twist =", Torsion(Geometry.Wing.b/2,calc_qbase(Moment_from_shear, L, Wing.z), M).to("rad/m"))
+print("twist =", Torsion(Geometry.Wing.b/2,calc_qbase(Moment_from_shear, L, Wing.z), M).to("rad/m"))
 
 # Wing deformation in X-direction
 def deformation_x(zs):
