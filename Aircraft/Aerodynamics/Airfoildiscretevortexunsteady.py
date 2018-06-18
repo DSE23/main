@@ -109,14 +109,14 @@ def oldmatrixconstructor(vortexlist,controllist,normallist,lastwakepoint):
     return matrix
 
 ### Construct the righthandside
-def righthandsideconstructor(freestreamvelocitylocal,controllist,normallist,listofwakeslocalcoordinates,listofwakemagnitudes,previousgamma,thetadot):
-    freestreamvelocitylocal = freestreamvelocitylocal[np.newaxis,:] +
+def righthandsideconstructor(freestreamvelocitylocal,controllist,normallist,listofwakeslocalcoordinates,listofwakemagnitudes,previousgamma,Omega):
+    freestreamvelocitylocal = freestreamvelocitylocal[np.newaxis,:] - np.cross(Omega,controllist)
     matrixofdistances = controllist[: ,np.newaxis, :] - listofwakeslocalcoordinates[np.newaxis,:,:]
     normaliseddistances = matrixofdistances / (matrixofdistances * matrixofdistances).sum(axis=2)[:, :, np.newaxis]
     matrixaftercrossproduct = np.cross(-unity,normaliseddistances)
     matrixafternormal = 1/(2*m.pi)*np.einsum("ijk,ik->ij",matrixaftercrossproduct,normallist)
     RHS = -np.einsum("ij,j->i",matrixafternormal,listofwakemagnitudes)
-    RHS -= np.einsum("j,ij->i",freestreamvelocitylocal,normallist)
+    RHS -= np.einsum("ij,ij->i",freestreamvelocitylocal,normallist)
     RHS = np.append(RHS,previousgamma)
     return RHS
 
@@ -132,12 +132,23 @@ def righthandsideconstructorold(freestreamvelocitylocal,controllist,normallist,l
     RHS[-1] = previousgamma
     return RHS
 
+def velocitycalculatorlocal(point,vortexlist,gammalist,localwakecoordinates,listofwakestrengths,freestreamvelocitylocal,Omega):
+    vortices = np.vstack((vortexlist,localwakecoordinates))
+    vorticitystrengths = np.append(gammalist,listofwakestrengths)
+    matrixofdistances = point[: ,np.newaxis, :] - vortices[np.newaxis, :, :]
+    normaliseddistances = matrixofdistances / (matrixofdistances * matrixofdistances).sum(axis=2)[:, :, np.newaxis]
+    matrixaftercrossproduct = np.cross(-unity,normaliseddistances)
+    velocityfieldduetovortices = 1/(2*m.pi)*np.einsum('ijk,j->ik',matrixaftercrossproduct,vorticitystrengths)
+    freestreamvelocitylocal = freestreamvelocitylocal[np.newaxis, :] - np.cross(Omega, point)
+    print(velocityfieldduetovortices+freestreamvelocitylocal)
+    return velocityfieldduetovortices+freestreamvelocitylocal
+
 ### Velocity of airfoil origin, as measured in inertial reference frame
 def dotX0(t):
     return -Vspeed - 0*m.sin(t)
 
 def dotZ0(t):
-    return 3*m.sin(t)
+    return 3
 
 def dottheta0(t):
     return 0*m.cos(t)
@@ -169,7 +180,6 @@ xairfoil = airfoilcenter - airfoillength * np.cos(thetaairfoil)/2
 yairfoil = np.zeros(Nairfoil+1)
 zairfoil = airfoilcamberline(xairfoil)
 
-
 panelarray = np.empty((N,7,3))
 panelarray[0:Nairfoil,0:2,:] = np.dstack((np.column_stack((xairfoil[0:Nairfoil],xairfoil[1:Nairfoil+1])),
                                np.column_stack((yairfoil[0:Nairfoil],yairfoil[1:Nairfoil+1])),
@@ -199,6 +209,7 @@ timeslower = 0
 while t < tmax:
     ### Find velocity vector of freestream, expressed in local coordinates
     Vlocal = transformglobaltolocalvelocity(theta,np.array([dotX0(t),0,dotZ0(t)]))
+    Omega = np.array([0,dottheta0(t),0])
 
     ### Find coordinates of wake in local coordinate system
     localcoordinatesofwake=transformglobaltolocal(theta,listofwakes[:,1:],airfoilorigin)
@@ -208,7 +219,7 @@ while t < tmax:
     matrix = matrixconstructor(panelarray[:,5,:],panelarray[:,6,:],panelarray[:,4,:],localcoordinatesofwake[-1])
 
     ### Compute RHS vector
-    RHS = righthandsideconstructor(Vlocal,panelarray[:,6,:],panelarray[:,4,:],localcoordinatesofwake,listofwakes[:,0],previousgamma)
+    RHS = righthandsideconstructor(Vlocal,panelarray[:,6,:],panelarray[:,4,:],localcoordinatesofwake,listofwakes[:,0],previousgamma,Omega)
     timeslower += time.time()-startslower
 
     ### Solve system
@@ -219,19 +230,19 @@ while t < tmax:
     Cl = np.sum(gammalist[:-1]) / (0.5 * Vspeed)
     print("Time is: ", t, "\nLift coefficient is: ",Cl)
 
-    ### Compute pressure distribution
-
-    ### Compute velocity at wake points
-
-    ### Update position of wake in airfoil coordinate system
+    ### Add latest wake to wakelist
     listofwakes[:-1,0] = listofwakes[1:,0]
     listofwakes[-1,0] = gammalist[-1]
-
-    ### Create new wake point
     localcoordinatesofwake[:-1,:] = localcoordinatesofwake[1:,:]
     Omega = np.array([0,dottheta0(t),0])
     VTE = np.array([dotX0(t),0,dotZ0(t)])+Omega.dot(panelarray[-1,1,:])
     localcoordinatesofwake[-1,:] = panelarray[-1,1,:] - 0.25*panelarray[-1,3,:]*np.linalg.norm(VTE)*dt
+
+    ### Compute velocity at wake points
+    velocitycalculatorlocal(panelarray[:,6,:], panelarray[:,5,:], gammalist[:-1], localcoordinatesofwake, listofwakes[:,0],
+                            Vlocal, Omega)
+
+    ### Update position of wake in airfoil coordinate system
 
     ### Convert positions of wake to global coordinate system
     listofwakes[:,1:] = transformlocaltoglobal(theta,localcoordinatesofwake,airfoilorigin)
@@ -243,3 +254,4 @@ while t < tmax:
 
 print(timeslow)
 print(timeslower)
+print(gammalist)

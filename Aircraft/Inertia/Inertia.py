@@ -38,6 +38,8 @@ W_Htail = Geometry.Masses.W_htail
 W_Vtail = Geometry.Masses.W_vtail
 W_wing = Geometry.Masses.W_wing
 W_wing = W_wing + Geometry.Masses.W_flaperons + Geometry.Masses.W_lehld
+W_flaperons = Geometry.Masses.W_flaperons
+W_lehld = Geometry.Masses.W_lehld
 W_spar1 = StrucVal.Weightspar1
 W_spar2 = StrucVal.Weightspar2
 Cbar_w = Geometry.Wing.MAC
@@ -48,7 +50,9 @@ t_c = Geometry.Wing.T_Cmax
 t_rootwrib = c_rw * t_c                           # Thickness of airfoil at root
 t_tipwrib = c_tw * t_c                            # Thickness of airfoil at tip
 W_rib = k_rib * rho_rib * S_wing * (t_ref + (t_rootwrib + t_tipwrib)/2)
-W_skin = W_wing - (W_spar1 + W_spar2 + W_rib)     # Skin weight
+W_skin = W_wing - (W_spar1 + W_spar2 + W_rib + W_flaperons + W_lehld)  # Skin weight
+F_lehld = W_lehld/W_wing
+F_flaps = W_flaperons/W_wing
 F_fs = W_spar1/W_wing                             # Front spar W fraction
 F_rs = W_spar2/W_wing                             # Rear spar W fraction
 F_skin = W_skin/W_wing                            # Skin W fraction
@@ -229,11 +233,11 @@ A_airfoili = np.array([[(AreaAfoil(x_c0, x_c1, chordw)).magnitude],
                        [(AreaAfoil(x_c4, x_c5-1*10**-10, chordw)).magnitude]])
 A_airfoilfrac = A_airfoili/sum(A_airfoili)
 N_windex = np.arange(N_stw)
-mpmw = np.array([[((L1 * F_skin + A_airfoilfrac[0]*F_ribs)*(A1+par*(N_windex-1))).magnitude],
+mpmw = np.array([[((F_lehld + L1 * F_skin + A_airfoilfrac[0]*F_ribs)*(A1+par*(N_windex-1))).magnitude],
                  [(((L2 - L1) * F_skin + A_airfoilfrac[1] * F_ribs + F_fs)*(A1 + par*(N_windex-1))).magnitude],
                  [(((L3 - L2) * F_skin + A_airfoilfrac[2] * F_ribs)*(A1 + par*(N_windex-1))).magnitude],
                  [(((L4 - L3) * F_skin + A_airfoilfrac[3] * F_ribs + F_rs)*(A1 + par*(N_windex-1))).magnitude],
-                 [(((1 - L4) * F_skin + A_airfoilfrac[4] * F_ribs)*(A1 + par* (N_windex-1))).magnitude]])
+                 [((F_flaps + (1 - L4) * F_skin + A_airfoilfrac[4] * F_ribs)*(A1 + par* (N_windex-1))).magnitude]])
 mpmw = mpmw[:, 0, 0, :] * Q_("kg")
 m_wing = sum(sum(mpmw))
 XCG_wingcomp = sum(sum(xcgw*mpmw))/m_wing

@@ -71,7 +71,7 @@ for V in np.arange (V_stall.magnitude ,V_a.magnitude, V_step):
         P_req.ito(Q_("hp"))
         P_ratio = P_req / P_to
         alpha_req.ito(Q_("deg"))
-        #print (alpha_req)
+        #print(alpha_req)
 
         if T_req >= (min(P_to * eta_prop / V, Tmax)) or alpha_req > alpha_max:
             T = Q_("0 N")
