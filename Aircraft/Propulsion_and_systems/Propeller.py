@@ -18,7 +18,7 @@ from Geometry import Geometry
 
 def Thrustcalc(V0):
     #Required values
-    D = Geometry.Prop.Diameter          #Diameter of the propeller
+    D = Geometry.Prop.Diameter.magnitude          #Diameter of the propeller
     R = D/2                             #Radius of the propeller
     Rhub = 0.20                         #Radius of the hub. Optimal at 0.31
     Elements = 10                     #Number of elements on the blade

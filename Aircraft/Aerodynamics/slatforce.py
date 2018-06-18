@@ -29,12 +29,12 @@ slatchordratio = np.linspace(0,0.15,20) #dimensionless
 verticaldeflection = np.linspace(0.05,0.0845,20) #in meter
 
 #DATCOM graph interpolation
-maxLeffect_datapoints = np.array([(0,0),(.05,.84),(.1,1.2),(.15,1.31),(.2,1.6),\
+maxLeffect_datapoints = np.array([(0,0),(.05,.84),(.1,1.2),(.15,1.44),(.2,1.6),\
                                   (.25,1.75),(.3,1.825)])
 maxL_x = maxLeffect_datapoints[:,0]
 maxL_y = maxLeffect_datapoints[:,1]
 eta_max = .8
-etadelta_datapoints = np.array([(15,1),(17.5,.95),(20,.9),(22.5,.82),(25,7.6),(30,.59)])
+etadelta_datapoints = np.array([(15,1),(17.5,.95),(20,.9),(22.5,.82),(25,.76),(30,.59)])
 ed_x = etadelta_datapoints[:,0]
 ed_y = etadelta_datapoints[:,1]
 
@@ -48,6 +48,7 @@ for defl in deflection_rad:
         for gap in verticaldeflection:
             maxlifteffect = np.interp(c_slat,maxL_x,maxL_y)
             da_corr_fact = np.interp(defl,ed_x,ed_y)
+           # print(m.degrees(defl),da_corr_fact)
             delta_clmax = maxlifteffect * eta_max * da_corr_fact * defl *\
             (GMAC.magnitude + gap)/GMAC.magnitude
             
