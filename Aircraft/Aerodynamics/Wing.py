@@ -55,9 +55,78 @@ def computeloads():
 
     data = np.genfromtxt(Datafile+'_results.dat',skip_header=12)
     alphaClmax = data[np.argmax(data[:,1]),0]
+    Cl = data[np.argmax(data[:,1]),1]
+    Cd = data[np.argmax(data[:,1]),2]
+    Cm = data[np.argmax(data[:,1]),4]
+
+    Cn = Cl*m.cos(m.radians(alphaClmax)) + Cd*m.sin(m.radians(alphaClmax))
+    Ct = Cd*m.cos(m.radians(alphaClmax)) - Cl*m.sin(m.radians(alphaClmax))
 
     subprocess.call('del ' + Datafile + '_results.dat', shell = True)
+    #
+    # command_file = open("commands.in", "w")
+    # command_file.write('load ' + "../" + Datafile + ".dat\n\
+    # panel\n\
+    # panel\n\
+    # plop\n\
+    # g f\n\
+    # \n\
+    # gdes\n\
+    # f\n\
+    # " + str(1-flapchordlength) + "\n\
+    # 999\n\
+    # 0.5\n\
+    # " + str(maximumdeflectionangle) + "\n\
+    # x\n\
+    # \n\
+    # ppar\n\
+    # N\n\
+    # 200\n\
+    # \n\
+    # \n\
+    # psav flappedairfoil.dat\n\
+    # oper\n\
+    # visc " + str(Re) + "\n\
+    # M " + str(M) + "\n\
+    # type 1\n\
+    # iter 1000 \n\
+    # seqp\n\
+    # a "  + str(alphaClmax) + "\n\
+    # cpwr cp.dat\n\
+    # \n\
+    # \n\
+    # quit\n")
+    # command_file.close()
+    #
+    # run_xfoil_command = '..\\xfoil < ' + 'commands.in'
+    # subprocess.call(run_xfoil_command, stdout= False, shell = True)
+    #
+    # pressures = np.genfromtxt('cp.dat',skip_header=3,skip_footer=1)
+    #
+    # Cy = 0
+    # Cx = 0
+    # Cm = 0
+    # xref = 0.25
+    # yref = 0.
+    #
+    # for i in range(np.size(pressures,0)-1):
+    #     normal = np.array([pressures[i-1,2]-pressures[i+1,2],pressures[i+1,1]-pressures[i-1,1]])
+    #     normalisednormal = normal/np.linalg.norm(normal)
+    #     length = m.sqrt((pressures[i-1,1]-pressures[i+1,1])**2+(pressures[i-1,2]-pressures[i+1,2])**2)/2
+    #     Cyi = normalisednormal[0]*pressures[i,0]*length
+    #     Cxi = normalisednormal[1]*pressures[i,0]*length
+    #     Cy += Cyi
+    #     Cx += Cxi
+    #     Cm += Cxi * (yref-pressures[i,2]) - Cyi * (xref-pressures[i,1])
 
+    return Cn, Ct, Cm
+
+def computeloadsht():
+    Datafile = "NACA0009"
+    Re = 8000000
+    M = 0.3128
+    flapchordlength = 0.5
+    maximumdeflectionangle = 25
     command_file = open("commands.in", "w")
     command_file.write('load ' + "../" + Datafile + ".dat\n\
     panel\n\
@@ -73,47 +142,198 @@ def computeloads():
     " + str(maximumdeflectionangle) + "\n\
     x\n\
     \n\
-    ppar\n\
-    N\n\
-    200\n\
-    \n\
-    \n\
-    psav flappedairfoil.dat\n\
     oper\n\
     visc " + str(Re) + "\n\
     M " + str(M) + "\n\
     type 1\n\
-    iter 1000 \n\
+    pacc\n"\
+    +  Datafile+"_results.dat\n\
+    \n\
+    iter\n 100 \n\
     seqp\n\
-    a "  + str(alphaClmax) + "\n\
-    cpwr cp.dat\n\
+    aseq 0 25 0.5 \n\
     \n\
     \n\
     quit\n")
     command_file.close()
 
     run_xfoil_command = '..\\xfoil < ' + 'commands.in'
-    subprocess.call(run_xfoil_command, stdout= False, shell = True)
+    subprocess.call(run_xfoil_command, stdout=FNULL, shell = True)
 
-    pressures = np.genfromtxt('cp.dat',skip_header=3,skip_footer=1)
+    data = np.genfromtxt(Datafile+'_results.dat',skip_header=12)
+    alphaClmax = data[np.argmax(data[:,1]),0]
+    Cl = data[np.argmax(data[:,1]),1]
+    Cd = data[np.argmax(data[:,1]),2]
+    Cm = data[np.argmax(data[:,1]),4]
 
-    Cy = 0
-    Cx = 0
-    Cm = 0
-    xref = 0.25
-    yref = 0.
+    Cn = Cl*m.cos(m.radians(alphaClmax)) + Cd*m.sin(m.radians(alphaClmax))
+    Ct = Cd*m.cos(m.radians(alphaClmax)) - Cl*m.sin(m.radians(alphaClmax))
 
-    for i in range(np.size(pressures,0)-1):
-        normal = np.array([pressures[i-1,2]-pressures[i+1,2],pressures[i+1,1]-pressures[i-1,1]])
-        normalisednormal = normal/np.linalg.norm(normal)
-        length = m.sqrt((pressures[i-1,1]-pressures[i+1,1])**2+(pressures[i-1,2]-pressures[i+1,2])**2)/2
-        Cyi = normalisednormal[0]*pressures[i,0]*length
-        Cxi = normalisednormal[1]*pressures[i,0]*length
-        Cy += Cyi
-        Cx += Cxi
-        Cm += Cxi * (yref-pressures[i,2]) - Cyi * (xref-pressures[i,1])
+    subprocess.call('del ' + Datafile + '_results.dat', shell = True)
+    #
+    # command_file = open("commands.in", "w")
+    # command_file.write('load ' + "../" + Datafile + ".dat\n\
+    # panel\n\
+    # panel\n\
+    # plop\n\
+    # g f\n\
+    # \n\
+    # gdes\n\
+    # f\n\
+    # " + str(1-flapchordlength) + "\n\
+    # 999\n\
+    # 0.5\n\
+    # " + str(maximumdeflectionangle) + "\n\
+    # x\n\
+    # \n\
+    # ppar\n\
+    # N\n\
+    # 200\n\
+    # \n\
+    # \n\
+    # psav flappedairfoil.dat\n\
+    # oper\n\
+    # visc " + str(Re) + "\n\
+    # M " + str(M) + "\n\
+    # type 1\n\
+    # iter 1000 \n\
+    # seqp\n\
+    # a "  + str(alphaClmax) + "\n\
+    # cpwr cp.dat\n\
+    # \n\
+    # \n\
+    # quit\n")
+    # command_file.close()
+    #
+    # run_xfoil_command = '..\\xfoil < ' + 'commands.in'
+    # subprocess.call(run_xfoil_command, stdout= False, shell = True)
+    #
+    # pressures = np.genfromtxt('cp.dat',skip_header=3,skip_footer=1)
+    #
+    # Cy = 0
+    # Cx = 0
+    # Cm = 0
+    # xref = 0.25
+    # yref = 0.
+    #
+    # for i in range(np.size(pressures,0)-1):
+    #     normal = np.array([pressures[i-1,2]-pressures[i+1,2],pressures[i+1,1]-pressures[i-1,1]])
+    #     normalisednormal = normal/np.linalg.norm(normal)
+    #     length = m.sqrt((pressures[i-1,1]-pressures[i+1,1])**2+(pressures[i-1,2]-pressures[i+1,2])**2)/2
+    #     Cyi = normalisednormal[0]*pressures[i,0]*length
+    #     Cxi = normalisednormal[1]*pressures[i,0]*length
+    #     Cy += Cyi
+    #     Cx += Cxi
+    #     Cm += Cxi * (yref-pressures[i,2]) - Cyi * (xref-pressures[i,1])
 
-    return Cy, Cx, Cm
+    return Cn, Ct, Cm
+
+def computeloadsvt():
+    Datafile = "FX71"
+    Re = 8000000
+    M = 0.3128
+    flapchordlength = 0.5
+    maximumdeflectionangle = 25
+    command_file = open("commands.in", "w")
+    command_file.write('load ' + "../" + Datafile + ".dat\n\
+    panel\n\
+    panel\n\
+    plop\n\
+    g f\n\
+    \n\
+    gdes\n\
+    f\n\
+    " + str(1-flapchordlength) + "\n\
+    999\n\
+    0.5\n\
+    " + str(maximumdeflectionangle) + "\n\
+    x\n\
+    \n\
+    oper\n\
+    visc " + str(Re) + "\n\
+    M " + str(M) + "\n\
+    type 1\n\
+    pacc\n"\
+    +  Datafile+"_results.dat\n\
+    \n\
+    iter\n 100 \n\
+    seqp\n\
+    aseq 0 25 0.5 \n\
+    \n\
+    \n\
+    quit\n")
+    command_file.close()
+
+    run_xfoil_command = '..\\xfoil < ' + 'commands.in'
+    subprocess.call(run_xfoil_command, stdout=FNULL, shell = True)
+
+    data = np.genfromtxt(Datafile+'_results.dat',skip_header=12)
+    alphaClmax = data[np.argmax(data[:,1]),0]
+    Cl = data[np.argmax(data[:,1]),1]
+    Cd = data[np.argmax(data[:,1]),2]
+    Cm = data[np.argmax(data[:,1]),4]
+
+    Cn = Cl*m.cos(m.radians(alphaClmax)) + Cd*m.sin(m.radians(alphaClmax))
+    Ct = Cd*m.cos(m.radians(alphaClmax)) - Cl*m.sin(m.radians(alphaClmax))
+
+    subprocess.call('del ' + Datafile + '_results.dat', shell = True)
+    #
+    # command_file = open("commands.in", "w")
+    # command_file.write('load ' + "../" + Datafile + ".dat\n\
+    # panel\n\
+    # panel\n\
+    # plop\n\
+    # g f\n\
+    # \n\
+    # gdes\n\
+    # f\n\
+    # " + str(1-flapchordlength) + "\n\
+    # 999\n\
+    # 0.5\n\
+    # " + str(maximumdeflectionangle) + "\n\
+    # x\n\
+    # \n\
+    # ppar\n\
+    # N\n\
+    # 200\n\
+    # \n\
+    # \n\
+    # psav flappedairfoil.dat\n\
+    # oper\n\
+    # visc " + str(Re) + "\n\
+    # M " + str(M) + "\n\
+    # type 1\n\
+    # iter 1000 \n\
+    # seqp\n\
+    # a "  + str(alphaClmax) + "\n\
+    # cpwr cp.dat\n\
+    # \n\
+    # \n\
+    # quit\n")
+    # command_file.close()
+    #
+    # run_xfoil_command = '..\\xfoil < ' + 'commands.in'
+    # subprocess.call(run_xfoil_command, stdout= False, shell = True)
+    #
+    # pressures = np.genfromtxt('cp.dat',skip_header=3,skip_footer=1)
+    #
+    # Cy = 0
+    # Cx = 0
+    # Cm = 0
+    # xref = 0.25
+    # yref = 0.
+    #
+    # for i in range(np.size(pressures,0)-1):
+    #     normal = np.array([pressures[i-1,2]-pressures[i+1,2],pressures[i+1,1]-pressures[i-1,1]])
+    #     normalisednormal = normal/np.linalg.norm(normal)
+    #     length = m.sqrt((pressures[i-1,1]-pressures[i+1,1])**2+(pressures[i-1,2]-pressures[i+1,2])**2)/2
+    #     Cyi = normalisednormal[0]*pressures[i,0]*length
+    #     Cxi = normalisednormal[1]*pressures[i,0]*length
+    #     Cy += Cyi
+    #     Cx += Cxi
+    #     Cm += Cxi * (yref-pressures[i,2]) - Cyi * (xref-pressures[i,1])
+
+    return Cn, Ct, Cm
 
 #airfoil = np.genfromtxt(Datafile+'.dat')
 #
@@ -145,4 +365,3 @@ Oswald_e = 0.792                        # Oswald efficiency factor
 C_Nw_alpha = 4.6532                     # Normal force coef with respect to alpha
 de_da = 0.806                           # Downwash gradient
 cl_da = 3.9282                          # Change in CL due to Aileron deflection
-

@@ -55,8 +55,26 @@ u = V_inf
 def local_chord(z, c_r, c_t, half_b):
     # Calculates the chord at location z(distance from center)
     return c_r - (c_r - c_t) / half_b * z
-def trimming():
-    trim_condition = False
+def trimming(u,ca_c,da, chord):
+    trimming_alpha = True
+    alpha_min = math.radians(-15)
+    alpha_max = math.radians(15)
+    while trimming_alpha:
+        alpha_t = (alpha_min+alpha_max)/2.
+        
+        w = u * math.tan(alpha_t)
+        Cl,Cd,Cm,xcp = lookup_data(alpha_t, ca_c, da, chord)
+        Lift = 0.5 * rho * (u*u+w*w) * Cl * (S_w-S_h)
+        Drag = 0.5 * rho * (u*u+w*w) * Cd * (S_w+S_h)
+        zforce = -Lift*math.cos(alpha_t) - Drag*math.sin(alpha_t) + W*math.cos(Theta)
+        if zforce.magnitude >0.:
+            alpha_min = alpha_t
+        else:
+            alpha_max = alpha_t
+        if abs(zforce.magnitude)<1.0:
+            trimming_alpha = False
+    print (Lift)
+    return alpha_t
 
 # import airfoil lookup tables
 data = pd.read_csv('aerodynamic_data_ms15.dat', ' ', header=None).values
@@ -64,9 +82,16 @@ data = pd.read_csv('aerodynamic_data_ms15.dat', ' ', header=None).values
 def lookup_data(alpha, ca_c, da, chord):
     # Looksup and interpolates Cl and Cd based on alpha, ca_c and da
     alpha = math.degrees(alpha)
-    indexda = abs(da)//5
     indexca_c = int(100*ca_c)-1
-    localdata = data[int(indexda*50*51+indexca_c*51):int(indexda*50*51+(indexca_c+1)*51),:]
+    if da % 5 ==0:
+        indexda = abs(da)//5
+        localdata = data[int(indexda*50*51+indexca_c*51):int(indexda*50*51+(indexca_c+1)*51),:]
+    else:
+        index1da = abs(da)//5
+        index2da = abs(da)//5 + 1
+        localdata1 = data[int(index1da*50*51+indexca_c*51):int(index1da*50*51+(indexca_c+1)*51),:]
+        localdata2 = data[int(index2da*50*51+indexca_c*51):int(index2da*50*51+(indexca_c+1)*51),:]
+        localdata = (localdata2 - localdata1)/5 * da
     non_zero_max = max(np.argwhere(localdata[:, 0]))[0]  # last non-zero row
     localdata = localdata[:non_zero_max+1,:]
     Cl_local = interpolate.interp1d(localdata[:,0], localdata[:,1], 'linear', fill_value='extrapolate')
@@ -127,7 +152,7 @@ sweep_LE = Geometry.Wing.Sweep_LE.magnitude*1
 
 cabin_width = Geometry.Fuselage.cabin_w + 0.1 * ureg.m  # import cabin width
 vt_width = t_c_v * c_r_v + 0.1 * ureg.m                 # import width of VT
-rho = IP.rho0                                           # import density
+rho = IP.rho0*ureg.kg/ureg.m**3                         # import density
 
 bloc_w = (b_w-cabin_width) / n_of_disc_w  # span of each station wing
 bloc_h = b_h / n_of_disc_h  # Span of each station HT
@@ -172,8 +197,10 @@ qdlst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 Fzlst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 tlst  = np.arange(0, t_end.magnitude, dt.magnitude)
 
-
+alpha_nose = trimming(V_inf,0.1,0,1)
+print ("Alpha_t:",alpha_nose)
 for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
+    
     disc_wing_w = np.zeros((len(kwlst)-1, 8))  # 2D array discretized wing
     disc_wing_h = np.zeros((len(khlst)-1, 6))  # 2D array discretized HT
     disc_wing_v = np.zeros((len(kvlst)-1, 6))  # 2D array discretized VT
@@ -207,6 +234,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
             alpha_i = alpha_i_new
         alpha = alpha_w - alpha_i
         downwash_angle = 2 * Cl / (math.pi * AR_w)
+
         Cl, Cd, Cm, xcp = lookup_data(alpha, ca_c, da_local,cc)
         Cdi = Cl * Cl / (math.pi * AR_w * e_w)
         Cd = Cd + Cdi
@@ -236,6 +264,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
         cc = local_chord(abs(y_i),c_r_h, c_t_h, half_b_h)
         Sloc = (c1 + c2) / 2 * (b2 - b1)
         alpha = alpha_nose + p*y_i/V_inf
+
         Cl, Cd, Cm, xcp = lookup_data(alpha, 0.2, de_local,cc)
         Cdi = Cl * Cl / (math.pi * AR_w * e_w)
         Cd = Cd + Cdi
@@ -319,7 +348,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
 
 # plt.plot(pmax[:,0],pmax[:,1])
 # plt.plot(tlst,plst)
-#plt.plot(tlst, Fzlst)
+plt.plot(tlst, Fzlst)
 #plt.show()
 
 
