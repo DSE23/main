@@ -272,7 +272,7 @@ def Shear_wb(zs, dL, dD, dM):
 
 
 def calc_qs0(Shear_wb, dL, zs, dD, dM):
-    n = 100
+    n = 101
     ds = Wing.HSpar1/n
     s1 = Shear_wb(zs, dL, dD, dM)[0]
     s2 = Shear_wb(zs, dL, dD, dM)[1]
