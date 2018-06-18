@@ -95,8 +95,8 @@ while flight_path_angle < Q_(" 45 deg "):
     D = C_d * 0.5 * rho * V**2 * S
     T = min(P * eta_prop / V, Tmax)
 
-    Fx = T - D - W * np.sin(flight_path_angle)
-    Fy = L - W * np.cos(flight_path_angle)
+    Fx = T *np.cos(flight_path_angle) - D - W * np.sin(flight_path_angle)
+    Fy = L - W * np.cos(flight_path_angle) + T *np.sin(flight_path_angle)
 
     V_dot = Fx / mass
     flight_path_angle_dot = Fy / (mass * V)
