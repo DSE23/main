@@ -235,7 +235,6 @@ def Shear_wb(zs, dL, dD, dM):
         s2 = np.append(s2, s)
         qs = s * Wing.get_xy_from_perim(s/Wing.length_chord(zs))[0]*Wing.length_chord(zs)*Wing.ThSkin*(-dL)/Inertia.Ixx_wb
         qs += s * Wing.get_xy_from_perim(s/Wing.length_chord(zs))[1]*Wing.length_chord(zs)*Wing.ThSkin*(-dD)/Inertia.Iyy_wb
-        qs += qtorque
         qs +=  section01at1
         qs2 = np.append(qs2, qs)
     section12at2 =  qs2[-1]
@@ -254,7 +253,6 @@ def Shear_wb(zs, dL, dD, dM):
         qs = -s**2*Wing.ThSpar2*(-dL)/Inertia.Ixx_wb
         qs += -s*Wing.ChSpar2*Wing.length_chord(zs)*Wing.ThSpar1*(-dD)/Inertia.Iyy_wb
         qs += section12at2
-        qs += qtorque
         qs3 = np.append(qs3, qs)
     qs1 *= ureg("N/m")
     qs2 *= ureg("N/m")
