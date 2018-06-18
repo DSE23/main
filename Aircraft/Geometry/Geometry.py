@@ -150,6 +150,7 @@ class CG(object):
     YCG_wing = Q_("0 m")
     CG_htail_mac = 0.5618
     CG_htail = H_tail.X_h + H_tail.MAC * CG_htail_mac   # H-tail cg relative to nose
+    X_htail = H_tail.X_h + H_tail.MAC * 0.25
     ZCG_htail = Q_("-0.094 m")
     YCG_vtail = Q_("0 m")
     CG_vtail_mac = 0.58799
