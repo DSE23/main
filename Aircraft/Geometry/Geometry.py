@@ -142,7 +142,7 @@ class CG(object):
     # Locations in here are referencd to the nose in x and the crankshaft of the
     # engine in z, unless stated otherwise, For Z downward == positive, for x
     # is to the tail positive
-    CG_wing_mac = 0.46385                   # CG location of wing as percentage of MAC
+    CG_wing_mac = 0.45                   # CG location of wing as percentage of MAC
     XLEMAC = Q_("1.24 m")               # LEMAC position
     CG_wing = CG_wing_mac*Wing.MAC + XLEMAC     # Wing CG position relative to nose
     X_wing = XLEMAC + 0.25 * Wing.MAC

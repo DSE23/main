@@ -19,7 +19,7 @@ slatwidth = Geometry.Wing.b  #width of the slats
 h = Q_('100 m') #altitude of flight
 Velocity = Q_(' 30 m/s') #aircraft velocity at which slats are deployed
 GMAC = Geometry.Wing.c_avg
-
+mass_sys = 20 #mass of slat system
 #%% Slat sizing for optimal max lift increase
 
 # optimization arrays:
@@ -100,6 +100,19 @@ slatarea = slatlength * slatwidth
 print('area',slatarea)
 P = 0.5 * density * Velocity**2 * slatarea #F = pressure times area
 print('Slat force required =', P)
+
+#suction peak calculation
+cp_file = np.genfromtxt('../Cp_slat.dat')
+cp_array = np.array([])
+for coor in np.arange(0,len(cp_file)):
+    if cp_file[coor,0] <= chordslat and cp_file[coor,1] > 0:
+        cp_array = np.append(cp_array, cp_file[coor,2])
+    
+cp_ave = np.average(cp_array)
+F = 0.5 * density * Velocity**2 * cp_ave * slatarea
+
+acc = F.magnitude / mass_sys
+time = m.sqrt(gapslat/-acc)
 
 
 #%% electric actuator size + stroke length
