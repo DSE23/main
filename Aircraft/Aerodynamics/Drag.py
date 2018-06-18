@@ -28,7 +28,7 @@ Rhtb = 1.05
 Rvtb= 1.05
 CL_trim = 0#lift coefficient needed to trim aircraft
 
-height = Q_('100 m') # height in m
+height = Q_('500 m') # height in m
 velocity = Q_('94  m/s') #velocity in m/s
 loc_max_tc_wing = 0 # 0 if t/c max is < 30%c, 1 if t/c max is >= 30%c
 loc_max_tc_ht = 0 # 0 if t/c max is < 30%c, 1 if t/c max is >= 30%c
