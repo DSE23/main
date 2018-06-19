@@ -207,29 +207,53 @@ def Calc_base_shear_flow(boom_areas):
 
 print(Calc_base_shear_flow(Get_boom_area(Q_("1000 mm**2"))))
 
-s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs61L, qs12D, qs23D, qs35D, qs56D, qs61D  = Calc_base_shear_flow(Get_boom_area(AreaClamps/2))
+s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs61L, qs12D, qs23D, qs35D, qs56D, qs61D  = Calc_base_shear_flow(Get_boom_area(Wing.AreaClamps/2))
 
 
 def Calculate_correcting_shear_flow(qs0):      #Tobias 
+    n = 100
     qs0denom = Wing.HSpar1/Wing.ThSpar1
     qs0denom += 2*Wing.length_Skin_x_c/Wing.ThSkin
     qs0denom += Wing.HSpar2/Wing.ThSpar2
     qs0nomL = 0
     qs0nomD = 0
-    for i in range(101):
-        ds = s1[1]-s[0]
-        qs0nomL += qs12L/Wing.ThSpar1*ds
-        qs0nomD += qs12D/Wing.ThSpar1*ds
+    for i in range(n+1):
+        ds = s1[1]-s1[0]
+        qs0nomL += qs12L[i]/Wing.ThSpar1*ds
+        qs0nomD += qs12D[i]/Wing.ThSpar1*ds
+        ds = s2[1]-s2[0]
+        qs0nomL += qs23L[i]/Wing.ThSkin*ds
+        qs0nomD += qs23D[i]/Wing.ThSkin*ds
+        ds = s3[1]-s3[0]
+        qs0nomL += qs35L[i]/Wing.ThSpar2*ds
+        qs0nomD += qs35D[i]/Wing.ThSpar2*ds
+        ds = s4[1]-s4[0]
+        qs0nomL += qs56L[i]/Wing.ThSkin*ds
+        qs0nomD += qs56D[i]/Wing.ThSkin*ds
+        ds = s5[1]-s5[0]
+        qs0nomL += qs61L[i]/Wing.ThSpar1*ds
+        qs0nomD += qs61D[i]/Wing.ThSpar1*ds
     qs0L = -qs0nomL/qs0denom
     qs0D = -qs0nomD/qs0denom
     return qs0L, qs0D
 
 # Add correcting shear flow to base shear flows
+def Correcting_shearflow_array(qs0L, qs0D):
+    n = 100
+    qs0_L = np.array([])
+    qs0_D = np.array([])
+    for _ in range(n+1):
+        qs0_L = np.append(qs0_L, qs0L)
+        qs0_D = np.append(qs0_D, qs0D)
+    return qs0_L, qs0_D
     
 # Add Moment shear flow to base shear flows
-
-
-
+def Moment_shearflow:
+    qmoment = WingStress.M/(2*Wing.Area_cell())
+    q_moment = np.array([])
+    for _ in range(n+1):
+        q_moment = np.append(q_moment, qmoment)
+    return q_moment
 # Compute moments around a.c. caused by shear forces due to shear flows
 
 # Calculate shear center location   #Tobias
