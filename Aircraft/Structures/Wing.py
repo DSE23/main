@@ -327,7 +327,7 @@ def length_Skin_x_c(Spar1, Spar2):                            #Input deminsionle
     x = Spar1
     Areaxc = 0
     arclength = 0
-    for i in range(n):
+    for _ in range(n):
         x = x + dx
         dxlength = dx * Chordlength
         dylength = abs(airfoilordinate(x - dx) - airfoilordinate(x)) * Chordlength
@@ -348,7 +348,7 @@ def Area_cell():
         area_cell = area_cell*2
     return area_cell
 
-
+skin_length = length_Skin_x_c(ChSpar1, ChSpar2) # skin length of top part of airfoil (dimensionless)
 
 x_y_angle_coords, perim_spacing = get_coord_from_perim(N_stringers/2, ChSpar1, ChSpar2, Chordlength)
 X_cen_strs, A_stringer_x_c = stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str)
@@ -365,5 +365,5 @@ centroidstringer= A_stringer_x_c/AreaStringers
 centroid = (Area_x_c/Area)/Chordlength
 centroidlength = Area_x_c/Area
 
-# print(centroid)
+print(centroid)
 # print(ChSpar1)
