@@ -36,12 +36,11 @@ for coordinate in airfoil_co[:,0]:
         if x_new < c_flap:
             airfoil_co[counter,0] = x_new
             airfoil_co[counter,1] = y_new
+            
         elif x_new >= c_flap:
             print ('do something')
-            np.delete(airfoil_co,( counter), axis = 0)
-            np.delete(airfoil_co, (counter), axis = 1)
+            airfoil_co = np.delete(airfoil_co,( counter), axis = 0)
+            #np.delete(airfoil_co, (counter), axis = 1)
+            counter =  counter - 1
     counter = counter + 1
-        
-        
-        
 np.savetxt('Verification.dat',airfoil_co)

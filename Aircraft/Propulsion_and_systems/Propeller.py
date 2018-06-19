@@ -12,13 +12,13 @@ from Misc import ureg, Q_
 # Imports the unit registry from the Misc folder
 
 import numpy as np
-
+from Geometry import Geometry
 
 # Returns the propeller efficiency, thrust and pitch at the hub for the maximum power value, for a given airspeed inbetween 15m/s and 200m/s.
 
 def Thrustcalc(V0):
     #Required values
-    D = 1.9                             #Diameter of the propeller
+    D = Geometry.Prop.Diameter.magnitude          #Diameter of the propeller
     R = D/2                             #Radius of the propeller
     Rhub = 0.20                         #Radius of the hub. Optimal at 0.31
     Elements = 10                     #Number of elements on the blade
@@ -31,6 +31,7 @@ def Thrustcalc(V0):
 
     running = True
     Thrustlst = []
+    Torquelist = []
     efflist = []
     BetaHublst = []
     Rvel = []
@@ -113,6 +114,7 @@ def Thrustcalc(V0):
             Final = [efflist[-1],Thrustlst[-1],i,w,Alphai,VR[-Elements:-1]]
         efflist.append(etaP)
         Thrustlst.append(Thrust)
+        Torquelist.append(Torque)
         Rvel.append(VR)
     return Final
 
@@ -152,22 +154,27 @@ def initialise_propxcg(inp):
     xcg = inp
 
 
-def initialise_propinertia(inp):
-    global ixg
-    ixg = inp
+def initialise_propinertia_y(inp):
+    global iyg
+    iyg = inp
+
+
+def initialise_propinertia_y(inp):
+    global iyg
+    iyg = inp
 
 
 # End defining global variables
 
 # Start assigning values to variables
 # Propeller mass
-mass = Q_("30 kg")  # Based on MT-propeller (4-bladed)
 
 # CG
-xcg = Q_("-20 cm")  # DUMMY VALUE, NOT KNOWN YET, negative because in front of datum
 
-# Mass moment of inertia
+
+# Mass moments of inertia
 ixg = Q_("0.9 kg * m**2")  # Based on slightly different propeller
+izg = Q_("0.2 kg * m**2")  # DUMMY
 
 #Propeller Diameter
 D_prop = Q_("1.90 m")
