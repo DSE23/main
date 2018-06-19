@@ -10,8 +10,16 @@ from Misc import ureg, Q_ # Imports the unit registry from the Misc folder
 from Structures import WingStress
 from Structures import Wing
 import numpy as np
-# Calculate Boom Area's
+
+# Calculate Boom Area's [Midas]
+# Units checked and correct
 def get_boom_area(A_spar_caps):
+    """
+    This function calculates the boom area's needed for the structural idealization
+    It assumes the wingbox is loaded in bending.
+    :param A_spar_caps: Spar cap area's [Expected With Unit]
+    :return: Boom area array with dimension.
+    """
     x_coords = Wing.x_y_angle_coords[0]
     y_coords = Wing.x_y_angle_coords[1]
     n_str = len(x_coords)
