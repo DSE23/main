@@ -82,7 +82,7 @@ class H_tail(object):
     S_e = Q_("1.3145 m**2")                # Elevator area
     c_e = Q_("0.50829 m")               # Elevator chord
     delta_e = Q_("30 deg")     # Max elevator deflection
-    X_h = Q_("5.27 m")                  # [m] 0.25C location compared to the nose
+    X_h = Q_("5.27 m")                  # [m] LE location compared to the nose
     Z_h = Q_("0.55 m")                  # [m] Distance MAC_h and zero lift line wing
     i_h = Q_("0 rad")                   #incidence angle ht
     Sweep_LE = (np.arctan(np.tan((Sweep_25))-(4/A) *
@@ -155,7 +155,7 @@ class CG(object):
     YCG_wing = Q_("0 m")
     CG_htail_mac = 0.5618
     CG_htail = H_tail.X_h + H_tail.MAC * CG_htail_mac   # H-tail cg relative to nose
-    X_htail = H_tail.X_h + H_tail.MAC * 0.25
+    X_htail = H_tail.X_h + H_tail.MAC * 0.25            # 0.25c location of H_tail
     ZCG_htail = Q_("-0.094 m")
     YCG_vtail = Q_("0 m")
     CG_vtail_mac = 0.58799
