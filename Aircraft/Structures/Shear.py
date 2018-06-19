@@ -39,7 +39,7 @@ def get_boom_area(A_spar_caps):
 
     return B_area*ureg("m**2")
 # UNCOMMENT TO TEST GET BOOM AREA FUNCTION:
-# print(get_boom_area(Q_("1000 mm**2")))
+#print(get_boom_area(Q_("1000 mm**2")))
 
 # Calculate base shear flow for every section of the wing box
 
