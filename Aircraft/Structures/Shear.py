@@ -68,24 +68,36 @@ def calc_corr_shearflow():
 # Compute moments around a.c. caused by shear forces due to shear flows
 
 # Calculate shear center location   #Tobias
+#units checked and correct
 def Shear_center(moment_shear):
     shear_center = moment_shear/WingStress.L
     return shear_center
 
+<<<<<<< HEAD
+# Calculate Torque                 #Tobias
+#units checked and correct
+=======
 print(Shear_center(Q_("200000 N*m")))
 
 # Calculate Torque                 #Tobias
+>>>>>>> f6697f6db4f9374a98d765021d2e0e84c65a8263
 def Torque_for_twist(shear_center):
     T = WingStress.M + WingStress.L * shear_center
     return T
 
+
 # Calculate Rate of Twist          #Tobias
+#units checked and correct
 def Rate_of_twist(T):
-    constant = T/(4*Wing.Area_cell()*WingStress.shear_modulus)
+    constant = T/(4*Wing.Area_cell()**2*WingStress.shear_modulus)
     integral = Wing.HSpar1/Wing.ThSpar1
-    integral += 2*Wing.length_Skin_x_c/Wing.ThSkin
+    integral += 2*Wing.length_Skin_x_c(Wing.ChSpar1, Wing.ChSpar2)/Wing.ThSkin
     integral += Wing.HSpar2/Wing.ThSpar2
     dthetadz = constant/integral
     return dthetadz
 
+<<<<<<< HEAD
+    
+=======
+>>>>>>> f6697f6db4f9374a98d765021d2e0e84c65a8263
 # Calculate shear stress
