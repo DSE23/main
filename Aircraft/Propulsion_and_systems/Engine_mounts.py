@@ -87,15 +87,15 @@ gravity = Q_("9.80665 m/s**2")
 roll_acc = Q_("1 rad/s**2")  # DUMMY
 
 # Determine max engine vertical force (in Newtons)
-f_y_eng = Engine.mass * gravity * loadfactor
+f_y_eng = -Engine.mass * gravity * loadfactor
 f_y_eng.ito(ureg.newton)
 
 # Determine max prop vertical force (in Newtons)
-f_y_prop = Geometry.Prop.mass * gravity * loadfactor
+f_y_prop = -Geometry.Prop.mass * gravity * loadfactor
 f_y_prop.ito(ureg.newton)
 
 # Determine max mount vertical force (in Newtons)
-f_y_mount = mass * gravity * loadfactor
+f_y_mount = -mass * gravity * loadfactor
 f_y_mount.ito(ureg.newton)
 
 # Determine reaction forces
@@ -104,15 +104,15 @@ r_y_total = f_y_prop + f_y_eng + f_y_mount
 
 # Gyro moment due to pitch rate
 # Pitch rate
-pitch_rate = Q_("60 deg/s")
+pitch_rate = Q_("60 deg/s")  # From Midas' calculation for 10G pull up
 # Call to Gyro file
-m_y_gyro = Gyro_effects.input_acceleration(0, 0, 0, pitch_rate)[0]
+m_y_gyro = Gyro_effects.input_acceleration(0, 0, 0, -pitch_rate)[0]
 
 # Moments
 # Component moments about axis parallel to Z-axis in firewall
-m_z_eng = f_y_eng * (Firewall.xcg - Engine.xcg)
-m_z_prop = f_y_prop * (Firewall.xcg - Geometry.CG.CG_prop)
-m_z_mount = f_y_mount * (Firewall.xcg - xcg)
+m_z_eng = f_y_eng * (Engine.xcg - Firewall.xcg)
+m_z_prop = f_y_prop * (Geometry.CG.CG_prop - Firewall.xcg)
+m_z_mount = f_y_mount * (xcg - Firewall.xcg)
 
 
 # Reaction forces and moments for Boris
