@@ -168,7 +168,7 @@ AreaSpar2xc = AreaSpar2 * ChSpar2 * Chordlength
 #For the clamps
 AreaClampsxc = AreaClamps * ChSpar1 * Chordlength
 
-def get_xy_from_perim(perim_val, start_x=0, dat_file_name="../Airfoil.dat"):
+def get_xy_from_perim(perim_val, start_x=0, reverse=False):
     """
         NOTE: Special function for Tobias
         This function returns the x and y coordinates for a given perimeter
@@ -192,16 +192,29 @@ def get_xy_from_perim(perim_val, start_x=0, dat_file_name="../Airfoil.dat"):
     perim = 0  # Set initial perimiter size to 0
     step = 0.001  # Step size for algorithm: increase will lead to faster computing times
     min_val = 10
-    for x_c in np.arange(start_x, 1, step):
-        perim += np.sqrt((step) ** 2 + (airfoilordinate(x_c + step) - airfoilordinate(x_c)) ** 2)
-        if abs(perim - perim_val) < min_val:
-            x_coord = 0.5 * (x_c + x_c + step)
-            y_coord = 0.5 * (airfoilordinate(x_c) + airfoilordinate(x_c + step))
-            min_val = abs(perim - perim_val)
-        else:
-            break
+    if reverse == False:
+        for x_c in np.arange(start_x, 1, step):
+            perim += np.sqrt((step) ** 2 + (airfoilordinate(x_c + step) - airfoilordinate(x_c)) ** 2)
+            if abs(perim - perim_val) < min_val:
+                x_coord = 0.5 * (x_c + x_c + step)
+                y_coord = 0.5 * (airfoilordinate(x_c) + airfoilordinate(x_c + step))
+                min_val = abs(perim - perim_val)
+            else:
+                break
 
-    return(x_coord, y_coord)
+        return(x_coord, y_coord)
+    else:
+        step *= -1
+        for x_c in np.arange(start_x, 0, step):
+            perim += np.sqrt((step) ** 2 + (airfoilordinate(x_c + step) - airfoilordinate(x_c)) ** 2)
+            if abs(perim - perim_val) < min_val:
+                x_coord = 0.5 * (x_c + x_c + step)
+                y_coord = 0.5 * (airfoilordinate(x_c) + airfoilordinate(x_c + step))
+                min_val = abs(perim - perim_val)
+            else:
+                break
+
+        return (x_coord, -y_coord)
 
 def get_perim_from_x(x_coor, dat_file_name="../Airfoil.dat"):
     """
@@ -277,7 +290,7 @@ def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../Airfoi
             i += 1
 
     # print(perim)
-    a_ran = np.arange(0, 1, 0.0001)
+    #a_ran = np.arange(0, 1, 0.0001)
     #plt.plot([start_x, start_x], [0, p(start_x)], 'b')
     #plt.plot([end_x, end_x], [0, p(end_x)], 'b')
     #plt.plot(x_coords, y_coords, '+')
@@ -285,7 +298,7 @@ def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../Airfoi
     #plt.plot(final_x_coords, final_y_coords, 'go')
     #plt.axis((0, 1, 0, 1))
     #plt.show()
-    return (final_x_coords*chord_l, final_y_coords*chord_l, final_angles)
+    return (final_x_coords*chord_l, final_y_coords*chord_l, final_angles), perim_spacing*chord_l
 
 def stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str):
 
@@ -327,7 +340,7 @@ def length_Skin_x_c(Spar1, Spar2):                            #Input deminsionle
     x = Spar1
     Areaxc = 0
     arclength = 0
-    for i in range(n):
+    for _ in range(n):
         x = x + dx
         dxlength = dx * Chordlength
         dylength = abs(airfoilordinate(x - dx) - airfoilordinate(x)) * Chordlength
@@ -348,9 +361,9 @@ def Area_cell():
         area_cell = area_cell*2
     return area_cell
 
+skin_length = length_Skin_x_c(ChSpar1, ChSpar2) # skin length of top part of airfoil (dimensionless)
 
-
-x_y_angle_coords = get_coord_from_perim(N_stringers/2, ChSpar1, ChSpar2, Chordlength)
+x_y_angle_coords, perim_spacing = get_coord_from_perim(N_stringers/2, ChSpar1, ChSpar2, Chordlength)
 X_cen_strs, A_stringer_x_c = stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str)
 Area_x_c = AreaSpar1xc + AreaSpar2xc + Area_Skin_x_c(ChSpar1, ChSpar2) + A_stringer_x_c + AreaClampsxc
 Area = AreaSpar1 + AreaSpar2 + Area_Skin(ChSpar1, ChSpar2)+ AreaStringers + AreaClamps
@@ -365,5 +378,5 @@ centroidstringer= A_stringer_x_c/AreaStringers
 centroid = (Area_x_c/Area)/Chordlength
 centroidlength = Area_x_c/Area
 
-# print(centroid)
+print(centroid)
 # print(ChSpar1)

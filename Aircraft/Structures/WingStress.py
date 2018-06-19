@@ -145,15 +145,10 @@ def computeloads(z):
 
     L_moment = L_moment * fac_20G
     D_moment = D_moment * fac_20G
+
     L = L * fac_20G
     D = D * fac_20G
     M = M * fac_20G
-
-    L *= Q_('kg * m / s**2')
-    D *= Q_('kg * m / s**2')
-    M *= Q_('kg * m ** 2 / s**2')
-    L_moment *= Q_('kg * m ** 2 / s**2')
-    D_moment *= Q_('kg * m ** 2 / s**2')
 
     return L, D, M, L_moment, D_moment, dL, dD, dM
 
