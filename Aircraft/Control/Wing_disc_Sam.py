@@ -84,6 +84,10 @@ Z_v = Geometry.V_tail.Z_v
 xcg    = Geometry.CG.CG_mtow
 xlemac = Geometry.CG.XLEMAC
 MAC = Geometry.Wing.MAC
+MAC_htail = Geometry.H_tail.MAC
+X_h = Geometry.CG.X_htail
+X_w = Geometry.CG.X_wing
+
 sweep_LE = Geometry.Wing.Sweep_LE.magnitude*1
 
 cabin_width = Geometry.Fuselage.cabin_w + 0.1 * ureg.m  # import cabin width
@@ -104,56 +108,37 @@ V_a = Performance.V_a_clean                  # manoeuvring speed
 def local_chord(z, c_r, c_t, half_b):
     # Calculates the chord at location z(distance from center)
     return c_r - (c_r - c_t) / half_b * z
-def trimming(u,ca_c, ce_c, da):
+def trimming(u,ca_c, ce_c):
     # Jurians dclde
     Cl1, Cdhde, Cmhde, Xcphde =  (lookup_data(0.,ce_c,0))                   # Change to H_tail
     Cl2, Cd2hde, Cm2hde, Xcp2hde =  (lookup_data(0.,ce_c,lin_ran_alpha))       #       ""    
     dCl_de = (Cl2-Cl1)/(lin_ran_alpha)                          # Elevator effectiveness
     dCd_de = (Cd2hde-Cdhde)/lin_ran_alpha
     dCm_de = (Cm2hde-Cmhde)/lin_ran_alpha
-    Cla1w, Cda1w, Cma1w, Xcpa1w = (lookup_data(0., ca_c, 0, chord))[0]                 
-    Cla2w, Cda2w, Cma2w, Xcpa2w = (lookup_data(lin_ran_alpha, ca_c, 0))[0]
-    dCl_alpha_w = (Cla2w-Cla1w)/lin_ran_alpha     # Cl alpha calculation of Wing
-    dCd_alpha_w = (Cda2w-Cda1w)/lin_ran_alpha     # Cd alpha calc of wing
-    dCm_alpha_w = (Cma2w - Cma1w)/lin_ran_alpha   # Cm alpha calc of wing
-    Cla1hm, Cda1h, Cma1h, Xcpa1h = (lookup_data(0., ce_c, 0, chord))[0]                 
-    Cla2h, Cda2h, Cma2h, Xcpa2h = (lookup_data(lin_ran_alpha, ce_c, 0))[0]
-    dCl_alpha_h = (Cla2h - Cla1h)/lin_ran_alpha     # Cl alpha calc. of H_tail
-    dCd_alpha_h = (Cda2h - Cda1h)/lin_ran_alpha     # Cd alpha calc. of H_tail
-    dCm_alpha_h = (Cma2h - Cma1h)/lin_ran_alpha     # Cm alpha calc. of H_tail
-    q_Sw = S_w * 0.5 * rho * (u**2 + w**2)          # Dynamic press. times Wing surface
-    q_Sh = S_h * 0.5 * rho * (u**2 + w**2)          # Dyn. press. times H_tail surface
-    
-    trim_mat = np.matrix([[q_Sw*(Cda1h-dCl_alpha_w)+q_Sh*(Cdhde-dCl_alpha_h),
-                           -q_Sh*dCl_de],
-                        []])
-    
-    trimming_alpha = True
-    alpha_min = m.radians(-15)
-    alpha_max = m.radians(15)
-    while trimming_alpha:
-        alpha_t = (alpha_min+alpha_max)/2.
-        
-
-        w = u * m.tan(alpha_t)
-        Cl_w,Cd_w,Cm_w,xcp_w = lookup_data(alpha_t, ca_c, da, chord)
-        Cl_h,Cd_h,Cm_h,xcp_h = lookup_data(alpha_t, ce_c, de, chord)
-        Lift_w = 0.5 * rho * (u*u+w*w) * Cl_w * S_w
-        Lift_h = 0.5 * rho * (u*u+w*w) * Cl_h * S_h
-        Drag_w = 0.5 * rho * (u*u+w*w) * Cd_w * S_w
-        Drag_h = 0.5 * rho * (u*u+w*w) * Cd_h * S_h
-        Lift = Lift_w + Lift_h
-        Drag = Drag_w + Drag_h
-        zforce = -Lift*m.cos(alpha_t) - Drag*m.sin(alpha_t) + W*m.cos(Theta)
-
-        if zforce.magnitude >0.:
-            alpha_min = alpha_t
-        else:
-            alpha_max = alpha_t
-        if abs(zforce.magnitude)<1.0:
-            trimming_alpha = False
-    print (Lift)
-    return alpha_t
+    Cla1w, Cda1w, Cma1w, Xcpa1w = (lookup_data(0., ca_c, 0))                 
+    Cla2w, Cda2w, Cma2w, Xcpa2w = (lookup_data(lin_ran_alpha, ca_c, 0))
+    dCl_alpha_w = (Cla2w-Cla1w)/m.radians(lin_ran_alpha)     # Cl alpha calculation of Wing
+    dCd_alpha_w = (Cda2w-Cda1w)/m.radians(lin_ran_alpha)     # Cd alpha calc of wing
+    dCm_alpha_w = (Cma2w - Cma1w)/m.radians(lin_ran_alpha)   # Cm alpha calc of wing
+    Cla1h, Cda1h, Cma1h, Xcpa1h = (lookup_data(0., ce_c, 0))                 
+    Cla2h, Cda2h, Cma2h, Xcpa2h = (lookup_data(lin_ran_alpha, ce_c, 0))
+    dCl_alpha_h = (Cla2h - Cla1h)/m.radians(lin_ran_alpha)     # Cl alpha calc. of H_tail
+    dCd_alpha_h = (Cda2h - Cda1h)/m.radians(lin_ran_alpha)     # Cd alpha calc. of H_tail
+    dCm_alpha_h = (Cma2h - Cma1h)/m.radians(lin_ran_alpha)     # Cm alpha calc. of H_tail
+    q_Sw = S_w * 0.5 * rho * (u**2)          # Dynamic press. times Wing surface
+    q_Sh = S_h * 0.5 * rho * (u**2)          # Dyn. press. times H_tail surface
+    l_w = X_w - xcg                                 # Wing arm
+    l_h = X_h - xcg                                 # Tail arm
+    trim_mat = np.matrix([[(q_Sw*(Cda1w-dCl_alpha_w)+q_Sh*(Cdhde-dCl_alpha_h)).magnitude,
+                         (-q_Sh*dCl_de).magnitude],
+                        [(q_Sw*((Cda1w-dCl_alpha_w)*l_w+dCm_alpha_w*MAC)+q_Sh*((Cda1h-dCl_alpha_h)*l_h+dCm_alpha_h*MAC_htail)).magnitude,
+                         (q_Sh*(dCm_de*MAC_htail - dCl_de*l_h)).magnitude]])
+    trim_mat2 = np.matrix([[(-mtow.magnitude*np.cos(theta))],
+                          [0]])
+    trim_cond = np.linalg.solve(trim_mat, trim_mat2)
+    alpha_t = m.degrees(trim_cond[0])
+    de_t = trim_cond[1]
+    return alpha_t, de_t
 
 # import airfoil lookup tables
 data = pd.read_csv('aerodynamic_data_ms15.dat', ' ', header=None).values
@@ -170,7 +155,7 @@ def lookup_data(alpha, ca_c, da):
         index2da = abs(da)//5 + 1
         localdata1 = data[int(index1da*50*51+indexca_c*51):int(index1da*50*51+(indexca_c+1)*51),:]
         localdata2 = data[int(index2da*50*51+indexca_c*51):int(index2da*50*51+(indexca_c+1)*51),:]
-        localdata = (localdata2 - localdata1)/5 * da
+        localdata = (localdata2 - localdata1)/5 *abs(da)
     non_zero_max = max(np.argwhere(localdata[:, 0]))[0]  # last non-zero row
     localdata = localdata[:non_zero_max+1,:]
     Cl_local = interpolate.interp1d(localdata[:,0], localdata[:,1], 'linear', fill_value='extrapolate')
