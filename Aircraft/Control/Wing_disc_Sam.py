@@ -24,7 +24,6 @@ import numpy as np
 import scipy.interpolate as interpolate
 import matplotlib.pyplot as plt
 import math as m
-import pandas as pd
 import time
 t0 = time.time()
 
@@ -218,6 +217,7 @@ tlst  = np.arange(0, t_end.magnitude, dt.magnitude)
 
 #alpha_nose = trimming(V_inf,0.1,0,1)
 print ("Alpha_t:",alpha_nose)
+
 for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     
     disc_wing_w = np.zeros((len(kwlst)-1, 9))  # 2D array discretized wing
@@ -375,8 +375,6 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     Fx = T - m.cos(beta_nose)*(Sum_Dw + Sum_Dh + D_fus_gear) - W*m.sin(Theta)
     Fy = Sideforce*m.cos(beta_nose) - m.sin(beta_nose)*(Sum_Dw + Sum_Dh + D_fus_gear) + W*m.sin(Theta)
     Fz = - Sum_Lw - Sum_Lh + W*m.cos(Phi)
-
-    
     u_dot = Fx/(mtow)
     u += u_dot*dt
     w_dot = Fz/(mtow)

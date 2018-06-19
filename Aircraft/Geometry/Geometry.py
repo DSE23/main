@@ -20,7 +20,7 @@ import numpy as np
 from Structures import StrucVal
 from Propulsion_and_systems import Firewall
 from Propulsion_and_systems import Engine
-from Propulsion_and_systems import Propeller
+#from Propulsion_and_systems import Propeller
 
 class Wing(object):
     
@@ -51,6 +51,10 @@ class Wing(object):
     c_a = Q_('0.3828 m')                # Aileron chord
     delta_a = Q_("30 deg")     # max aileron deflection
     delta_CL_max_a = 0.8267     # Max lift coeff difference due to aileron deflection
+              
+class Prop(object):
+    Diameter = Q_('1.9 m')
+    mass = Q_("30 kg")                   # Based on MT-propeller (4-bladed)
 
 class Fuselage(object):
     
@@ -63,6 +67,7 @@ class Fuselage(object):
     S_wet_f= Q_("14.94 m**2")              # [m^2] Fuselage wetted area
     cabin_w = Q_("0.6 m")               # [m] cabin width (inside)
     A_max_canopy = Q_(" m**2")          # [m^2], coming from catia
+
 class H_tail(object):
     
     S = Q_("2.629 m**2")                 # [m^2] Horizontal tail surface
@@ -105,7 +110,7 @@ class V_tail(object):
     
 class Landing_gear(object):
     Prop_clear_req = Q_("0.23 m")                   # Required prop clearance CS23
-    Prop_length = Propeller.D_prop/2
+    Prop_length = Prop.Diameter/2
     Z_mainlg = Prop_clear_req + Prop_length       # [m] Z_location bottom main L_G
     Tip_angle = Q_("12 deg")                        # Should be between 10 and 15
     X_mainlg = Firewall.xcg
@@ -122,7 +127,7 @@ class Masses(object):                    # !!!Structures should watch this!!!
     W_fus = Q_("82 kg")                  # [kg] Mass of Fuselage
     W_gear = Q_("58 kg")                 # [kg] Mass of landing gear
     W_engine = Engine.mass               # [kg] Mass of engine
-    W_prop = Propeller.mass              # [kg] Mass of propellor
+    W_prop = Prop.mass                   # [kg] Mass of propellor
     W_fuelsys = Q_("10 kg")              # [kg] Mass of fuel system
     W_hydraulic = Q_("1 kg")             # [kg] Mass of hydraulics
     W_flightcontrol = Q_("20 kg")        # [kg] Mass of flight control
@@ -164,7 +169,7 @@ class CG(object):
     CG_lgear = 0.23 * Fuselage.l_f             # CG LG relative to nose !!!update!!!
     ZCG_lgear = Q_("0.69 m")
     CG_engine = Engine.xcg                     # CG of the engine relative to nose
-    CG_prop = Propeller.xcg                    # CG propellor !!!update!!! 
+    CG_prop = Q_("-20 cm")  # DUMMY VALUE, NOT KNOWN YET, negative because in front of datum
     ZCG_prop = Q_("0 m")
     ZCG_engine = Engine.zcg
     CG_fuelsys = Q_("1.18 m")                  # CG fuel system !!!update!!!
@@ -207,6 +212,3 @@ class CG(object):
                 (Masses.W_OEW+ Masses.W_pilot)
     ZCG_mtow = (ZCG_wpilot*(Masses.W_OEW+ Masses.W_pilot)+ZCG_fuel * Masses.W_fuel)\
               /(Masses.W_MTOW)
-              
-class Prop(object):
-    Diameter = Q_('1.9 m')

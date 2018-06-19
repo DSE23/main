@@ -22,6 +22,7 @@ from Performance import Performance
 import matplotlib.pyplot as plt
 import time
 
+
 cl, cd, cm = AWing.computeloads()           #Load aerodynamic properties
 n = 10                      #number of the devided sections
 b = Wing.s         #Wing span
@@ -104,7 +105,7 @@ def computeloads(z):
         dL *= Q_('kg * m / s**2')
         dD *= Q_('kg * m / s**2')
         dM *= Q_('kg * m**2 / s**2')
-        
+
         if zs < Geometry.Fuselage.b_f*0:
             dL = 0
             dD = 0
@@ -381,7 +382,7 @@ def Torsion(dM, dL, shearcentre_x, zs):
 print("twist", Torsion(dM, dL, shearcentre_x,zs))
 
 #Final shear flow
-    
+
 def Shear_stress_wb(zs, dL, dD, dM):
     n = 100
     s1 = calc_qs0[0]
@@ -402,7 +403,7 @@ def Shear_stress_wb(zs, dL, dD, dM):
     for i in range(n):
         tauinrange2 = qs2[i]/Wing.ThSkin
         tau2 = np.append(tau2, tauinrange2)
-        
+
     #section23
     for i in range(n):
         tauinrange3 = qs3[i]/Wing.ThSpar2
