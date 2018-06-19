@@ -212,7 +212,7 @@ def Shear_wb(zs, dL, dD, dM):
     #section 01
     qtorque = dM/(2*Wing.Area_cell())
     n = 100
-    ds = Wing.HSpar1/n
+    ds = Wing.HSpar1/(2*n)
     qs1 = np.array([])
     s1 = np.array([])
     qs1 = np.append(qs1, 0)
@@ -249,12 +249,12 @@ def Shear_wb(zs, dL, dD, dM):
     section12at2 *= Q_("N/m")
     #section23
     n = 100
-    ds = Wing.HSpar2/n
+    ds = Wing.HSpar2/(2*n)
     qs3 = np.array([])
     s3 = np.array([])
     qs3 = np.append(qs3, section12at2)
     s3 = np.append(s3, 0)
-    y = Wing.HSpar2
+    y = Wing.HSpar2/2
     s = Q_("0 m")
     for i in range(n):
         y = y - ds
@@ -283,7 +283,7 @@ def Shear_wb(zs, dL, dD, dM):
 
 def calc_qs0(Shear_wb, dL, zs, dD, dM):
     n = 101
-    ds = Wing.HSpar1/n
+    ds = Wing.HSpar1/(2*n)
     s1, s2, s3, qs1, qs2, qs3 = Shear_wb(zs, dL, dD, dM)
     qs0nom = 0
     for i in range(n):
@@ -291,10 +291,10 @@ def calc_qs0(Shear_wb, dL, zs, dD, dM):
     ds = (Wing.length_Skin_x_c(Wing.ChSpar1, Wing.ChSpar2)/n)
     for i in range(n):
         qs0nom += qs2[i]* ds / Wing.ThSkin
-    ds = Wing.HSpar2/n
+    ds = Wing.HSpar2/(2*n)
     for i in range(n):
         qs0nom += qs3[i]* ds / Wing.ThSpar2
-    qs0denom = Wing.HSpar1/Wing.ThSpar1 + Wing.HSpar2/Wing.ThSpar2 + Wing.length_Skin_x_c(Wing.ChSpar1, Wing.ChSpar2)/Wing.ThSkin
+    qs0denom = Wing.HSpar1/(2*Wing.ThSpar1) + Wing.HSpar2/(2*Wing.ThSpar2) + Wing.length_Skin_x_c(Wing.ChSpar1, Wing.ChSpar2)/Wing.ThSkin
     qs0 =  - qs0nom/qs0denom
     for i in range(n):
         qs1[i] += qs0
@@ -373,8 +373,8 @@ def Torsion(dM, dL, shearcentre_x, zs):
     const_tor = T/(4*A_cell**2*shear_modulus) #constant term in twist formula
     print("0", const_tor)
     line_int_tor = 2*Wing.length_Skin_x_c(Wing.ChSpar1, Wing.ChSpar2)*Wing.length_chord(zs)/Wing.ThSkin
-    line_int_tor += Wing.HSpar1*Wing.length_chord(zs)/Wing.ThSpar1
-    line_int_tor += Wing.HSpar2*Wing.length_chord(zs)/Wing.ThSpar2 #result from line integral from torsion formula
+    line_int_tor += Wing.HSpar1*Wing.length_chord(zs)/(2*Wing.ThSpar1)
+    line_int_tor += Wing.HSpar2*Wing.length_chord(zs)/(2*Wing.ThSpar2) #result from line integral from torsion formula
     twist_wb_tor_per_m  = const_tor*line_int_tor
     return twist_wb_tor_per_m
 
