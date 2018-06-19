@@ -152,9 +152,14 @@ def initialise_propxcg(inp):
     xcg = inp
 
 
-def initialise_propinertia(inp):
-    global ixg
-    ixg = inp
+def initialise_propinertia_y(inp):
+    global iyg
+    iyg = inp
+
+
+def initialise_propinertia_y(inp):
+    global iyg
+    iyg = inp
 
 
 # End defining global variables
@@ -165,8 +170,9 @@ def initialise_propinertia(inp):
 # CG
 
 
-# Mass moment of inertia
+# Mass moments of inertia
 ixg = Q_("0.9 kg * m**2")  # Based on slightly different propeller
+izg = Q_("0.2 kg * m**2")  # DUMMY
 
 #Propeller Diameter
 D_prop = Q_("1.90 m")

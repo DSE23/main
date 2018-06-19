@@ -99,7 +99,7 @@ f_y_mount.ito(ureg.newton)
 
 # Determine reaction forces
 # Sum of forces in y-direction, r_y is engine mount reaction force
-r_y_total = f_y_prop+f_y_eng
+r_y_total = f_y_prop + f_y_eng + f_y_mount
 
 # Moments
 # Component moments about axis parallel to Z-axis through bottom engine mount
