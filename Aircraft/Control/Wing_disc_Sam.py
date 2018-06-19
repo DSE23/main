@@ -23,10 +23,13 @@ from Performance import Performance
 import numpy as np
 import scipy.interpolate as interpolate
 import matplotlib.pyplot as plt
+import pandas as pd
 import math as m
 import time
 import pandas as pd
 t0 = time.time()
+
+np.seterr(all='raise')
 
 # Variables
 l_a = Q_("0.3015 m")        # Set aileron length
@@ -52,6 +55,7 @@ r = Q_("0. 1/s")            # initial yaw rate   [rad/s]
 Phi   = Q_("0. rad")        # Initial euler angle around x-axis
 Psi   = Q_("0. rad")        # Initial euler angle around z-axis
 Theta = Q_("0. rad")        # Initial euler angle around y-axis
+lin_ran_alpha = 10          # Linear range of angle of attack and elevator defl.
 w = Q_("0. m/s")
 u = V_inf
 v = Q_("0. m/s")
@@ -88,6 +92,10 @@ Z_v = Geometry.V_tail.Z_v
 xcg    = Geometry.CG.CG_mtow
 xlemac = Geometry.CG.XLEMAC
 MAC = Geometry.Wing.MAC
+MAC_htail = Geometry.H_tail.MAC
+X_h = Geometry.CG.X_htail
+X_w = Geometry.CG.X_wing
+
 sweep_LE = Geometry.Wing.Sweep_LE.magnitude*1
 
 cabin_width = Geometry.Fuselage.cabin_w + 0.1 * ureg.m  # import cabin width
@@ -108,45 +116,45 @@ V_a = Performance.V_a_clean                  # manoeuvring speed
 def local_chord(z, c_r, c_t, half_b):
     # Calculates the chord at location z(distance from center)
     return c_r - (c_r - c_t) / half_b * z
-def trimming(u,ca_c,da, chord):
-    # Jurians dclde
-    Cl1, dummy, dummy, dummy =  (lookup_data(0.,0.5,0,1.))
-    Cl2, dummy, dummy, dummy =  (lookup_data(0.,0.5,10,1.))
-    dcl_de = (Cl2-Cl1)/(10)
-    
-    
-    trimming_alpha = True
-    alpha_min = m.radians(-15)
-    alpha_max = m.radians(15)
-    while trimming_alpha:
-        alpha_t = (alpha_min+alpha_max)/2.
-        
+def trimming(u,ca_c, ce_c):
+    # Calculates trim condition
+    Cl1, Cdhde, Cmhde, Xcphde =  (lookup_data(0.,ce_c,0))                   # Change to H_tail
+    Cl2, Cd2hde, Cm2hde, Xcp2hde =  (lookup_data(0.,ce_c,lin_ran_alpha))       #       ""    
+    dCl_de = (Cl2-Cl1)/(lin_ran_alpha)                          # Elevator effectiveness
+    dCd_de = (Cd2hde-Cdhde)/lin_ran_alpha
+    dCm_de = (Cm2hde-Cmhde)/lin_ran_alpha
+    Cla1w, Cda1w, Cma1w, Xcpa1w = (lookup_data(0., ca_c, 0))                 
+    Cla2w, Cda2w, Cma2w, Xcpa2w = (lookup_data(lin_ran_alpha, ca_c, 0))
+    dCl_alpha_w = (Cla2w-Cla1w)/m.radians(lin_ran_alpha)     # Cl alpha calculation of Wing
+    dCd_alpha_w = (Cda2w-Cda1w)/m.radians(lin_ran_alpha)     # Cd alpha calc of wing
+    dCm_alpha_w = (Cma2w - Cma1w)/m.radians(lin_ran_alpha)   # Cm alpha calc of wing
+    Cla1h, Cda1h, Cma1h, Xcpa1h = (lookup_data(0., ce_c, 0))                 
+    Cla2h, Cda2h, Cma2h, Xcpa2h = (lookup_data(lin_ran_alpha, ce_c, 0))
+    dCl_alpha_h = (Cla2h - Cla1h)/m.radians(lin_ran_alpha)     # Cl alpha calc. of H_tail
+    dCd_alpha_h = (Cda2h - Cda1h)/m.radians(lin_ran_alpha)     # Cd alpha calc. of H_tail
+    dCm_alpha_h = (Cma2h - Cma1h)/m.radians(lin_ran_alpha)     # Cm alpha calc. of H_tail
+    q_Sw = S_w * 0.5 * rho * (u**2)          # Dynamic press. times Wing surface
+    q_Sh = S_h * 0.5 * rho * (u**2)          # Dyn. press. times H_tail surface
+    l_w = X_w - xcg                                 # Wing arm
+    l_h = X_h - xcg                                 # Tail arm
+    trim_mat = np.matrix([[(q_Sw*(Cda1w-dCl_alpha_w)+q_Sh*(Cdhde-dCl_alpha_h)).magnitude,
+                         (-q_Sh*dCl_de).magnitude],
+                        [(q_Sw*((Cda1w-dCl_alpha_w)*l_w+dCm_alpha_w*MAC)+q_Sh*((Cda1h-dCl_alpha_h)*l_h+dCm_alpha_h*MAC_htail)).magnitude,
+                         (q_Sh*(dCm_de*MAC_htail - dCl_de*l_h)).magnitude]])
+    trim_mat2 = np.matrix([[(-mtow.magnitude*np.cos(Theta))],
+                          [0]])
+    trim_cond = np.linalg.solve(trim_mat, trim_mat2)
+    alpha_t = m.degrees(trim_cond[0])
+    de_t = trim_cond[1]
+    return alpha_t, de_t
 
-        w = u * m.tan(alpha_t)
-        Cl_w,Cd_w,Cm_w,xcp_w = lookup_data(alpha_t, ca_c, da, chord)
-        Cl_h,Cd_h,Cm_h,xcp_h = lookup_data(alpha_t, ca_c, de, chord)
-        Lift_w = 0.5 * rho * (u*u+w*w) * Cl_w * S_w
-        Lift_h = 0.5 * rho * (u*u+w*w) * Cl_h * S_h
-        Drag_w = 0.5 * rho * (u*u+w*w) * Cd_w * S_w
-        Drag_h = 0.5 * rho * (u*u+w*w) * Cd_h * S_h
-        Lift = Lift_w + Lift_h
-        Drag = Drag_w + Drag_h
-        zforce = -Lift*m.cos(alpha_t) - Drag*m.sin(alpha_t) + W*m.cos(Theta)
-
-        if zforce.magnitude >0.:
-            alpha_min = alpha_t
-        else:
-            alpha_max = alpha_t
-        if abs(zforce.magnitude)<1.0:
-            trimming_alpha = False
-    print (Lift)
-    return alpha_t
 
 # import airfoil lookup tables
 data = pd.read_csv('aerodynamic_data_ms15.dat', ' ', header=None).values
 
-def lookup_data(alpha, ca_c, da, chord):
+def lookup_data(alpha, ca_c, da):
     # Looksup and interpolates Cl and Cd based on alpha, ca_c and da
+    alpha = round(alpha,3)
     alpha = m.degrees(alpha)
     indexca_c = int(100*ca_c)-1
     if da % 5 ==0:
@@ -157,7 +165,7 @@ def lookup_data(alpha, ca_c, da, chord):
         index2da = abs(da)//5 + 1
         localdata1 = data[int(index1da*50*51+indexca_c*51):int(index1da*50*51+(indexca_c+1)*51),:]
         localdata2 = data[int(index2da*50*51+indexca_c*51):int(index2da*50*51+(indexca_c+1)*51),:]
-        localdata = (localdata2 - localdata1)/5 * da
+        localdata = (localdata2 - localdata1)/5 *abs(da)
     non_zero_max = max(np.argwhere(localdata[:, 0]))[0]  # last non-zero row
     localdata = localdata[:non_zero_max+1,:]
     Cl_local = interpolate.interp1d(localdata[:,0], localdata[:,1], 'linear', fill_value='extrapolate')
@@ -176,9 +184,9 @@ def lookup_data(alpha, ca_c, da, chord):
         Cd = Cd_local(-alpha)
         Cm = -Cm_local(-alpha)
     
-    Cn = m.cos(m.radians(alpha))*Cl + m.sin(m.radians(alpha))*Cd
-    if Cn !=0:
-        xcp = 0.25-Cm/Cn
+    Cn_lookup = m.cos(m.radians(alpha))*Cl + m.sin(m.radians(alpha))*Cd
+    if Cn_lookup !=0:
+        xcp = 0.25-Cm/Cn_lookup
     else:
         xcp = 0.25
     return Cl, Cd, Cm, xcp
@@ -223,11 +231,10 @@ qdlst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 Fzlst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 tlst  = np.arange(0, t_end.magnitude, dt.magnitude)
 
-#alpha_nose = trimming(V_inf,0.1,0,1)
-print ("Alpha_t:",alpha_nose)
-
+alpha_nose,de = trimming(V_inf,0.1,0.5)
+alpha_nose = m.radians(alpha_nose)
+de = de[0,0]
 for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
-    print(n)
     disc_wing_w = np.zeros((len(kwlst)-1, 20))  # 2D array discretized wing
     disc_wing_h = np.zeros((len(khlst)-1, 20))  # 2D array discretized HT
     disc_wing_v = np.zeros((len(kvlst)-1, 20))  # 2D array discretized VT
@@ -264,11 +271,15 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
         running_alpha_i = True
         while running_alpha_i:
             alpha_e = alpha_w - alpha_i
-            Cl, Cd, Cm, xcp = lookup_data(alpha_e, ca_c, da_local,cc)
-            alpha_i_new = Cl / (m.pi * AR_w * e_w)
-            if (alpha_i_new-alpha_i)/alpha_i_new < 0.01:
+            Cl, Cd, Cm, xcp = lookup_data(alpha_e, ca_c, da_local)
+            if abs(Cl) <0.01:
+                alpha_i_new = 0.
                 running_alpha_i = False
-            alpha_i = alpha_i_new
+            else:
+                alpha_i_new = Cl / (m.pi * AR_w * e_w)
+                if (alpha_i_new-alpha_i)/alpha_i_new < 0.01:
+                    running_alpha_i = False
+                alpha_i = alpha_i_new
 
         alpha_w = alpha_w - alpha_i                 # Angle of Attack as experienced by the piece
         beta_w  = beta_nose                         # Angle of Sideslip as experienced by the piece
@@ -277,7 +288,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
         downwash_angle = 2 * Cl / (m.pi * AR_w)     # Downwash generated by the piece which will be used for the HT
         sidewash_angle = 0.                         # Sidewash generated by the piece which will be used for the VT
         # Lookup Aerodynamic data of the wing based on given imput
-        Cl, Cd, Cm, xcp = lookup_data(alpha_w, ca_c, da_local,cc)
+        Cl, Cd, Cm, xcp = lookup_data(alpha_w, ca_c, da_local)
         
         # Determine induced drag
         Cdi = Cl * Cl / (m.pi * AR_w * e_w)
@@ -321,8 +332,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
         disc_wing_w[i][17] = 0.
         disc_wing_w[i][18] = 0.
         disc_wing_w[i][18] = 0.
-    print(alpha_w)
-    print(disc_wing_w[:,11])    
+
     # Determine the downwash as function of y-distance to c.g.
     down_wash_func = interpolate.interp1d(disc_wing_w[:,1],disc_wing_w[:,8],'linear')
     side_wash_func = interpolate.interp1d(disc_wing_w[:,1],disc_wing_w[:,9],'linear')
@@ -353,21 +363,27 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
         running_alpha_i = True
         while running_alpha_i:
             alpha_e = alpha_h - alpha_i
-            Cl, Cd, Cm, xcp = lookup_data(alpha_e, ce_c, de_local,cc)
-            alpha_i_new = Cl / (m.pi * AR_h * e_h)
-            if (alpha_i_new-alpha_i)/alpha_i_new < 0.01:
+            Cl, Cd, Cm, xcp = lookup_data(alpha_e, ce_c, da_local)
+            if abs(Cl) <0.01:
+                alpha_i_new = 0.
                 running_alpha_i = False
-            alpha_i = alpha_i_new
+            else:
+                alpha_i_new = Cl / (m.pi * AR_h * e_h)
+                if (alpha_i_new-alpha_i)/alpha_i_new < 0.01:
+                    running_alpha_i = False
+                alpha_i = alpha_i_new
 
         alpha_h = alpha_h - alpha_i                             # Angle of Attack as experienced by the piece
         beta_h  = beta_nose                                     # Angle of Sideslip as experienced by the piece
         delta_alpha = roll_induced_alpha - alpha_i-downwash     # Difference between AoA nose and piece
         
+
         # Lookup Aerodynamic data of the wing based on given imput
-        Cl, Cd, Cm, xcp = lookup_data(alpha_h, ce_c, de_local,cc)
+        Cl, Cd, Cm, xcp = lookup_data(alpha_h, ce_c, de_local)
         
         # Determine induced drag
         Cdi = Cl * Cl / (m.pi * AR_h * e_h)
+
         Cd = Cd + Cdi
               
         # Normal and tangental coefficients (wrt body frame):
@@ -403,29 +419,8 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
         disc_wing_h[i][18] = 0.
         disc_wing_h[i][19] = 0.
 
-
-
     # Calculate for Vertical Tail
     for i in range(0, len(kvlst)-1):
-#        dr_local = disc_wing_v[i][0]
-#        b1 = kvlst[i]
-#        b2 = kvlst[i+1]
-#        z_i = (b1 + b2) / 2
-#        c1 = local_chord(abs(b1 - Z_v), c_r_v, c_t_v, b_v)
-#        c2 = local_chord(abs(b2 - Z_v), c_r_v, c_t_v, b_v)
-#        Sloc = (c1 + c2) / 2 * (b2 - b1)
-#        beta = beta_nose + p * z_i / V_inf
-#
-#        Cl, Cd, Cm, xcp = lookup_data(beta, cr_c, dr_local,1.0*ureg.m)
-#
-#        Lift = 0.5 * rho * V_inf ** 2 * Sloc * Cl
-#        Drag = 0.5 * rho * V_inf ** 2 * Sloc * Cd
-#        disc_wing_v[i][1] = Sloc.magnitude
-#        disc_wing_v[i][2] = beta.magnitude
-#        disc_wing_v[i][3] = Lift.magnitude
-#        disc_wing_v[i][4] = c2.magnitude
-#        disc_wing_v[i][5] = (Lift.magnitude * z_i.magnitude)
-        "---------------------------------------------------------------------"
         dr_local = disc_wing_v[i][0]                        # Local aileron deflection of piece
         b1 = kvlst[i] - Z_v                                 # Y boundary left of piece
         b2 = kvlst[i+1] - Z_v                               # Y boundary right of piece
@@ -450,9 +445,9 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
         running_beta_i = True
         while running_beta_i:
             beta_e = beta_v - beta_i
-            Cl, Cd, Cm, xcp = lookup_data(beta_e, cr_c, dr_local,cc)
-            if Cl == 0.:
-                beta_i = 0.
+            Cl, Cd, Cm, xcp = lookup_data(beta_e, cr_c, dr_local)
+            if abs(Cl) <0.01:
+                alpha_i_new = 0.
                 running_beta_i = False
             else:
                 beta_i_new = Cl / (m.pi * AR_v * e_v)
@@ -465,7 +460,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
         delta_beta = roll_induced_beta + yaw_induced_beta - beta_i - sidewash      # Difference between AoA nose and piece
         
         # Lookup Aerodynamic data of the wing based on given imput
-        Cl, Cd, Cm, xcp = lookup_data(beta_v, ca_c, da_local,cc)
+        Cl, Cd, Cm, xcp = lookup_data(beta_v, ca_c, da_local)
         
         # Determine induced drag
         Cdi = Cl * Cl / (m.pi * AR_v * e_v)
@@ -506,8 +501,6 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
         disc_wing_v[i][18] = (Fb*z_i).magnitude
         disc_wing_v[i][19] = (Fb*l_v).magnitude
 
-
-
 #    # Determine all the Forces and moments caused by the forces    
 #    Sum_Dw_y = sum(disc_wing_w[:,4])*ureg.N*ureg.m
 #    Sum_Dh_y = sum(disc_wing_h[:,4])*ureg.N*ureg.m
@@ -530,6 +523,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
 #    Fx = T - m.cos(beta_nose)*(Sum_Dw + Sum_Dh + D_fus_gear) - W*m.sin(Theta)
 #    Fy = Sideforce*m.cos(beta_nose) - m.sin(beta_nose)*(Sum_Dw + Sum_Dh + D_fus_gear) + W*m.sin(Theta)
 #    Fz = - Sum_Lw - Sum_Lh + W*m.cos(Phi)
+
     
     # New forces and moments
     Sum_Fn     = (sum(disc_wing_w[:,11]) + sum(disc_wing_h[:,11]) + sum(disc_wing_v[:,11])) * Q_("N")
@@ -542,9 +536,9 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     Sum_Fb_z   = (sum(disc_wing_v[:,18]) + sum(disc_wing_h[:,18]) + sum(disc_wing_v[:,18])) * Q_("N*m")
     Sum_Fb_y   = (sum(disc_wing_v[:,19]) + sum(disc_wing_h[:,19]) + sum(disc_wing_v[:,19])) * Q_("N*m")    
     #EOM NEW
-    # these zeroes are placeholders....
     Mx  = - Sum_Fn_y + Sum_Fb_z
     My  = Sum_Fn_x 
+
     Mz  = Sum_Ft_y + Sum_Fb_y
     Fx = T + Sum_Ft - W * m.sin(Theta)
     Fy = Sum_Fb + W * m.sin(Phi)

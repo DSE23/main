@@ -277,7 +277,7 @@ def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../Airfoi
             i += 1
 
     # print(perim)
-    a_ran = np.arange(0, 1, 0.0001)
+    #a_ran = np.arange(0, 1, 0.0001)
     #plt.plot([start_x, start_x], [0, p(start_x)], 'b')
     #plt.plot([end_x, end_x], [0, p(end_x)], 'b')
     #plt.plot(x_coords, y_coords, '+')
@@ -285,7 +285,7 @@ def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../Airfoi
     #plt.plot(final_x_coords, final_y_coords, 'go')
     #plt.axis((0, 1, 0, 1))
     #plt.show()
-    return (final_x_coords*chord_l, final_y_coords*chord_l, final_angles)
+    return (final_x_coords*chord_l, final_y_coords*chord_l, final_angles), perim_spacing*chord_l
 
 def stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str):
 
@@ -327,7 +327,7 @@ def length_Skin_x_c(Spar1, Spar2):                            #Input deminsionle
     x = Spar1
     Areaxc = 0
     arclength = 0
-    for i in range(n):
+    for _ in range(n):
         x = x + dx
         dxlength = dx * Chordlength
         dylength = abs(airfoilordinate(x - dx) - airfoilordinate(x)) * Chordlength
@@ -348,9 +348,9 @@ def Area_cell():
         area_cell = area_cell*2
     return area_cell
 
+skin_length = length_Skin_x_c(ChSpar1, ChSpar2) # skin length of top part of airfoil (dimensionless)
 
-
-x_y_angle_coords = get_coord_from_perim(N_stringers/2, ChSpar1, ChSpar2, Chordlength)
+x_y_angle_coords, perim_spacing = get_coord_from_perim(N_stringers/2, ChSpar1, ChSpar2, Chordlength)
 X_cen_strs, A_stringer_x_c = stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str)
 Area_x_c = AreaSpar1xc + AreaSpar2xc + Area_Skin_x_c(ChSpar1, ChSpar2) + A_stringer_x_c + AreaClampsxc
 Area = AreaSpar1 + AreaSpar2 + Area_Skin(ChSpar1, ChSpar2)+ AreaStringers + AreaClamps
@@ -365,5 +365,5 @@ centroidstringer= A_stringer_x_c/AreaStringers
 centroid = (Area_x_c/Area)/Chordlength
 centroidlength = Area_x_c/Area
 
-# print(centroid)
+print(centroid)
 # print(ChSpar1)

@@ -161,7 +161,7 @@ ClampsIxx = ((Wing.AreaClamps/2) * ((Wing.airfoilordinate(Wing.ChSpar1)*Wing.Cho
 ClampsIyy = ((Wing.AreaClamps/2) * ((abs(Wing.ChSpar1 - Wing.centroid)*Wing.Chordlength)**2))*2
 
 
-I_XX_TOT_str, I_YY_TOT_str, I_XY_TOT_str = calc_total_stringer_inertia(Wing.get_coord_from_perim(Wing.N_stringers/2, Wing.ChSpar1, Wing.ChSpar2, Wing.Chordlength), calc_stringer_inertia(Wing.h_str, Wing.w_str, Wing.t_str))
+I_XX_TOT_str, I_YY_TOT_str, I_XY_TOT_str = calc_total_stringer_inertia(Wing.get_coord_from_perim(Wing.N_stringers/2, Wing.ChSpar1, Wing.ChSpar2, Wing.Chordlength)[0], calc_stringer_inertia(Wing.h_str, Wing.w_str, Wing.t_str))
 I_XX_Spar1, I_YY_Spar1 = Calc_spar_inertia(Wing.HSpar1, Wing.ThSpar1, Wing.ChSpar1, Wing.z)
 I_XX_Spar2, I_YY_Spar2 = Calc_spar_inertia(Wing.HSpar2, Wing.ThSpar2, Wing.ChSpar2, Wing.z)
 
