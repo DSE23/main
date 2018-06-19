@@ -161,10 +161,9 @@ def initialise_propinertia(inp):
 
 # Start assigning values to variables
 # Propeller mass
-mass = Q_("30 kg")  # Based on MT-propeller (4-bladed)
 
 # CG
-xcg = Q_("-20 cm")  # DUMMY VALUE, NOT KNOWN YET, negative because in front of datum
+
 
 # Mass moment of inertia
 ixg = Q_("0.9 kg * m**2")  # Based on slightly different propeller
