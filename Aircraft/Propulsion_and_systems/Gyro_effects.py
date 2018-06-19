@@ -16,7 +16,7 @@ sys.path.append('../')
 from Misc import ureg, Q_
 # Imports the unit registry from the Misc folder
 
-import Propeller
+from Propulsion_and_systems import Propeller
 
 # Coordinate system:
 # Origin is in propeller attachment to engine
@@ -61,7 +61,7 @@ def input_moment(yaw_moment, pitch_moment, yaw_rate, pitch_rate):
     # print("Pitch acceleration: {}".format(omega_z_dot))
     return [omega_y_dot, omega_z_dot]
 
-
+# Test the function!
 # input_moment(0, 0, Q_("5 deg/s"), 0)
 
 # Make function which calculates gyro moments from rate and acceleration inputs

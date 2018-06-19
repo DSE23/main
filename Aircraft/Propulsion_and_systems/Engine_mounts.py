@@ -20,10 +20,10 @@ from Misc import ureg, Q_
 # Import data
 from Geometry import Geometry
 from Performance import Performance
-import Engine
-import Propdata
-import Firewall
-import Gyro_effects
+from Propulsion_and_systems import Engine
+from Propulsion_and_systems import Propdata
+from Propulsion_and_systems import Firewall
+from Propulsion_and_systems import Gyro_effects
 
 # Coordinate system:
 # Origin is in propeller attachment to engine
@@ -121,7 +121,7 @@ f_x = -Propdata.data_reader(Performance.V_a_clean, "Total thrust")
 f_y = r_y_total
 f_z = 0
 
-m_x = Propdata.data_reader(Q_("15 m/s"), "Torque")
+m_x = Propdata.data_reader(Performance.V_a_clean, "Torque")
 m_y = m_y_gyro
 m_z = m_z_eng + m_z_mount + m_z_prop
 
