@@ -18,7 +18,7 @@ from Misc import ureg, Q_
 # Imports the unit registry from the Misc folder
 
 # Import data
-import Geometry
+from Geometry import Geometry
 import Engine
 import Propeller
 import Firewall
@@ -91,7 +91,7 @@ f_y_eng = Engine.mass * gravity * loadfactor
 f_y_eng.ito(ureg.newton)
 
 # Determine max prop vertical force (in Newtons)
-f_y_prop = Propeller.mass * gravity * loadfactor
+f_y_prop = Geometry.Prop.mass * gravity * loadfactor
 f_y_prop.ito(ureg.newton)
 
 # Determine max mount vertical force (in Newtons)
@@ -109,24 +109,22 @@ pitch_rate = Q_("60 deg/s")
 m_y_gyro = Gyro_effects.input_acceleration(0, 0, 0, pitch_rate)[0]
 
 # Moments
-# Component moments about axis parallel to Z-axis through bottom engine mount
+# Component moments about axis parallel to Z-axis in firewall
 m_z_eng = f_y_eng * (Firewall.xcg - Engine.xcg)
-m_z_prop = f_y_prop * (Firewall.xcg - Propeller.xcg)
+m_z_prop = f_y_prop * (Firewall.xcg - Geometry.CG.CG_prop)
 m_z_mount = f_y_mount * (Firewall.xcg - xcg)
-# Sum of moments about axis parallel to Z-axis through bottom engine mount
-r_x_1 = (m_z_eng + m_z_prop) / v_dist
-# Sum of forces in x-direction
-r_x_2 = -r_x_1
 
-# Reaction forces and moments
+
+# Reaction forces and moments for Boris
 f_x = 0
-f_y = 0
+f_y = r_y_total
 f_z = 0
 
 m_x = 0
-m_y = 0
-m_z = 0
+m_y = m_y_gyro
+m_z = m_z_eng + m_z_mount + m_z_prop
 
-print("Vertical shear force per mount: {}".format(r_y_total/4))
-print("Normal force per top mount: {}".format(r_x_1/2))
-print("Normal force per bottom mount: {}".format(r_x_2/2))
+print("Vertical shear force: {}".format(f_y))
+print("Moment about x: {}".format(m_x))
+print("Moment about y: {}".format(m_y))
+print("Moment about z: {}".format(m_z))
