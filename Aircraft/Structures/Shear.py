@@ -206,18 +206,19 @@ print(Calc_base_shear_flow(Get_boom_area(Q_("1000 mm**2"))))
 
 
 
-def Calculate_correcting_shear_flow(qs0):      #Tobias #WORK IN PROGRESS
-s1, s2, s3, s4, s5, qs1L, qs2L, qs3L, qs4L, qs5L, qs1D, qs2D, qs3D, qs4D, qs5D  = Calc_base_shear_flow(AreaClamps/2)
+def Calculate_correcting_shear_flow(qs0):      #Tobias 
+    s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs61L, qs12D, qs23D, qs35D, qs56D, qs61D  = Calc_base_shear_flow(AreaClamps/2)
     qs0denom = Wing.HSpar1/Wing.ThSpar1
     qs0denom += 2*Wing.length_Skin_x_c/Wing.ThSkin
     qs0denom += Wing.HSpar2/Wing.ThSpar2
-    #Lift
-    for i in range(101)
-    qs0nom =
-    qs0L = -qs0nom/qs0denom
-    #Drag
-    qs0nom =
-    qs0D = -qs0nom/qs0denom
+    qs0nomL = 0
+    qs0nomD = 0
+    for i in range(101):
+        ds = s1[1]-s[0]
+        qs0nomL += qs12L/Wing.ThSpar1*ds
+        qs0nomD += qs12D/Wing.ThSpar1*ds
+    qs0L = -qs0nomL/qs0denom
+    qs0D = -qs0nomD/qs0denom
     return qs0L, qs0D
 
 # Add correcting shear flow to base shear flows
