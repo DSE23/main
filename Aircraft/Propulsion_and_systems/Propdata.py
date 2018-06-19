@@ -46,7 +46,4 @@ def data_reader(velocity, needed_value):
         print("ERROR: please supply a valid column header as needed_value")
         return
 
-    print("Index: {}".format(index))
-    print(col)
-    print(data[index][col])
     return Q_("{} {}".format(data[index, col], unit))
