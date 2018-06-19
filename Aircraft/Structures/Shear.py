@@ -143,7 +143,8 @@ def Calc_base_shear_flow(boom_areas):
     ## section 5 6
     ds = (Wing.skin_length) / n
     s = Q_("0 m")
-    qs56L = np.array([])4    qs56L = np.append(qs56L, qs56L[-1])
+    qs56L = np.array([])
+    qs56L = np.append(qs56L, qs56L[-1])
     qs56D = np.array([])
     qs56D = np.append(qs56D, qs56D[-1])
     s4 = np.array([])
