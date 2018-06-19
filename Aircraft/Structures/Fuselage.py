@@ -61,7 +61,7 @@ Izz_sec3, Iyy_sec3 = (b_f_taper/2)**2 * B_sec3 * 4
 
 #Loading section 1
 My = x * Engine_mounts.f_y + Engine_mounts.m_y         #calculation of the resultant moment in y as variable of z
-Mx = x * Engine_mounts.f_x + Engine_mounts.m_x         #calculation of the resultant moment in y as variable of z
+Mx = Engine_mounts.m_x         #calculation of the resultant moment in y as variable of z
 Mz = x * Engine_mounts.f_z + Engine_mounts.f_z          #calculation of the resultant moment in y as variable of z
 
 #Loading section 2
@@ -78,6 +78,8 @@ sigma_x = My / Iyy_sec1 * z + Mz / Izz_sec1 * y         #bending stress
 
 q_x = Mx / (2 * b_f80)                                  #shear flow
 shear_x = q_x / t
+
+print(sigma_x)
 
 
 
