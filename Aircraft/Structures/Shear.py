@@ -76,7 +76,7 @@ def Calc_base_shear_flow(boom_areas):
     q_loc_L = 0
     q_loc_D = 0
     x = (Wing.ChSpar1 - Wing.centroid) * Wing.Chordlength  # x_coordinate of Spar 1 w.r.t. the centroid
-    for _ in range(n-1):
+    for _ in range(n):
         s += ds
         y = s
         s1 = np.append(s1, s)
@@ -188,7 +188,7 @@ def Calc_base_shear_flow(boom_areas):
     # Drag
     q_loc_D += (S_x / Iyy) *( Wing.ThSpar1 * x * ds + boom_areas[-1] * x)
     qs61D = np.append(qs12D, q_loc_D)
-    for _ in range(n-1):
+    for _ in range(n):
         s += ds
         y = -Wing.HSpar1/2 + s  # x_coordinate of Spar 1 w.r.t. the centroid
         s5 = np.append(s5, s)
@@ -207,10 +207,10 @@ def Calc_base_shear_flow(boom_areas):
 
 print(Calc_base_shear_flow(Get_boom_area(Q_("1000 mm**2"))))
 
+s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs61L, qs12D, qs23D, qs35D, qs56D, qs61D  = Calc_base_shear_flow(Get_boom_area(AreaClamps/2))
 
 
 def Calculate_correcting_shear_flow(qs0):      #Tobias 
-    s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs61L, qs12D, qs23D, qs35D, qs56D, qs61D  = Calc_base_shear_flow(AreaClamps/2)
     qs0denom = Wing.HSpar1/Wing.ThSpar1
     qs0denom += 2*Wing.length_Skin_x_c/Wing.ThSkin
     qs0denom += Wing.HSpar2/Wing.ThSpar2
