@@ -13,7 +13,7 @@ import numpy as np
 
 # Calculate Boom Area's [Midas]
 # Units checked and correct
-def get_boom_area(A_spar_caps):
+def Get_boom_area(A_spar_caps):
     """
     This function calculates the boom area's needed for the structural idealization
     It assumes the wingbox is loaded in bending.
@@ -51,8 +51,9 @@ def get_boom_area(A_spar_caps):
 
 # Calculate base shear flow for every section of the wing box
 
-# Calculate correcting shear flow (qs0)      #Tobias
-def calc_corr_shearflow():
+
+# Calculate correcting shear flow (qs0)      #Tobias #WORK IN PROGRESS
+def Calc_corr_shearflow():
 #s1, s2, s3, s4, s5, qs1L, qs2L, qs3L, qs4L, qs5L, qs1D, qs2D, qs3D, qs4D, qs5D  = b
 #    for i in range(5):
 
@@ -64,6 +65,10 @@ def calc_corr_shearflow():
     return qs0
 
 # Add correcting shear flow to base shear flows
+    
+# Add Moment shear flow to base shear flows
+
+
 
 # Compute moments around a.c. caused by shear forces due to shear flows
 
@@ -73,14 +78,9 @@ def Shear_center(moment_shear):
     shear_center = moment_shear/WingStress.L
     return shear_center
 
-<<<<<<< HEAD
-# Calculate Torque                 #Tobias
-#units checked and correct
-=======
-print(Shear_center(Q_("200000 N*m")))
 
 # Calculate Torque                 #Tobias
->>>>>>> f6697f6db4f9374a98d765021d2e0e84c65a8263
+#units checked and correct
 def Torque_for_twist(shear_center):
     T = WingStress.M + WingStress.L * shear_center
     return T
@@ -96,8 +96,5 @@ def Rate_of_twist(T):
     dthetadz = constant/integral
     return dthetadz
 
-<<<<<<< HEAD
-    
-=======
->>>>>>> f6697f6db4f9374a98d765021d2e0e84c65a8263
+
 # Calculate shear stress
