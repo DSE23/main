@@ -78,8 +78,8 @@ def input_acceleration(yaw_acceleration, pitch_acceleration, yaw_rate, pitch_rat
     m_y.ito(ureg("newton * meter"))
     m_z.ito(ureg("newton * meter"))
 
-    print("Yaw moment: {}".format(m_y))
-    print("Pitch moment: {}".format(m_z))
+    # print("Yaw moment: {}".format(m_y))
+    # print("Pitch moment: {}".format(m_z))
     return [m_y, m_z]
 
 
