@@ -12,7 +12,7 @@ import scipy as sp
 from scipy import optimize
 from scipy import interpolate
 from Geometry import Geometry
-from Propulsion_and_system import Engine_mounts
+from Propulsion_and_systems import Engine_mounts
 from Aerodynamics import Wing as AWing
 from Performance import Performance
 
@@ -105,35 +105,49 @@ ax_sec3 = D_VT + D_HT
 
 '''----------Bending stress calculations----------------'''
 
-'''section 1'''
-#Bending section 1
-sigma_x_sec1 = My_sec1 / Iyy_sec1 * z + Mz_sec1 / Izz_sec1 * y + (ax_sec1 / (B_sec1 * 4))        #bending stress
-
-#Torsion section 1
-
-q_x_sec1 = Mx_sec1 / (2 * b_f80 * 2)                                  #shear flow
-shear_x_sec1 = q_x_sec1 / t
-
-'''section 2'''
-#Bending section 2
-sigma_x_sec2 = My_sec2 / Iyy_sec2 * z + Mz_sec2 / Izz_sec2 * y + (ax_sec2 / (B_sec2 * 4))
-
-#Torsion section 2
-
-q_x_sec2 = Mx_sec2 / (2 * b_f80 * 2)
-shear_x_sec2 = q_x_sec2 / t
-
-'''section 3'''
-#Bending section 3
-sigma_x_sec3 = My_sec3 / Iyy_sec3 * z + Mz_sec3 / Izz_sec3 * y + (ax_sec3 / (B_sec3 * 4))
-
-#Torsion section 3
-q_x_sec3 = Mx_sec3 / (2 * b_f_taper * 2)
-shear_x_sec3 = q_x_sec3 / t
 
 
+def normal_shear_stress(x):
 
-print(sigma_x_sec1)
+    if x < l_sec1:
+        '''section 1'''
+        #Bending section 1
+        sigma_x = My_sec1 / Iyy_sec1 * z + Mz_sec1 / Izz_sec1 * y + (ax_sec1 / (B_sec1 * 4))        #bending stress
+
+        #Torsion section 1
+
+        q_x_sec1 = Mx_sec1 / (2 * b_f80 * 2)                                  #shear flow
+        shear_x = q_x_sec1 / t
+
+    if l_sec1 < x < l_sec1 + l_sec2:
+
+        '''section 2'''
+        #Bending section 2
+        sigma_x = My_sec2 / Iyy_sec2 * z + Mz_sec2 / Izz_sec2 * y + (ax_sec2 / (B_sec2 * 4))
+
+        #Torsion section 2
+
+        q_x_sec2 = Mx_sec2 / (2 * b_f80 * 2)
+        shear_x = q_x_sec2 / t
+
+    if l_sec1 + l_sec2 < x < l_fus:
+        '''section 3'''
+        #Bending section 3
+        sigma_x = My_sec3 / Iyy_sec3 * z + Mz_sec3 / Izz_sec3 * y + (ax_sec3 / (B_sec3 * 4))
+
+        #Torsion section 3
+        q_x_sec3 = Mx_sec3 / (2 * b_f_taper * 2)
+        shear_x = q_x_sec3 / t
+
+    else:
+        print('x is outside fuselage length')
+
+    return sigma_x, shear_x
+
+
+
+print(normal_shear_stress(x))
+
 
 
 
