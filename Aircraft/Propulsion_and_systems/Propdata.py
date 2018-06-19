@@ -16,7 +16,7 @@ sys.path.append('../')
 from Misc import ureg, Q_
 # Imports the unit registry from the Misc folder
 
-data = np.loadtxt("DataReal.txt", delimiter=" ", skiprows=1)
+data = np.loadtxt("../DataReal.txt", delimiter=" ", skiprows=1)
 
 
 def data_reader(velocity, needed_value):

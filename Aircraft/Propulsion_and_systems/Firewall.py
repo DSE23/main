@@ -37,6 +37,6 @@ def initialise_xcg(inp):
 
 # Start assigning values to variables
 # Distance between engine and firewall, assumed to be 10cm
-eng_clearance = Q_("10 cm")
+eng_clearance = Q_("10 cm")  # ASSUMPTION
 # Position behind datum
 xcg = Engine.length + eng_clearance

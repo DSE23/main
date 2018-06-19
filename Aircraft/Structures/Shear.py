@@ -174,8 +174,9 @@ def Calc_base_shear_flow(boom_areas):
 print(Calc_base_shear_flow(Get_boom_area(Q_("1000 mm**2"))))
 
 
-# Calculate correcting shear flow (qs0)      #Tobias
-def Calc_corr_shearflow():
+
+# Calculate correcting shear flow (qs0)      #Tobias #WORK IN PROGRESS
+
 #s1, s2, s3, s4, s5, qs1L, qs2L, qs3L, qs4L, qs5L, qs1D, qs2D, qs3D, qs4D, qs5D  = b
 #    for i in range(5):
 
@@ -187,6 +188,10 @@ def Calc_corr_shearflow():
     return qs0
 
 # Add correcting shear flow to base shear flows
+    
+# Add Moment shear flow to base shear flows
+
+
 
 # Compute moments around a.c. caused by shear forces due to shear flows
 
