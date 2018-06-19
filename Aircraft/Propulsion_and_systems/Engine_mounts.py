@@ -19,8 +19,9 @@ from Misc import ureg, Q_
 
 # Import data
 from Geometry import Geometry
+from Performance import Performance
 import Engine
-import Propeller
+import Propdata
 import Firewall
 import Gyro_effects
 
@@ -116,14 +117,15 @@ m_z_mount = f_y_mount * (xcg - Firewall.xcg)
 
 
 # Reaction forces and moments for Boris
-f_x = 0
+f_x = -Propdata.data_reader(Performance.V_a_clean, "Total thrust")
 f_y = r_y_total
 f_z = 0
 
-m_x = 0
+m_x = Propdata.data_reader(Q_("15 m/s"), "Torque")
 m_y = m_y_gyro
 m_z = m_z_eng + m_z_mount + m_z_prop
 
+print("Normal force due to thrust: {}".format(f_x))
 print("Vertical shear force: {}".format(f_y))
 print("Moment about x: {}".format(m_x))
 print("Moment about y: {}".format(m_y))
