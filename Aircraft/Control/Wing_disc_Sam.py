@@ -102,6 +102,12 @@ def local_chord(z, c_r, c_t, half_b):
     # Calculates the chord at location z(distance from center)
     return c_r - (c_r - c_t) / half_b * z
 def trimming(u,ca_c,da, chord):
+    # Jurians dclde
+    Cl1, dummy, dummy, dummy =  (lookup_data(0.,0.5,0,1.))
+    Cl2, dummy, dummy, dummy =  (lookup_data(0.,0.5,10,1.))
+    dcl_de = (Cl2-Cl1)/(10)
+    
+    
     trimming_alpha = True
     alpha_min = m.radians(-15)
     alpha_max = m.radians(15)

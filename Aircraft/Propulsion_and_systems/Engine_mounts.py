@@ -22,6 +22,7 @@ import Geometry
 import Engine
 import Propeller
 import Firewall
+import Gyro_effects
 
 # Coordinate system:
 # Origin is in propeller attachment to engine
@@ -101,6 +102,12 @@ f_y_mount.ito(ureg.newton)
 # Sum of forces in y-direction, r_y is engine mount reaction force
 r_y_total = f_y_prop + f_y_eng + f_y_mount
 
+# Gyro moment due to pitch rate
+# Pitch rate
+pitch_rate = Q_("60 deg/s")
+# Call to Gyro file
+m_y_gyro = Gyro_effects.input_acceleration(0, 0, 0, pitch_rate)[0]
+
 # Moments
 # Component moments about axis parallel to Z-axis through bottom engine mount
 m_z_eng = f_y_eng * (Firewall.xcg - Engine.xcg)
@@ -110,6 +117,15 @@ m_z_mount = f_y_mount * (Firewall.xcg - xcg)
 r_x_1 = (m_z_eng + m_z_prop) / v_dist
 # Sum of forces in x-direction
 r_x_2 = -r_x_1
+
+# Reaction forces and moments
+f_x = 0
+f_y = 0
+f_z = 0
+
+m_x = 0
+m_y = 0
+m_z = 0
 
 print("Vertical shear force per mount: {}".format(r_y_total/4))
 print("Normal force per top mount: {}".format(r_x_1/2))
