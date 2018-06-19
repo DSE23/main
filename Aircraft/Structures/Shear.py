@@ -127,7 +127,7 @@ def Calc_base_shear_flow(boom_areas):
     qs35D = np.array([])
     qs35L = np.append(qs35L, qs23L[-1])
     qs35D = np.append(qs35D, qs23D[-1])
-    s3 = 0
+    s3 = np.array([])
     s3 = np.append(s3, 0)
     s = Q_("0 m")
     x = (Wing.ChSpar2 - Wing.centroid) * Wing.Chordlength  # x_coordinate of Spar 1 w.r.t. the centroid
