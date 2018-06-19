@@ -23,6 +23,7 @@ from Performance import Performance
 import numpy as np
 import scipy.interpolate as interpolate
 import matplotlib.pyplot as plt
+import pandas as pd
 import math as m
 import time
 t0 = time.time()
@@ -50,6 +51,7 @@ r = Q_("0. 1/s")            # initial yaw rate   [rad/s]
 Phi   = Q_("0. rad")        # Initial euler angle around x-axis
 Psi   = Q_("0. rad")        # Initial euler angle around z-axis
 Theta = Q_("0. rad")        # Initial euler angle around y-axis
+lin_ran_alpha = 10          # Linear range of angle of attack and elevator defl.
 w = Q_("0. m/s")
 u = V_inf
 mtow = Geometry.Masses.W_MTOW
@@ -101,12 +103,29 @@ V_a = Performance.V_a_clean                  # manoeuvring speed
 def local_chord(z, c_r, c_t, half_b):
     # Calculates the chord at location z(distance from center)
     return c_r - (c_r - c_t) / half_b * z
-def trimming(u,ca_c,da, chord):
+def trimming(u,ca_c, ce_c, da, chord):
     # Jurians dclde
-    Cl1, dummy, dummy, dummy =  (lookup_data(0.,0.5,0,1.))
-    Cl2, dummy, dummy, dummy =  (lookup_data(0.,0.5,10,1.))
-    dcl_de = (Cl2-Cl1)/(10)
+    Cl1, Cdhde, Cmhde, Xcphde =  (lookup_data(0.,ce_c,0, chord))                   # Change to H_tail
+    Cl2, Cd2hde, Cm2hde, Xcp2hde =  (lookup_data(0.,ce_c,lin_ran_alpha, chord))       #       ""    
+    dCl_de = (Cl2-Cl1)/(lin_ran_alpha)                          # Elevator effectiveness
+    dCd_de = (Cd2hde-Cdhde)/lin_ran_alpha
+    dCm_de = (Cm2hde-Cmhde)/lin_ran_alpha
+    Cla1w, Cda1w, Cma1w, Xcpa1w = (lookup_data(0., ca_c, 0, chord))[0]                 
+    Cla2w, Cda2w, Cma2w, Xcpa2w = (lookup_data(lin_ran_alpha, ca_c, 0, chord))[0]
+    dCl_alpha_w = (Cla2w-Cla1w)/lin_ran_alpha     # Cl alpha calculation of Wing
+    dCd_alpha_w = (Cda2w-Cda1w)/lin_ran_alpha     # Cd alpha calc of wing
+    dCm_alpha_w = (Cma2w - Cma1w)/lin_ran_alpha   # Cm alpha calc of wing
+    Cla1hm, Cda1h, Cma1h, Xcpa1h = (lookup_data(0., ce_c, 0, chord))[0]                 
+    Cla2h, Cda2h, Cma2h, Xcpa2h = (lookup_data(lin_ran_alpha, ce_c, 0, chord))[0]
+    dCl_alpha_h = (Cla2h - Cla1h)/lin_ran_alpha     # Cl alpha calc. of H_tail
+    dCd_alpha_h = (Cda2h - Cda1h)/lin_ran_alpha     # Cd alpha calc. of H_tail
+    dCm_alpha_h = (Cma2h - Cma1h)/lin_ran_alpha     # Cm alpha calc. of H_tail
+    q_Sw = S_w * 0.5 * rho * (u**2 + w**2)          # Dynamic press. times Wing surface
+    q_Sh = S_h * 0.5 * rho * (u**2 + w**2)          # Dyn. press. times H_tail surface
     
+    trim_mat = np.matrix([[q_Sw*(Cda1h-dCl_alpha_w)+q_Sh*(Cdhde-dCl_alpha_h),
+                           -q_Sh*dCl_de],
+                        []])
     
     trimming_alpha = True
     alpha_min = m.radians(-15)
