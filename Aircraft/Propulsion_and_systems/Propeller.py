@@ -31,6 +31,7 @@ def Thrustcalc(V0):
 
     running = True
     Thrustlst = []
+    Torquelist = []
     efflist = []
     BetaHublst = []
     Rvel = []
@@ -113,6 +114,7 @@ def Thrustcalc(V0):
             Final = [efflist[-1],Thrustlst[-1],i,w,Alphai,VR[-Elements:-1]]
         efflist.append(etaP)
         Thrustlst.append(Thrust)
+        Torquelist.append(Torque)
         Rvel.append(VR)
     return Final
 
