@@ -18,20 +18,20 @@ from Geometry import Geometry
 
 def Thrustcalc(V0):
     #Required values
-    D = Geometry.Prop.Diameter.magnitude          #Diameter of the propeller
-    R = D/2                             #Radius of the propeller
-    Rhub = 0.20                         #Radius of the hub. Optimal at 0.31
-    Elements = 10                     #Number of elements on the blade
-    RPM = 2700                          #constant speed prop
-    Omega = RPM/60*2*np.pi              #rotational speed, rad/s
-    TotalTwist = 33.6/180*np.pi         #Total twist of the propeller blade
-    PitchRange = np.arange(35,70,0.1)   #Range of starting pitch of the hub which will be tested.
-    rho = 1.225                         #Density at SL
-    Nprop = 4                           #Number of propellers
+    D = Geometry.Prop.Diameter.magnitude          # Diameter of the propeller
+    R = D/2                             # Radius of the propeller
+    Rhub = 0.20                         # Radius of the hub. Optimal at 0.31
+    Elements = 10                     # Number of elements on the blade
+    RPM = 2700                          # constant speed prop
+    Omega = RPM/60*2*np.pi              # rotational speed, rad/s
+    TotalTwist = 33.6/180*np.pi         # Total twist of the propeller blade
+    PitchRange = np.arange(35,70,0.1)   # Range of starting pitch of the hub which will be tested.
+    rho = 1.225                         # Density at SL
+    Nprop = 4                           # Number of propellers
 
     running = True
     Thrustlst = []
-    Torquelist = []
+    # Torquelist = []
     efflist = []
     BetaHublst = []
     Rvel = []
@@ -114,23 +114,23 @@ def Thrustcalc(V0):
             Final = [efflist[-1],Thrustlst[-1],i,w,Alphai,VR[-Elements:-1]]
         efflist.append(etaP)
         Thrustlst.append(Thrust)
-        Torquelist.append(Torque)
+        # Torquelist.append(Torque)
         Rvel.append(VR)
     return Final
 
 
-#Returns propeller efficiency, Thrust, Pitchangle, induced velocity, and Induced AOA for max power.
+# Returns propeller efficiency, Thrust, Pitchangle, induced velocity, and Induced AOA for max power.
 # For Alphai: w cos(Alphai+phi) is in airflow direction. w sin(Alphai + phi) is naar buiten.
 
 
-D = 1.90            #Diameter of the propeller
-R = D/2             #Radius of the propeller
-Rhub = 0.20         #Radius of the huboptimal at 0.31
+D = 1.90            # Diameter of the propeller
+R = D/2             # Radius of the propeller
+Rhub = 0.20         # Radius of the huboptimal at 0.31
 Elements = 1000
 P = 235000
 rho = 1.225
 
-Tstatic = 0.85*P**(2/3)*(2*rho*R**2*np.pi)**(1/3)*(1-Rhub**2/(R**2))    #Maximum static thrust.
+Tstatic = 0.85*P**(2/3)*(2*rho*R**2*np.pi)**(1/3)*(1-Rhub**2/(R**2))    # Maximum static thrust.
 
 
 
