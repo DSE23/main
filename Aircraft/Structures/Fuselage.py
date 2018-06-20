@@ -25,7 +25,7 @@ moter_w = Q_('180 kg')                          #Resultant weight of the motor
 g = Q_('9.81 m / s**2')                         #The gravity acceleration
 l_fus = Geometry.Fuselage.l_f                   #length of the fuselage in m
 l_sec1 = Q_('1.0 m')                          #length of section 1 (normal)
-l_sec2 = Q_('1.0 m')                          #length of section 2 (cut out)
+l_sec2 = Q_('1.1 m')                          #length of section 2 (cut out)
 l_sec3 = l_fus - l_sec1 - l_sec2               #length of section 3 (taper)
 rho = Performance.rho_c.magnitude * ureg("kg/(m**3)") #rho at cruise altitude
 V = Performance.V_cruise.magnitude * ureg("m/s")        #cruise speed
@@ -45,7 +45,7 @@ shear_modulus = Q_("36 GPa")   #G
 poisson = 0.31                 # maximum 0.33
 tau_max = Q_("35 MPa")
 
-x = 1.2
+x = 0.2
 
 x *= Q_('m')
 
@@ -150,6 +150,7 @@ def normal_shear_stress(x):
         #Bending section 2
         sigma_x = My_sec2 / Iyy_sec2 * z + Mz_sec2 / Izz_sec2 * y + (ax_sec2 / (B_sec2 * 4))
 
+
         #Torsion section 2
 
         q_x_sec2 = Mx_sec2 / (2 * b_f80 * 2)
@@ -167,22 +168,79 @@ def normal_shear_stress(x):
 
     return sigma_x, shear_x
 
-'''Cut out correction calculation'''
+sigma_x, shear_x = normal_shear_stress(x)
+
+'''------------Cut out correction calculation---------------'''
 q_12 = normal_shear_stress(x)[1]
 
 q_34_cor = (b_f80 * q_12) / b_f80
 q_23_cor = (b_f80 * q_34_cor) / b_f80
 q_14_cor = (b_f80 * q_23_cor) / b_f80
 
-q_34 = q_12 + q_34_cor
+q_34 = q_12 + -q_34_cor
 q_23 = q_12 + q_23_cor
 q_14 = q_12 + q_14_cor
-q_12 = q_12 + q_12
+q_12 = q_12 + -q_12
 
+P = ((q_14_cor + q_23_cor) * l_sec2) / 2
+
+P_stress = P / B_sec3
+
+if y > Q_('0 m') and z > Q_('0 m'):
+    P_stress = -P_stress
+if y < Q_('0 m') and z < Q_('0 m'):
+    P_stress = -P_stress
+
+if l_sec1 < x < l_sec1 + l_sec2:
+    sigma_x = sigma_x + P_stress
+
+'''-------------Cut Out correction for non cut out parts (sec 1 and sec 3---------------'''
+
+if x <= l_sec1:
+    a = np.array([[b_f_taper.magnitude, 0, -b_f_taper.magnitude, 0],
+                 [0, b_f_taper.magnitude, 0, -b_f_taper.magnitude],
+                 [0, 0, l_sec1.magnitude, l_sec1.magnitude],
+                 [b_f_taper.magnitude, -b_f_taper.magnitude, 0, 0]])
+
+    b = np.array([0, 0, P.magnitude, 0])
+
+    M = np.linalg.solve(a, b)
+
+    q_34 = shear_x + -M[2] * Q_('N/m')
+    q_23 = shear_x + M[1] * Q_('N/m')
+    q_14 = shear_x + M[3] * Q_('N/m')
+    q_12 = shear_x + -M[0] * Q_('N/m')
+
+if x >= l_sec1 + l_sec2:
+    a = np.array([[b_f_taper.magnitude, 0, -b_f_taper.magnitude, 0],
+                  [0, b_f_taper.magnitude, 0, -b_f_taper.magnitude],
+                  [0, 0, l_sec3.magnitude, l_sec3.magnitude],
+                  [b_f_taper.magnitude, -b_f_taper.magnitude, 0, 0]])
+
+    b = np.array([0, 0, P.magnitude, 0])
+
+    M = np.linalg.solve(a, b)
+
+    q_34 = shear_x + -M[2] * Q_('N/m')
+    q_23 = shear_x + M[1] * Q_('N/m')
+    q_14 = shear_x + M[3] * Q_('N/m')
+    q_12 = shear_x + -M[0] * Q_('N/m')
+
+    shear_x = q_12
+
+    if z >= b_f_taper - Q_('0.01 m') or z <= -b_f_taper + Q_('0.01 m'):
+        print('i dont know whtat is wrong')
+
+
+
+
+
+
+print(M[0])
 print('q_12', q_12)
-print('q_34', q_34_cor)
-print('q_23', q_23_cor)
-print('q_14', q_14_cor)
+print('q_34', q_34)
+print('q_23', q_23)
+print('q_14', q_14)
 
 
 
