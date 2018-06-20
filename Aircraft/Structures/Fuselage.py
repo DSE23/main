@@ -26,19 +26,18 @@ g = Q_('9.81 m / s**2')                         #The gravity acceleration
 l_fus = Geometry.Fuselage.l_f                   #length of the fuselage in m
 l_sec1 = Q_('1.0 m')                          #length of section 1 (normal)
 l_sec2 = Q_('1.0 m')                          #length of section 2 (cut out)
-l_sec3 = Q_('2.0 m')                          #length of section 3 (taper)
+l_sec3 = l_fus - l_sec1 - l_sec2               #length of section 3 (taper)
 rho = Performance.rho_c.magnitude * ureg("kg/(m**3)") #rho at cruise altitude
 V = Performance.V_cruise.magnitude * ureg("m/s")        #cruise speed
-S_VT = Geometry.V_Tail.S                    #area of vertical tail
-S_HT = Geometry.H_Tail.S                    #are of horizontal tail
-b_VT = Geometry.V_Tail.b                    #span vertical tail
-MAC_VT = Geometry.V_Tail.MAC
-MAC_HT = Geometry.H_Tail.MAC
+S_VT = Geometry.V_tail.S                    #area of vertical tail
+S_HT = Geometry.H_tail.S                    #are of horizontal tail
+b_VT = Geometry.V_tail.b                    #span vertical tail
+MAC_VT = Geometry.V_tail.MAC
+MAC_HT = Geometry.H_tail.MAC
 
-y = 0
-x = 0
-z = 0                                         #the dreadful z
-z *= Q_('meter')
+x = 0.5
+x *= Q_('m')
+
 
 
 #Boom areas section 1 (normal)
@@ -50,21 +49,36 @@ B_sec2 = t * (b_f80 / 2) / 2 + t * (b_f80 / 2) / 2
 
 #Boom areas section 3 (cone/taper)
 def B_calc(x):
-    b_f_taper = b_f80 / l_sec3 * x
-    B_sec3 = t * (b_f_taper / 2) / 2 + t * (b_f_taper / 2) / 2
+    if Q_('0 m') <= x <= l_sec1 + l_sec2:
+        b_f_taper = b_f80
+        B_sec3 = B_sec1
+
+    if l_sec1 + l_sec2 < x <= l_fus:
+        b_f_taper = b_f80 / l_sec3 * x
+        B_sec3 = t * (b_f_taper / 2) / 2 + t * (b_f_taper / 2) / 2
+
+
     return B_sec3, b_f_taper
+
+y = B_calc(x)[1]
+z = B_calc(x)[1]                                         #the dreadful z
+
+
 B_sec3, b_f_taper = B_calc(x)
 
 '''------------------Inertia calculation-----------------------'''
 
 #Inertia section 1 (normal)
-Izz_sec1, Iyy_sec1 = (b_f80/2)**2 * B_sec1 * 4
+Iyy_sec1 = (b_f80/2)**2 * B_sec1 * 4
+Izz_sec1 = Iyy_sec1
 
 #Inertia section 2
-Izz_sec2, Iyy_sec2 = (b_f80/2)**2 * B_sec2 * 4
+Iyy_sec2 = (b_f80/2)**2 * B_sec2 * 4
+Izz_sec2 = Iyy_sec2
 
 #Inertia section 3
-Izz_sec3, Iyy_sec3 = (b_f_taper/2)**2 * B_sec3 * 4
+Iyy_sec3 = (b_f_taper/2)**2 * B_sec3 * 4
+Izz_sec3 = Iyy_sec3
 
 '''------------Loading force/moment calculation------------'''
 
@@ -109,7 +123,7 @@ ax_sec3 = D_VT + D_HT
 
 def normal_shear_stress(x):
 
-    if x < l_sec1:
+    if Q_('0 m') < x < l_sec1:
         '''section 1'''
         #Bending section 1
         sigma_x = My_sec1 / Iyy_sec1 * z + Mz_sec1 / Izz_sec1 * y + (ax_sec1 / (B_sec1 * 4))        #bending stress
@@ -139,12 +153,12 @@ def normal_shear_stress(x):
         q_x_sec3 = Mx_sec3 / (2 * b_f_taper * 2)
         shear_x = q_x_sec3 / t
 
-    else:
-        print('x is outside fuselage length')
 
     return sigma_x, shear_x
 
+'''Cut out correction calculation'''
 
+q_34 = 
 
 print(normal_shear_stress(x))
 

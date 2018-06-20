@@ -119,14 +119,22 @@ m_z_mount = f_y_mount * (xcg - Firewall.xcg)
 # Reaction forces and moments for Boris
 f_x = -Propdata.data_reader(Performance.V_a_clean, "Total thrust")
 f_y = r_y_total
-f_z = 0
+f_z = Q_('0 N')
 
 m_x = Propdata.data_reader(Performance.V_a_clean, "Torque")
 m_y = m_y_gyro
 m_z = m_z_eng + m_z_mount + m_z_prop
 
-print("Normal force due to thrust: {}".format(f_x))
-print("Vertical shear force: {}".format(f_y))
-print("Moment about x: {}".format(m_x))
-print("Moment about y: {}".format(m_y))
-print("Moment about z: {}".format(m_z))
+
+print('f_x', f_x)
+print('f_y', f_y)
+print('f_z', f_z)
+print('m_x', m_x)
+print('m_y', m_y)
+print('m_z', m_z)
+
+# print("Normal force due to thrust: {}".format(f_x))
+# print("Vertical shear force: {}".format(f_y))
+# print("Moment about x: {}".format(m_x))
+# print("Moment about y: {}".format(m_y))
+# print("Moment about z: {}".format(m_z))
