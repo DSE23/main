@@ -85,23 +85,22 @@ def Calc_base_shear_flow(boom_areas, n):
         y = s
         s1 = np.append(s1, s)
         # Lift
-        q_loc_L += (S_y/Ixx)*Wing.ThSpar1*y*ds
-        qs12L = np.append(qs12L, q_loc_L)
+        q_loc_L += -(S_y/Ixx)*Wing.ThSpar1*y*ds
+        qs12L = np.append(qs12L, q_loc_L.to(ureg("N/m")))
         # Drag
-        q_loc_D += (S_x/Iyy)*Wing.ThSpar1*x*ds
-        qs12D = np.append(qs12D, q_loc_D)
+        q_loc_D += -(S_x/Iyy)*Wing.ThSpar1*x*ds
+        qs12D = np.append(qs12D, q_loc_D.to(ureg("N/m")))
     s += ds
     y = s
     s1 = np.append(s1, s)
     # Lift
     q_loc_L += -(S_y / Ixx) *( Wing.ThSpar1 * y * ds + boom_areas[0] * Wing.HSpar1/2 )
-    qs12L = np.append(qs12L, q_loc_L)
+    qs12L = np.append(qs12L, q_loc_L.to(ureg("N/m")))
     # Drag
     q_loc_D += -(S_x / Iyy) *( Wing.ThSpar1 * x * ds + boom_areas[0] * x)
-    qs12D = np.append(qs12D, q_loc_D)
+    qs12D = np.append(qs12D, q_loc_D.to(ureg("N/m")))
 
-    qs12L *= ureg("N/m")
-    qs12D *= ureg("N/m")
+
     ## section 2 3
     ds = (Wing.skin_length)/n
     s = Q_("0 m")
@@ -126,8 +125,8 @@ def Calc_base_shear_flow(boom_areas, n):
             q_loc_L += -(S_y/Ixx)*Wing.A_stringer*strs_y_coords[str_counter]
             q_loc_D += -(S_x/Iyy) *Wing.A_stringer *(strs_x_coords[str_counter]/Wing.Chordlength - Wing.centroid)*Wing.Chordlength
             str_counter += 1
-        qs23L = np.append(qs23L, q_loc_L)
-        qs23D = np.append(qs23D, q_loc_D)
+        qs23L = np.append(qs23L, q_loc_L.to(ureg("N/m")))
+        qs23D = np.append(qs23D, q_loc_D.to(ureg("N/m")))
 
     ## Section 3 5
     ds = Wing.HSpar2/n
@@ -146,13 +145,11 @@ def Calc_base_shear_flow(boom_areas, n):
         s3 = np.append(s3, s)
         # Lift
         q_loc_L += -(S_y / Ixx) * Wing.ThSpar2 * y * ds
-        qs35L = np.append(qs35L, q_loc_L)
+        qs35L = np.append(qs35L, q_loc_L.to(ureg("N/m")))
         # Drag
         q_loc_D += -(S_x / Iyy) * Wing.ThSpar2 * x * ds
-        qs35D = np.append(qs35D, q_loc_D)
+        qs35D = np.append(qs35D, q_loc_D.to(ureg("N/m")))
 
-    qs35L *= ureg("N/m")
-    qs35D *= ureg("N/m")
 
     ## section 5 6
     ds = (Wing.skin_length) / n
@@ -178,8 +175,8 @@ def Calc_base_shear_flow(boom_areas, n):
                 print(strs_x_coords[str_counter])
                 q_loc_D += -(S_x / Iyy) * Wing.A_stringer * (strs_x_coords[str_counter] / Wing.Chordlength - Wing.centroid) * Wing.Chordlength
                 str_counter += 1
-        qs56L = np.append(qs56L, q_loc_L)
-        qs56D = np.append(qs56D, q_loc_D)
+        qs56L = np.append(qs56L, q_loc_L.to(ureg("N/m")))
+        qs56D = np.append(qs56D, q_loc_D.to(ureg("N/m")))
 
     ## section 6 1
     ds = Wing.HSpar1/(2*n)
@@ -195,33 +192,45 @@ def Calc_base_shear_flow(boom_areas, n):
     # Lift
     s5 = np.append(s5, 0)
     q_loc_L += -(S_y / Ixx) *( Wing.ThSpar1 * y * ds + boom_areas[-1] * y )
-    qs61L = np.append(qs61L, q_loc_L)
+    qs61L = np.append(qs61L, q_loc_L.to(ureg("N/m")))
     # Drag
     q_loc_D += -(S_x / Iyy) *( Wing.ThSpar1 * x * ds + boom_areas[-1] * x)
-    qs61D = np.append(qs61D, q_loc_D)
+    qs61D = np.append(qs61D, q_loc_D.to(ureg("N/m")))
     for _ in range(n-1):
         s += ds
         y = -Wing.HSpar1/2 + s  # x_coordinate of Spar 1 w.r.t. the centroid
         s5 = np.append(s5, s)
         # Lift
         q_loc_L += -(S_y/Ixx)*Wing.ThSpar1*y*ds
-        qs61L = np.append(qs61L, q_loc_L)
+        qs61L = np.append(qs61L, q_loc_L.to(ureg("N/m")))
         # Drag
         q_loc_D += -(S_x/Iyy)*Wing.ThSpar1*x*ds
-        qs61D = np.append(qs61D, q_loc_D)
+        qs61D = np.append(qs61D, q_loc_D.to(ureg("N/m")))
 
-
+    s1 *= ureg("m")
+    s2 *= ureg("m")
+    s3 *= ureg("m")
+    s4 *= ureg("m")
+    s5 *= ureg("m")
     qs12L *= ureg("N/m")
     qs12D *= ureg("N/m")
+    qs23L *= ureg("N/m")
+    qs23D *= ureg("N/m")
+    qs35L *= ureg("N/m")
+    qs35D *= ureg("N/m")
+    qs56L *= ureg("N/m")
+    qs56D *= ureg("N/m")
+    qs61L *= ureg("N/m")
+    qs61D *= ureg("N/m")
 
     return s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs61L, qs12D, qs23D, qs35D, qs56D, qs61D
 
 
 s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs61L, qs12D, qs23D, qs35D, qs56D, qs61D  = Calc_base_shear_flow(Get_boom_area(Wing.AreaClamps/2), n)
 
-print("qs at 1st spar cap:", qs23D[0])
-print("qs at 2nd spar cap:", qs56D[-1])
-print("qs at beginning:", qs12D[0], "\tqs at end end:", qs61D[-1])
+print("qs at 1st spar cap:", qs23L[0])
+print("qs at 2nd spar cap:", qs56L[-1])
+print("qs at beginning:", qs12L[0], "\tqs at end end:", qs61L[-1])
 
 def Calculate_correcting_shear_flow(qs0, n):      #Tobias
     qs0denom = Wing.HSpar1/Wing.ThSpar1
@@ -266,7 +275,84 @@ def Moment_shearflow(n):
         q_moment = np.append(q_moment, qmoment)
     return q_moment
 # Compute moments around a.c. caused by shear forces due to shear flows
+def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs61L):
 
+    x_coor_AC = 0.25*Wing.Chordlength
+    Moment_L = 0
+    # Moments from section 1 -> 2
+    for i in range(0,len(qs12L)-1):
+        q_loc = (qs12L[i] + qs12L[i+1])/2
+        s_loc = (s1[i] + s1[i+1])/2
+        ds = s1[i+1]-s1[i]
+        x_loc = Wing.ChSpar1*Wing.Chordlength - x_coor_AC
+        F_y = q_loc * ds
+        Moment_L += F_y * x_loc
+
+    # Moments from section 2 -> 3
+    for i in range(0, len(qs23L)-1):
+        q_loc = (qs23L[i] + qs23L[i + 1]) / 2
+        s_loc = (s2[i] + s2[i + 1]) / 2
+        ds = s2[i + 1] - s2[i]
+        x_loc_1, y_loc_1 = Wing.get_xy_from_perim(s2[i]/Wing.Chordlength, Wing.ChSpar1)
+        x_loc_2, y_loc_2 = Wing.get_xy_from_perim(s2[i+1]/Wing.Chordlength, Wing.ChSpar1)
+        x_loc_1 *= Wing.Chordlength
+
+        x_loc_2 *= Wing.Chordlength
+
+        y_loc_1 *= Wing.Chordlength
+        y_loc_2 *= Wing.Chordlength
+        Force_angle = np.arctan2(y_loc_2 - y_loc_1, x_loc_2 - x_loc_1)
+        x_loc_1 -= x_coor_AC
+        x_loc_2 -= x_coor_AC
+        F_x = q_loc * ds * np.cos(Force_angle)
+        F_y = q_loc * ds * np.sin(Force_angle)
+
+        Moment_L += -F_x*(y_loc_2 + y_loc_1)/2 + F_y*(x_loc_2 + x_loc_1)/2
+
+    # Moments from section 3->5
+    for i in range(0, len(qs35L)-1):
+        q_loc = (qs35L[i] + qs35L[i + 1]) / 2
+        s_loc = (s3[i] + s3[i + 1]) / 2
+        ds = s3[i + 1] - s3[i]
+        x_loc = Wing.ChSpar2 * Wing.Chordlength - x_coor_AC
+
+        F_y = q_loc * ds
+        Moment_L += -F_y * x_loc
+
+    # Moments from section 5 -> 6
+    for i in range(0, len(qs56L)-1):
+        q_loc = (qs56L[i] + qs56L[i + 1]) / 2
+        s_loc = (s4[i] + s4[i + 1]) / 2
+        ds = s4[i + 1] - s4[i]
+        x_loc_1, y_loc_1 = Wing.get_xy_from_perim(s4[i] / Wing.Chordlength, Wing.ChSpar2, reverse=True)
+        x_loc_2, y_loc_2 = Wing.get_xy_from_perim(s4[i + 1] / Wing.Chordlength, Wing.ChSpar2, reverse=True)
+        x_loc_1 *= Wing.Chordlength
+        x_loc_1 -= x_coor_AC
+        x_loc_2 *= Wing.Chordlength
+        x_loc_2 -= x_coor_AC
+        y_loc_1 *= Wing.Chordlength
+        y_loc_2 *= Wing.Chordlength
+
+        Force_angle = np.arctan2(y_loc_2 - y_loc_1, x_loc_2 - x_loc_1)
+
+        F_x = q_loc * ds * np.cos(Force_angle)
+        F_y = q_loc * ds * np.sin(Force_angle)
+        Moment_L += -F_x * (y_loc_2 + y_loc_1) / 2 + F_y * (x_loc_2 + x_loc_1) / 2
+
+    # Moment 6 -> 1
+    for i in range(0, len(qs61L)-1):
+        q_loc = (qs61L[i] + qs61L[i + 1]) / 2
+        s_loc = (s5[i] + s5[i + 1]) / 2
+        ds = s5[i + 1] - s5[i]
+        x_loc = Wing.ChSpar1 * Wing.Chordlength - x_coor_AC
+
+        F_y = q_loc * ds
+        Moment_L += F_y * x_loc
+
+    return Moment_L
+
+Moment_L = Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs61L)
+print(Moment_L)
 # Calculate shear center location   #Tobias
 #units checked and correct
 def Shear_center(moment_shear):
@@ -293,9 +379,3 @@ def Rate_of_twist(T):
 
 # Calculate shear stress
 
-plt.plot(s1, qs12D)
-plt.plot(s2, qs23D, 'r')
-plt.plot(s3, qs35D, 'y')
-plt.plot(s4, qs56D, 'k')
-plt.plot(s5, qs61D, 'p')
-plt.show()
