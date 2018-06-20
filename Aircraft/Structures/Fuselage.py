@@ -35,6 +35,7 @@ b_VT = Geometry.V_tail.b                    #span vertical tail
 MAC_VT = Geometry.V_tail.MAC
 MAC_HT = Geometry.H_tail.MAC
 
+<<<<<<< HEAD
 #Material properties of the chosen material.
 #Current chosen material:
 #Carbon fiber reinforced carbon matrix composite (Vf:50%)
@@ -46,6 +47,9 @@ poisson = 0.31                 # maximum 0.33
 tau_max = Q_("35 MPa")
 
 x = 0.5
+=======
+x = 1.2
+>>>>>>> Beginning on shear flow calculations for cut out
 x *= Q_('m')
 
 
@@ -167,8 +171,26 @@ def normal_shear_stress(x):
     return sigma_x, shear_x
 
 '''Cut out correction calculation'''
+q_12 = normal_shear_stress(x)[1]
 
+q_34_cor = (b_f80 * q_12) / b_f80
+q_23_cor = (b_f80 * q_34_cor) / b_f80
+q_14_cor = (b_f80 * q_23_cor) / b_f80
+
+q_34 = q_12 + q_34_cor
+q_23 = q_12 + q_23_cor
+q_14 = q_12 + q_14_cor
+q_12 = q_12 + q_12
+
+print('q_12', q_12)
+print('q_34', q_34_cor)
+print('q_23', q_23_cor)
+print('q_14', q_14_cor)
+
+<<<<<<< HEAD
 q_34 = 0
+=======
+>>>>>>> Beginning on shear flow calculations for cut out
 
 print(normal_shear_stress(x))
 
