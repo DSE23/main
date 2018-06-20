@@ -23,6 +23,18 @@ import matplotlib.pyplot as plt
 import time
 
 
+#Material properties of the chosen material.
+#Current chosen material:
+#Carbon fiber reinforced carbon matrix composite (Vf:50%)
+youngs_modulus = Q_("95 GPa")  #E
+yield_strength = Q_("23 MPa")  #tensile
+compr_strength = Q_("247 MPa") #compression
+shear_modulus = Q_("36 GPa")   #G
+poisson = 0.31                 # maximum 0.33
+tau_max = Q_("35 MPa")
+
+
+
 cl, cd, cm = AWing.computeloads()           #Load aerodynamic properties
 n = 10                      #number of the devided sections
 b = Wing.s         #Wing span
@@ -171,25 +183,6 @@ dM = 0
 # # print("Llist=", Llist[0])
 # plt.plot(zlist, L_momentlist)
 # plt.show()
-
-
-
-
-
-
-
-#Material properties of the chosen material.
-#Current chosen material:
-#Carbon fiber reinforced carbon matrix composite (Vf:50%)
-youngs_modulus = Q_("95 GPa")  #E
-yield_strength = Q_("23 MPa")  #tensile
-compr_strength = Q_("247 MPa") #compression
-shear_modulus = Q_("36 GPa")   #G
-poisson = 0.31                 # maximum 0.33
-tau_max = Q_("35 MPa")
-
-
-
 
 
 def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending

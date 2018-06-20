@@ -35,6 +35,16 @@ b_VT = Geometry.V_tail.b                    #span vertical tail
 MAC_VT = Geometry.V_tail.MAC
 MAC_HT = Geometry.H_tail.MAC
 
+#Material properties of the chosen material.
+#Current chosen material:
+#Carbon fiber reinforced carbon matrix composite (Vf:50%)
+youngs_modulus = Q_("95 GPa")  #E
+yield_strength = Q_("23 MPa")  #tensile
+compr_strength = Q_("247 MPa") #compression
+shear_modulus = Q_("36 GPa")   #G
+poisson = 0.31                 # maximum 0.33
+tau_max = Q_("35 MPa")
+
 x = 0.5
 x *= Q_('m')
 
@@ -158,7 +168,7 @@ def normal_shear_stress(x):
 
 '''Cut out correction calculation'''
 
-q_34 = 
+q_34 = 0
 
 print(normal_shear_stress(x))
 
@@ -173,7 +183,8 @@ print(normal_shear_stress(x))
 
 
 #Tsia-Wu Failure criterion
-def Tsia_Wu(sigma_zs):
+## For section 1
+def Tsai_Wu(sigma_x, shear_x, q_34):
     F11=1/(yield_strength*compr_strength)
     F22 = F11
     F12 = -1/2*np.sqrt(F11*F22)
@@ -181,12 +192,12 @@ def Tsia_Wu(sigma_zs):
     F2 = 1/(yield_strength)-1/(compr_strength)
     F44 = 1/tau_max**2
     F66 = 1/tau_max**2
-    sigma1 = sigma_zs
-    sigma2 = 0
-    sigma3 = 0
-    tau12 = 1 #DUMMY VALUE
-    tau23 = 0 #DUMMY VALUE
-    tau13 = 1 #DUMMY VALUE 
+    sigma1 = sigma_x
+    sigma2 = Q_("0 MPa")
+    sigma3 = Q_("0 MPa")
+    tau12 = shear_x
+    tau23 = Q_("0 MPa")
+    tau13 = (shear_x-q_34)
     F = F11 *sigma1**2+F22*(sigma2**2+sigma3**2)+sigma2*sigma3*(2*F22-F44)
     F += 2*F12*sigma1*(sigma3+sigma2)+F1*(sigma1+sigma2) + F2*sigma3
     F += F44*tau23**2 + F66*(tau13**2+tau12**2)
@@ -194,3 +205,5 @@ def Tsia_Wu(sigma_zs):
         print("No failure occurs")
     else:
         print("Failure occurs")
+    return F
+        
