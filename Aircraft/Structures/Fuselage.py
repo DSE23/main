@@ -47,9 +47,6 @@ poisson = 0.31                 # maximum 0.33
 tau_max = Q_("35 MPa")
 
 x = 0.5
-=======
-x = 1.2
->>>>>>> Beginning on shear flow calculations for cut out
 x *= Q_('m')
 
 
@@ -187,10 +184,9 @@ print('q_34', q_34_cor)
 print('q_23', q_23_cor)
 print('q_14', q_14_cor)
 
-<<<<<<< HEAD
-q_34 = 0
-=======
->>>>>>> Beginning on shear flow calculations for cut out
+
+#q_34 = 0
+# Beginning on shear flow calculations for cut out
 
 print(normal_shear_stress(x))
 
