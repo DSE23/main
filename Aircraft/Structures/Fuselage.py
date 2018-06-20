@@ -25,7 +25,7 @@ moter_w = Q_('180 kg')                          #Resultant weight of the motor
 g = Q_('9.81 m / s**2')                         #The gravity acceleration
 l_fus = Geometry.Fuselage.l_f                   #length of the fuselage in m
 l_sec1 = Q_('1.0 m')                          #length of section 1 (normal)
-l_sec2 = Q_('1.1 m')                          #length of section 2 (cut out)
+l_sec2 = Q_('1.0 m')                          #length of section 2 (cut out)
 l_sec3 = l_fus - l_sec1 - l_sec2               #length of section 3 (taper)
 rho = Performance.rho_c.magnitude * ureg("kg/(m**3)") #rho at cruise altitude
 V = Performance.V_cruise.magnitude * ureg("m/s")        #cruise speed
@@ -250,7 +250,7 @@ print(normal_shear_stress(x))
 
 #Tsia-Wu Failure criterion
 ## For section 1
-def Tsai_Wu(sigma_x, shear_x, q_34):
+def Tsai_Wu(sigma_x, shear_x):
     F11=1/(yield_strength*compr_strength)
     F22 = F11
     F12 = -1/2*np.sqrt(F11*F22)
@@ -263,7 +263,7 @@ def Tsai_Wu(sigma_x, shear_x, q_34):
     sigma3 = Q_("0 MPa")
     tau12 = shear_x
     tau23 = Q_("0 MPa")
-    tau13 = (shear_x-q_34)
+    tau13 = shear_x
     F = F11 *sigma1**2+F22*(sigma2**2+sigma3**2)+sigma2*sigma3*(2*F22-F44)
     F += 2*F12*sigma1*(sigma3+sigma2)+F1*(sigma1+sigma2) + F2*sigma3
     F += F44*tau23**2 + F66*(tau13**2+tau12**2)
