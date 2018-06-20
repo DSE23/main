@@ -169,7 +169,7 @@ def Calc_base_shear_flow(boom_areas, n):
         q_loc_D += -(S_x / Iyy) * (Wing.ThSkin * (x_coor - Wing.centroid) * Wing.Chordlength * ds)
         if (abs(x_coor * Wing.Chordlength - strs_x_coords[str_counter]) < Q_("1 cm")):
             q_loc_L += -(S_y / Ixx) * Wing.A_stringer * strs_y_coords[str_counter]
-            q_loc_D += -(S_x / Iyy) * Wing.A_stringer * (strs_x_coords[str_counter] / Wing.Chordlength - Wing.centroid) * Wing.Chordlength
+\            q_loc_D += -(S_x / Iyy) * Wing.A_stringer * (strs_x_coords[str_counter] / Wing.Chordlength - Wing.centroid) * Wing.Chordlength
             str_counter += 1
         qs56L = np.append(qs56L, q_loc_L)
         qs56D = np.append(qs56D, q_loc_D)
