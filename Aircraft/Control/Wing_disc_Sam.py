@@ -13,7 +13,7 @@ To be updated:
 - Drag from fuselage and gear
 """
 
-import sys, os
+import sys
 sys.path.append('../')              # This makes sure the parent directory gets added to the system path
 from Misc import ureg, Q_
 from Geometry import Geometry
@@ -26,7 +26,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import math as m
 import time
-import pandas as pd
 t0 = time.time()
 
 np.seterr(all='raise')
@@ -151,7 +150,6 @@ def trimming(u,ca_c, ce_c):
     return alpha_t, de_t
 
 
-
 # import airfoil lookup tables
 data = pd.read_csv('aerodynamic_data_ms15.dat', ' ', header=None).values
 
@@ -194,10 +192,6 @@ def lookup_data(alpha, ca_c, da):
     Cl_local = interpolate.interp1d(localdata[:,0], localdata[:,1], 'linear', fill_value='extrapolate')
     Cd_local = interpolate.interp1d(localdata[:,0], localdata[:,2], 'linear', fill_value='extrapolate')
     Cm_local = interpolate.interp1d(localdata[:,0], localdata[:,4], 'linear', fill_value='extrapolate')
-    #plt.plot(localdata[:,0],localdata[:,4])
-    #plt.plot(localdata[:,0],localdata[:,1])
-    
-    #plt.plot(localdata[range(1,len(localdata[:,0])),0],0.25-localdata[range(1,len(localdata[:,0])),4]/localdata[range(1,len(localdata[:,0])),1])
     if da >= 0:
         Cl = Cl_local(alpha)
         Cd = Cd_local(alpha)
@@ -213,9 +207,6 @@ def lookup_data(alpha, ca_c, da):
     else:
         xcp = 0.25
     return Cl, Cd, Cm, xcp
-
-
-
     
 # Import other forces
 T = Q_("1000 N")
@@ -242,12 +233,6 @@ for k in range(n_of_disc_v + 1):
 
 
 # Init sim
-# n_V = 0
-#Vrange = np.arange(V_s, V_a, 1)
-#pmax = np.transpose(np.vstack([Vrange, np.zeros((1, len(Vrange)))[0]]))
-# for V in Vrange:
-#    V_inf = V*ureg.m/ureg.s
-
 running = True
 n = 0
 # empty arrays for plotting in the end:
@@ -599,14 +584,8 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
 
     n += 1
 
-#    pmax[n_V,1] = max(plst)
-#    n_V += 1
-
 # plt.plot(pmax[:,0],pmax[:,1])
 # plt.plot(tlst,plst)
 #plt.plot(tlst,Fzlst)
 
 print("Finished in:", round(time.time() - t0, 1), "s")
-
-
-
