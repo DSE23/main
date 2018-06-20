@@ -13,7 +13,9 @@ To be updated:
 - Drag from fuselage and gear
 """
 
-import sys
+import sys, os
+stdout_old = sys.stdout
+sys.stdout = open(os.devnull, 'w')
 sys.path.append('../')              # This makes sure the parent directory gets added to the system path
 from Misc import ureg, Q_
 from Geometry import Geometry
@@ -26,6 +28,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import math as m
 import time
+sys.stdout = stdout_old
 t0 = time.time()
 
 np.seterr(all='raise')
@@ -44,8 +47,8 @@ alpha_nose = Q_("0. rad") # angle of attack of nose
 beta_nose  = Q_("0. rad")   # angle of sideslip of nose
 V_inf = Q_("110.3 m/s")     # V infinity
 t_current = Q_("0.0 s")       # Start time of sim
-dt = Q_("0.01 s")           # Time step of sim
-t_end = Q_("0.01 s")         # End time of sim
+dt = Q_("0.05 s")           # Time step of sim
+t_end = Q_("3. s")         # End time of sim
 l_h = Q_("3.6444 m")        # Tail arm ac-ac horizontal
 l_v = Q_("3.7 m")           # Tail arm ac-ac vertical
 p = Q_("0. 1/s")            # initial roll rate  [rad/s]
@@ -136,17 +139,22 @@ def trimming(u,ca_c, ce_c):
     q_Sh = S_h * 0.5 * rho * (u**2)          # Dyn. press. times H_tail surface
     l_w = X_w - xcg                                 # Wing arm
     l_h = X_h - xcg                                 # Tail arm
-    trim_mat = np.matrix([[(q_Sw*(Cda1w-dCl_alpha_w)+q_Sh*(Cdhde-dCl_alpha_h)).magnitude,
+    trim_mat = np.matrix([[(q_Sw*(Cda1w-dCl_alpha_w)).magnitude, (q_Sh*(Cdhde-dCl_alpha_h)).magnitude,
                          (-q_Sh*dCl_de).magnitude],
-                        [(q_Sw*((Cda1w-dCl_alpha_w)*l_w+dCm_alpha_w*MAC)+q_Sh*((Cda1h-dCl_alpha_h)*l_h+dCm_alpha_h*MAC_htail)).magnitude,
-                         (q_Sh*(dCm_de*MAC_htail - dCl_de*l_h)).magnitude]])
+                        [(q_Sw*((Cda1w-dCl_alpha_w)*l_w+dCm_alpha_w*MAC)).magnitude, (q_Sh*((Cda1h-dCl_alpha_h)*l_h+dCm_alpha_h*MAC_htail)).magnitude,
+                         (q_Sh*(dCm_de*MAC_htail - dCl_de*l_h)).magnitude],
+                         [1-2*dCl_alpha_w/(m.pi*AR_w * e_w), -1, 0]])
     trim_mat2 = np.matrix([[((-mtow*g0).magnitude*np.cos(Theta))],
+                          [0],
                           [0]])
     trim_cond = np.linalg.solve(trim_mat, trim_mat2)
+    alpha_t = trim_cond[0] + (dCl_alpha_w * trim_cond[0])/(m.pi * AR_w * e_w)
+#    print((trim_cond[0]))
+#    print((trim_cond[1]))
+#    print((trim_cond[0]-2*trim_cond[0]*dCl_alpha_w/(m.pi*AR_w * e_w)))
     
-    alpha_t = m.degrees(trim_cond[0])
-    de_t = trim_cond[1]
-    
+    alpha_t = m.degrees(alpha_t)
+    de_t = trim_cond[2]
     return alpha_t, de_t
 
 
@@ -237,18 +245,23 @@ running = True
 n = 0
 # empty arrays for plotting in the end:
 plst  = np.zeros((1, int((t_end / dt).magnitude)))[0]
+alst  = np.zeros((1, int((t_end / dt).magnitude)))[0]
 pdlst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 qlst  = np.zeros((1, int((t_end / dt).magnitude)))[0]
 qdlst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 Fzlst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 tlst  = np.arange(0, t_end.magnitude, dt.magnitude)
-
+t2lst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 alpha_nose,de = trimming(V_inf,0.1,0.5)
 alpha_nose = m.radians(alpha_nose)
+Theta = alpha_nose
 de = de[0,0]
+
+
 
 #raise ValueError("breakie breakie")
 for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
+    t_start_loop = time.time()
     disc_wing_w = np.zeros((len(kwlst)-1, 20))  # 2D array discretized wing
     disc_wing_h = np.zeros((len(khlst)-1, 20))  # 2D array discretized HT
     disc_wing_v = np.zeros((len(kvlst)-1, 20))  # 2D array discretized VT
@@ -536,7 +549,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     My = Sum_Fn_x
     Mz = -Sum_Ft_y + Sum_Fb_y
 
-    print("Fz:",Fz)
+
     # Kinematic relations
     u_dot = Fx/(mtow)
     u += u_dot*dt
@@ -556,9 +569,8 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     w_e = u*(m.sin(Theta)) +\
           v*(m.sin(Phi)*m.cos(Theta)) +\
           w*(m.cos(Phi)*m.cos(Theta))
-    
-    gamma = m.atan(-w_e/(np.sqrt(u**2+v**2)))
-    Xi = m.atan(v_e/u)
+    gamma = m.atan(-w_e/(np.sqrt(u_e**2+v_e**2)))
+    Xi = m.atan(v_e/u_e)
     
     p_dot = Mx / I_xx
     p    += p_dot * dt
@@ -568,24 +580,32 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     
     r_dot = Mz / I_zz
     r    += r_dot * dt
-
-    alpha_nose= Theta - gamma
-    beta_nose = Psi - Xi
     
     Phi += (p + q*m.sin(Phi)*m.tan(Theta)  + r*m.cos(Phi)*m.tan(Theta)) * dt
     Theta += (q*m.cos(Phi) - r*m.sin(Phi)) * dt
     Psi += (q*m.sin(Phi)/m.cos(Theta) + r*m.cos(Phi)/m.cos(Theta)) * dt
+    
+    
+    alpha_nose= Theta - gamma
+    beta_nose = Psi - Xi
+    
     # update lists for plots
     plst[n]  = p.magnitude
     pdlst[n] = p_dot.magnitude
     qlst[n]  = q.magnitude
     qdlst[n] = q_dot.magnitude
     Fzlst[n] = Fz.magnitude
+    alst[n] = alpha_nose.magnitude
 
+    
+    t_end_loop = time.time()
+    t2lst[n] = t_end_loop-t_start_loop
     n += 1
-
+    #print("Lw:",sum(disc_wing_w[:,11]))
+plt.plot(tlst,np.degrees(alst))
 # plt.plot(pmax[:,0],pmax[:,1])
 # plt.plot(tlst,plst)
 #plt.plot(tlst,Fzlst)
 
+print("Average Loop Time:",round(np.average(t2lst),2),"s")
 print("Finished in:", round(time.time() - t0, 1), "s")
