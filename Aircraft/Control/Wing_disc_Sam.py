@@ -55,7 +55,7 @@ r = Q_("0. 1/s")            # initial yaw rate   [rad/s]
 Phi   = Q_("0. rad")        # Initial euler angle around x-axis
 Psi   = Q_("0. rad")        # Initial euler angle around z-axis
 Theta = Q_("0. rad")        # Initial euler angle around y-axis
-lin_ran_alpha = 10          # Linear range of angle of attack and elevator defl.
+lin_ran_alpha = 5          # Linear range of angle of attack and elevator defl.
 w = Q_("0. m/s")
 u = V_inf
 v = Q_("0. m/s")
@@ -124,12 +124,12 @@ def trimming(u,ca_c, ce_c):
     dCd_de = (Cd2hde-Cdhde)/lin_ran_alpha
     dCm_de = (Cm2hde-Cmhde)/lin_ran_alpha
     Cla1w, Cda1w, Cma1w, Xcpa1w = (lookup_data(0., ca_c, 0))                 
-    Cla2w, Cda2w, Cma2w, Xcpa2w = (lookup_data(lin_ran_alpha, ca_c, 0))
+    Cla2w, Cda2w, Cma2w, Xcpa2w = (lookup_data(m.radians(lin_ran_alpha), ca_c, 0))
     dCl_alpha_w = (Cla2w-Cla1w)/m.radians(lin_ran_alpha)     # Cl alpha calculation of Wing
     dCd_alpha_w = (Cda2w-Cda1w)/m.radians(lin_ran_alpha)     # Cd alpha calc of wing
     dCm_alpha_w = (Cma2w - Cma1w)/m.radians(lin_ran_alpha)   # Cm alpha calc of wing
     Cla1h, Cda1h, Cma1h, Xcpa1h = (lookup_data(0., ce_c, 0))                 
-    Cla2h, Cda2h, Cma2h, Xcpa2h = (lookup_data(lin_ran_alpha, ce_c, 0))
+    Cla2h, Cda2h, Cma2h, Xcpa2h = (lookup_data(m.radians(lin_ran_alpha), ce_c, 0))
     dCl_alpha_h = (Cla2h - Cla1h)/m.radians(lin_ran_alpha)     # Cl alpha calc. of H_tail
     dCd_alpha_h = (Cda2h - Cda1h)/m.radians(lin_ran_alpha)     # Cd alpha calc. of H_tail
     dCm_alpha_h = (Cma2h - Cma1h)/m.radians(lin_ran_alpha)     # Cm alpha calc. of H_tail
@@ -141,12 +141,16 @@ def trimming(u,ca_c, ce_c):
                          (-q_Sh*dCl_de).magnitude],
                         [(q_Sw*((Cda1w-dCl_alpha_w)*l_w+dCm_alpha_w*MAC)+q_Sh*((Cda1h-dCl_alpha_h)*l_h+dCm_alpha_h*MAC_htail)).magnitude,
                          (q_Sh*(dCm_de*MAC_htail - dCl_de*l_h)).magnitude]])
-    trim_mat2 = np.matrix([[(-mtow.magnitude*np.cos(Theta))],
+    trim_mat2 = np.matrix([[((-mtow*g0).magnitude*np.cos(Theta))],
                           [0]])
     trim_cond = np.linalg.solve(trim_mat, trim_mat2)
+    
     alpha_t = m.degrees(trim_cond[0])
     de_t = trim_cond[1]
+    
+
     return alpha_t, de_t
+
 
 
 # import airfoil lookup tables
@@ -154,7 +158,7 @@ data = pd.read_csv('aerodynamic_data_ms15.dat', ' ', header=None).values
 
 def lookup_data(alpha, ca_c, da):
     # Looksup and interpolates Cl and Cd based on alpha, ca_c and da
-    alpha = round(alpha,3)
+    alpha = round(alpha,5)
     alpha = m.degrees(alpha)
     indexca_c = int(100*ca_c)-1
     if da % 5 ==0:
@@ -168,6 +172,7 @@ def lookup_data(alpha, ca_c, da):
         localdata = (localdata2 - localdata1)/5 *abs(da)
     non_zero_max = max(np.argwhere(localdata[:, 0]))[0]  # last non-zero row
     localdata = localdata[:non_zero_max+1,:]
+    print(localdata[:,1])
     Cl_local = interpolate.interp1d(localdata[:,0], localdata[:,1], 'linear', fill_value='extrapolate')
     Cd_local = interpolate.interp1d(localdata[:,0], localdata[:,2], 'linear', fill_value='extrapolate')
     Cm_local = interpolate.interp1d(localdata[:,0], localdata[:,4], 'linear', fill_value='extrapolate')
@@ -233,7 +238,18 @@ tlst  = np.arange(0, t_end.magnitude, dt.magnitude)
 
 alpha_nose,de = trimming(V_inf,0.1,0.5)
 alpha_nose = m.radians(alpha_nose)
+
 de = de[0,0]
+Clw, Cdw, dummy, dummy = lookup_data(alpha_nose,0.1,0)
+Clh, Cdh, dummy, dummy = lookup_data(alpha_nose,0.5,de)
+Lw = 0.5 * rho * V_inf**2 * Clw * S_w
+Dw = 0.5 * rho * V_inf**2 * Cdw * S_w
+Lh = 0.5 * rho * V_inf**2 * Clh * S_h
+Dh = 0.5 * rho * V_inf**2 * Cdh * S_h
+Fz = -m.cos(alpha_nose)*(Lw+Lh) + m.sin(alpha_nose)*(Dw+Dh) + W
+print ("Fz",Fz)
+
+raise ValueError("breakie breakie")
 for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     disc_wing_w = np.zeros((len(kwlst)-1, 20))  # 2D array discretized wing
     disc_wing_h = np.zeros((len(khlst)-1, 20))  # 2D array discretized HT
@@ -544,6 +560,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     Fy = Sum_Fb + W * m.sin(Phi)
     Fz = Sum_Fn + W * m.cos(Theta) * m.cos(Phi)
 
+    print (Fz)
     # Kinematic relations
     u_dot = Fx/(mtow)
     u += u_dot*dt
@@ -554,9 +571,9 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     
     V_inf = np.sqrt(u*u+w*w+v*v)
     
-    u_e = V_inf*m.cos(gamma)*m.cos(gamma_lateral)
-    w_e = V_inf*m.sin(gamma)
-    v_e = V_inf*m.cos(gamma)*m.sin(gamma_lateral)
+    u_e = V_inf*m.cos(Theta)*m.cos(Psi)
+    w_e = V_inf*m.sin(Theta)
+    v_e = V_inf*m.cos(Theta)*m.sin(Psi)
     
     gamma = m.atan(w_e/u_e)
     gamma_lateral = m.atan(v_e/u_e)
@@ -590,7 +607,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
 
 # plt.plot(pmax[:,0],pmax[:,1])
 # plt.plot(tlst,plst)
-
+plt.plot(tlst,Fzlst)
 
 print("Finished in:", round(time.time() - t0, 1), "s")
 
