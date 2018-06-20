@@ -45,7 +45,7 @@ shear_modulus = Q_("36 GPa")   #G
 poisson = 0.31                 # maximum 0.33
 tau_max = Q_("35 MPa")
 
-x = 0.5
+x = 1.2
 x *= Q_('m')
 
 
@@ -167,24 +167,31 @@ def normal_shear_stress(x):
     return sigma_x, shear_x
 
 '''Cut out correction calculation'''
+q_12 = normal_shear_stress(x)[1]
 
-q_34 = 0
+q_34_cor = (b_f80 * q_12) / b_f80
+q_23_cor = (b_f80 * q_34_cor) / b_f80
+q_14_cor = (b_f80 * q_23_cor) / b_f80
+
+q_34 = q_12 + q_34_cor
+q_23 = q_12 + q_23_cor
+q_14 = q_12 + q_14_cor
+q_12 = q_12 + q_12
+
+print('q_12', q_12)
+print('q_34', q_34_cor)
+print('q_23', q_23_cor)
+print('q_14', q_14_cor)
+
+
 
 print(normal_shear_stress(x))
 
 
 
-
-
-
-
-
-
-
-
 #Tsia-Wu Failure criterion
 ## For section 1
-def Tsai_Wu(sigma_x, shear_x, q_34):
+def Tsai_Wu(sigma_x, shear_x):
     F11=1/(yield_strength*compr_strength)
     F22 = F11
     F12 = -1/2*np.sqrt(F11*F22)
@@ -197,7 +204,7 @@ def Tsai_Wu(sigma_x, shear_x, q_34):
     sigma3 = Q_("0 MPa")
     tau12 = shear_x
     tau23 = Q_("0 MPa")
-    tau13 = (shear_x-q_34)
+    tau13 = shear_x
     F = F11 *sigma1**2+F22*(sigma2**2+sigma3**2)+sigma2*sigma3*(2*F22-F44)
     F += 2*F12*sigma1*(sigma3+sigma2)+F1*(sigma1+sigma2) + F2*sigma3
     F += F44*tau23**2 + F66*(tau13**2+tau12**2)
@@ -206,4 +213,3 @@ def Tsai_Wu(sigma_x, shear_x, q_34):
     else:
         print("Failure occurs")
     return F
-        
