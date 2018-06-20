@@ -167,10 +167,12 @@ def Calc_base_shear_flow(boom_areas, n):
 
         # Drag
         q_loc_D += -(S_x / Iyy) * (Wing.ThSkin * (x_coor - Wing.centroid) * Wing.Chordlength * ds)
-        if (abs(x_coor * Wing.Chordlength - strs_x_coords[str_counter]) < Q_("1 cm")):
-            q_loc_L += -(S_y / Ixx) * Wing.A_stringer * strs_y_coords[str_counter]
-\            q_loc_D += -(S_x / Iyy) * Wing.A_stringer * (strs_x_coords[str_counter] / Wing.Chordlength - Wing.centroid) * Wing.Chordlength
-            str_counter += 1
+        if(str_counter < 8):
+            if (abs(x_coor * Wing.Chordlength - strs_x_coords[str_counter]) < Q_("1 cm")):
+                q_loc_L += -(S_y / Ixx) * Wing.A_stringer * strs_y_coords[str_counter]
+                print(strs_y_coords[str_counter])
+                q_loc_D += -(S_x / Iyy) * Wing.A_stringer * (strs_x_coords[str_counter] / Wing.Chordlength - Wing.centroid) * Wing.Chordlength
+                str_counter += 1
         qs56L = np.append(qs56L, q_loc_L)
         qs56D = np.append(qs56D, q_loc_D)
 
@@ -178,18 +180,19 @@ def Calc_base_shear_flow(boom_areas, n):
     ds = Wing.HSpar1/(2*n)
     qs61L = np.array([])
     qs61D = np.array([])
-    qs61L = np.append(qs61L, q_loc_L)
-    qs61D = np.append(qs61D, q_loc_D)
+    qs61L = np.append(qs61L, qs56L[-1])
+    qs61D = np.append(qs61D, qs56D[-1])
     s5 = np.array([])
     s5 = np.append(s5, 0)
     s = Q_("0 m")
     x = (Wing.ChSpar1 - Wing.centroid) * Wing.Chordlength  # x_coordinate of Spar 1 w.r.t. the centroid
+    y = -Wing.HSpar1 / 2
     # Lift
-    q_loc_L += -(S_y / Ixx) *( Wing.ThSpar1 * y * ds + boom_areas[-1] * -Wing.HSpar1/2 )
-    qs61L = np.append(qs12L, q_loc_L)
+    q_loc_L += -(S_y / Ixx) *( Wing.ThSpar1 * y * ds + boom_areas[-1] * y )
+    qs61L = np.append(qs61L, q_loc_L)
     # Drag
     q_loc_D += -(S_x / Iyy) *( Wing.ThSpar1 * x * ds + boom_areas[-1] * x)
-    qs61D = np.append(qs12D, q_loc_D)
+    qs61D = np.append(qs61D, q_loc_D)
     for _ in range(n):
         s += ds
         y = -Wing.HSpar1/2 + s  # x_coordinate of Spar 1 w.r.t. the centroid
