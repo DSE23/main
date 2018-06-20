@@ -168,7 +168,7 @@ AreaSpar2xc = AreaSpar2 * ChSpar2 * Chordlength
 #For the clamps
 AreaClampsxc = AreaClamps * ChSpar1 * Chordlength
 
-def get_xy_from_perim(perim_val, start_x=0, dat_file_name="../Airfoil.dat"):
+def get_xy_from_perim(perim_val, start_x=0, reverse=False):
     """
         NOTE: Special function for Tobias
         This function returns the x and y coordinates for a given perimeter
@@ -192,16 +192,29 @@ def get_xy_from_perim(perim_val, start_x=0, dat_file_name="../Airfoil.dat"):
     perim = 0  # Set initial perimiter size to 0
     step = 0.001  # Step size for algorithm: increase will lead to faster computing times
     min_val = 10
-    for x_c in np.arange(start_x, 1, step):
-        perim += np.sqrt((step) ** 2 + (airfoilordinate(x_c + step) - airfoilordinate(x_c)) ** 2)
-        if abs(perim - perim_val) < min_val:
-            x_coord = 0.5 * (x_c + x_c + step)
-            y_coord = 0.5 * (airfoilordinate(x_c) + airfoilordinate(x_c + step))
-            min_val = abs(perim - perim_val)
-        else:
-            break
+    if reverse == False:
+        for x_c in np.arange(start_x, 1, step):
+            perim += np.sqrt((step) ** 2 + (airfoilordinate(x_c + step) - airfoilordinate(x_c)) ** 2)
+            if abs(perim - perim_val) < min_val:
+                x_coord = 0.5 * (x_c + x_c + step)
+                y_coord = 0.5 * (airfoilordinate(x_c) + airfoilordinate(x_c + step))
+                min_val = abs(perim - perim_val)
+            else:
+                break
 
-    return(x_coord, y_coord)
+        return(x_coord, y_coord)
+    else:
+        step *= -1
+        for x_c in np.arange(start_x, 0, step):
+            perim += np.sqrt((step) ** 2 + (airfoilordinate(x_c + step) - airfoilordinate(x_c)) ** 2)
+            if abs(perim - perim_val) < min_val:
+                x_coord = 0.5 * (x_c + x_c + step)
+                y_coord = 0.5 * (airfoilordinate(x_c) + airfoilordinate(x_c + step))
+                min_val = abs(perim - perim_val)
+            else:
+                break
+
+        return (x_coord, -y_coord)
 
 def get_perim_from_x(x_coor, dat_file_name="../Airfoil.dat"):
     """
