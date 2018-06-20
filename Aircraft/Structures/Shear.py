@@ -337,9 +337,6 @@ def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs6
 
         F_x = q_loc * ds * np.cos(Force_angle)
         F_y = q_loc * ds * np.sin(Force_angle)
-        print("q_loc=", q_loc)
-        print("F_x=", F_x)
-        print("F_y=", F_y)
         Moment_L += -F_x * (y_loc_2 + y_loc_1) / 2 + F_y * (x_loc_2 + x_loc_1) / 2
 
     # Moment 6 -> 1
