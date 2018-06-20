@@ -45,9 +45,9 @@ dr = Q_("0 deg")            # rudder deflection
 de = Q_("0 deg")            # elevator deflection
 alpha_nose = Q_("0. rad") # angle of attack of nose
 beta_nose  = Q_("0. rad")   # angle of sideslip of nose
-V_inf = Q_("110.3 m/s")     # V infinity
+V_inf = Q_("60 m/s")     # V infinity
 t_current = Q_("0.0 s")       # Start time of sim
-dt = Q_("0.05 s")           # Time step of sim
+dt = Q_("0.01 s")           # Time step of sim
 t_end = Q_("3. s")         # End time of sim
 l_h = Q_("3.6444 m")        # Tail arm ac-ac horizontal
 l_v = Q_("3.7 m")           # Tail arm ac-ac vertical
@@ -70,6 +70,9 @@ g0 = Performance.g0.magnitude * Q_("m/s**2")
 I_yy = Inertia.I_yy
 I_xx = Inertia.I_xx
 I_zz = Inertia.I_zz
+I_xz = Inertia.I_xz
+I_star = I_xx*I_zz-I_xz**2
+
 b_w = Geometry.Wing.b
 S_w = Geometry.Wing.S
 c_r_w = Geometry.Wing.c_r
@@ -178,11 +181,13 @@ def lookup_data(alpha, ca_c, da):
         localdata1 = data[int(index1da*50*51+indexca_c*51):int(index1da*50*51+(indexca_c+1)*51),:]
         localdata2 = data[int(index2da*50*51+indexca_c*51):int(index2da*50*51+(indexca_c+1)*51),:]
         localdata3 = data[int(index3da*50*51+indexca_c*51):int(index3da*50*51+(indexca_c+1)*51),:]
-        non_zero_max = max(np.argwhere(localdata1[:, 0]))[0]  # last non-zero row
+        non_zero_max1 = max(np.argwhere(localdata1[:, 0]))[0]  # last non-zero row
+        non_zero_max2 = max(np.argwhere(localdata2[:, 0]))[0]  # last non-zero row
+        non_zero_max3 = max(np.argwhere(localdata3[:, 0]))[0]  # last non-zero row
+        non_zero_max = min((non_zero_max1,non_zero_max2,non_zero_max3))
+        
         localdata1 = localdata1[:non_zero_max+1,:]
-        non_zero_max = max(np.argwhere(localdata2[:, 0]))[0]  # last non-zero row
         localdata2 = localdata2[:non_zero_max+1,:]    
-        non_zero_max = max(np.argwhere(localdata2[:, 0]))[0]  # last non-zero row
         localdata3 = localdata3[:non_zero_max+1,:]   
         
         localdata_alpha = localdata2[:,0]
@@ -258,9 +263,10 @@ Theta = alpha_nose
 de = de[0,0]
 
 
-
 #raise ValueError("breakie breakie")
 for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
+    if t_current >= 2.:
+        de = 5
     t_start_loop = time.time()
     disc_wing_w = np.zeros((len(kwlst)-1, 20))  # 2D array discretized wing
     disc_wing_h = np.zeros((len(khlst)-1, 20))  # 2D array discretized HT
@@ -551,11 +557,12 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
 
 
     # Kinematic relations
-    u_dot = Fx/(mtow)
+    u_dot = Fx/(mtow) - q*w + r*v
+    v_dot = Fy/(mtow) - r*u + p*w
+    w_dot = Fz/(mtow) - p*v + q*u
+    
     u += u_dot*dt
-    w_dot = Fz/(mtow)
     w += w_dot*dt
-    v_dot = Fy/(mtow)
     v += v_dot*dt
     
     V_inf = np.sqrt(u*u+w*w+v*v)
@@ -569,17 +576,22 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     w_e = u*(m.sin(Theta)) +\
           v*(m.sin(Phi)*m.cos(Theta)) +\
           w*(m.cos(Phi)*m.cos(Theta))
+    
     gamma = m.atan(-w_e/(np.sqrt(u_e**2+v_e**2)))
     Xi = m.atan(v_e/u_e)
     
-    p_dot = Mx / I_xx
-    p    += p_dot * dt
+    p_dot = I_zz/I_star * Mx + I_xz/I_star * Mz +\
+            ((I_xx-I_yy+I_zz)*I_xz)/I_star * p * q +\
+            ((I_yy-I_zz)*I_zz-I_xz**2)/I_star * q * r
+    q_dot = My/I_yy + I_xz/I_yy * (r**2 - p**2) +\
+            (I_zz-I_xx)/I_yy * p * r
+    r_dot = I_xz/I_star * Mx + I_xx/I_star * Mz +\
+            ((I_xx-I_yy)*I_xx + I_xz**2)/I_star * p * q +\
+            ((-I_xx+I_yy-I_zz)*I_xz)/I_star * q *r
     
-    q_dot  = My / I_yy
-    q     += q_dot * dt
-    
-    r_dot = Mz / I_zz
-    r    += r_dot * dt
+    p += p_dot * dt
+    q += q_dot * dt
+    r += r_dot * dt
     
     Phi += (p + q*m.sin(Phi)*m.tan(Theta)  + r*m.cos(Phi)*m.tan(Theta)) * dt
     Theta += (q*m.cos(Phi) - r*m.sin(Phi)) * dt
@@ -602,7 +614,10 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     t2lst[n] = t_end_loop-t_start_loop
     n += 1
     #print("Lw:",sum(disc_wing_w[:,11]))
-plt.plot(tlst,np.degrees(alst))
+plt.plot(tlst,np.degrees(alst),label="alpha")
+plt.plot(tlst,np.degrees(qlst),label="pitch")
+plt.legend()
+plt.show()
 # plt.plot(pmax[:,0],pmax[:,1])
 # plt.plot(tlst,plst)
 #plt.plot(tlst,Fzlst)
