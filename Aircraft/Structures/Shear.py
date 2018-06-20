@@ -11,6 +11,7 @@ from Structures import WingStress
 from Structures import Wing
 from Structures import Inertia
 import numpy as np
+from matplotlib import pyplot as plt
 
 
 
@@ -79,7 +80,7 @@ def Calc_base_shear_flow(boom_areas, n):
     q_loc_L = 0
     q_loc_D = 0
     x = (Wing.ChSpar1 - Wing.centroid) * Wing.Chordlength  # x_coordinate of Spar 1 w.r.t. the centroid
-    for _ in range(n):
+    for _ in range(n-1):
         s += ds
         y = s
         s1 = np.append(s1, s)
@@ -89,6 +90,9 @@ def Calc_base_shear_flow(boom_areas, n):
         # Drag
         q_loc_D += (S_x/Iyy)*Wing.ThSpar1*x*ds
         qs12D = np.append(qs12D, q_loc_D)
+    s += ds
+    y = s
+    s1 = np.append(s1, s)
     # Lift
     q_loc_L += -(S_y / Ixx) *( Wing.ThSpar1 * y * ds + boom_areas[0] * Wing.HSpar1/2 )
     qs12L = np.append(qs12L, q_loc_L)
@@ -117,8 +121,9 @@ def Calc_base_shear_flow(boom_areas, n):
 
         # Drag
         q_loc_D += -(S_x / Iyy) * (Wing.ThSkin * (x_coor - Wing.centroid) * Wing.Chordlength * ds)
-        if(abs(x_coor*Wing.Chordlength - strs_x_coords[str_counter]) < Q_("1 cm")):
-            q_loc_L +=  -(S_y/Ixx)*Wing.A_stringer*strs_y_coords[str_counter]
+        if(np.sqrt((x_coor*Wing.Chordlength - strs_x_coords[str_counter])**2 + (y_coor*Wing.Chordlength - strs_y_coords[str_counter])**2) < Q_("1 cm")):
+            print("s2:", strs_x_coords[str_counter])
+            q_loc_L += -(S_y/Ixx)*Wing.A_stringer*strs_y_coords[str_counter]
             q_loc_D += -(S_x/Iyy) *Wing.A_stringer *(strs_x_coords[str_counter]/Wing.Chordlength - Wing.centroid)*Wing.Chordlength
             str_counter += 1
         qs23L = np.append(qs23L, q_loc_L)
@@ -170,7 +175,7 @@ def Calc_base_shear_flow(boom_areas, n):
         if(str_counter < 8):
             if (abs(x_coor * Wing.Chordlength - strs_x_coords[str_counter]) < Q_("1 cm")):
                 q_loc_L += -(S_y / Ixx) * Wing.A_stringer * strs_y_coords[str_counter]
-                print(strs_y_coords[str_counter])
+                print(strs_x_coords[str_counter])
                 q_loc_D += -(S_x / Iyy) * Wing.A_stringer * (strs_x_coords[str_counter] / Wing.Chordlength - Wing.centroid) * Wing.Chordlength
                 str_counter += 1
         qs56L = np.append(qs56L, q_loc_L)
@@ -188,12 +193,13 @@ def Calc_base_shear_flow(boom_areas, n):
     x = (Wing.ChSpar1 - Wing.centroid) * Wing.Chordlength  # x_coordinate of Spar 1 w.r.t. the centroid
     y = -Wing.HSpar1 / 2
     # Lift
+    s5 = np.append(s5, 0)
     q_loc_L += -(S_y / Ixx) *( Wing.ThSpar1 * y * ds + boom_areas[-1] * y )
     qs61L = np.append(qs61L, q_loc_L)
     # Drag
     q_loc_D += -(S_x / Iyy) *( Wing.ThSpar1 * x * ds + boom_areas[-1] * x)
     qs61D = np.append(qs61D, q_loc_D)
-    for _ in range(n):
+    for _ in range(n-1):
         s += ds
         y = -Wing.HSpar1/2 + s  # x_coordinate of Spar 1 w.r.t. the centroid
         s5 = np.append(s5, s)
@@ -213,9 +219,9 @@ def Calc_base_shear_flow(boom_areas, n):
 
 s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs61L, qs12D, qs23D, qs35D, qs56D, qs61D  = Calc_base_shear_flow(Get_boom_area(Wing.AreaClamps/2), n)
 
-print("qs at 1st spar cap:", qs23L[0])
-print("qs at 2nd spar cap:", qs56L[-1])
-print("qs at beginning:", qs12L[0], "\tqs at end end:", qs61L[-1])
+print("qs at 1st spar cap:", qs23D[0])
+print("qs at 2nd spar cap:", qs56D[-1])
+print("qs at beginning:", qs12D[0], "\tqs at end end:", qs61D[-1])
 
 def Calculate_correcting_shear_flow(qs0, n):      #Tobias
     qs0denom = Wing.HSpar1/Wing.ThSpar1
@@ -286,3 +292,10 @@ def Rate_of_twist(T):
     return dthetadz
 
 # Calculate shear stress
+
+plt.plot(s1, qs12D)
+plt.plot(s2, qs23D, 'r')
+plt.plot(s3, qs35D, 'y')
+plt.plot(s4, qs56D, 'k')
+plt.plot(s5, qs61D, 'p')
+plt.show()
