@@ -247,7 +247,7 @@ def fuselage_calc(x):
 
     print(normal_shear_stress(x))
 
-    return sigma_x, shear_x
+    return sigma_x, shear_x, q_12, q_23, q_34, q_14
 
 
 
@@ -273,7 +273,7 @@ def Tsai_Wu(sigma_x, shear_x):
     sigma3 = Q_("0 MPa")
     tau12 = shear_x
     tau23 = Q_("0 MPa")
-    tau13 = shear_x
+    tau13 = Q_("0 MPa")
     F = F11 *sigma1**2+F22*(sigma2**2+sigma3**2)+sigma2*sigma3*(2*F22-F44)
     F += 2*F12*sigma1*(sigma3+sigma2)+F1*(sigma1+sigma2) + F2*sigma3
     F += F44*tau23**2 + F66*(tau13**2+tau12**2)
