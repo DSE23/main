@@ -597,8 +597,8 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
         
        
         # Normal and tangental coefficients (wrt body frame):
-        Cb = -Cl*m.cos(beta_v) - Cd*m.sin(beta_v)
-        Ct = Cl*m.sin(beta_v) - Cd*m.cos(beta_v)
+        Cb = Cl*m.cos(beta_v) - Cd*m.sin(beta_v)
+        Ct = -Cl*m.sin(beta_v) - Cd*m.cos(beta_v)
 
         Ft = 0.5 * rho * V_local ** 2 * Sloc * Ct
         Fb = 0.5 * rho * V_local ** 2 * Sloc * Cb
