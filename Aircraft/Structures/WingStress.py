@@ -17,6 +17,7 @@ from Geometry import Geometry
 # import Wing
 from Structures import Inertia
 from Structures import Wing
+from Structures import Shear
 from Aerodynamics import Wing as AWing
 from Performance import Performance
 import matplotlib.pyplot as plt
@@ -453,7 +454,6 @@ def Tsia_Wu(sigma_zs):
         print("No failure occurs")
     else:
         print("Failure occurs")
-
 
 
 #plt.plot(s3, qs3)
