@@ -47,8 +47,8 @@ alpha_nose = Q_("0. rad") # angle of attack of nose
 beta_nose  = Q_("0. rad")   # angle of sideslip of nose
 V_inf = Q_("60 m/s")     # V infinity
 t_current = Q_("0.0 s")       # Start time of sim
-dt = Q_("0.05 s")           # Time step of sim
-t_end = Q_("8.0 s")         # End time of sim
+dt = Q_("0.04 s")           # Time step of sim
+t_end = Q_("6.5 s")         # End time of sim
 l_h = Q_("3.6444 m")        # Tail arm ac-ac horizontal
 l_v = Q_("3.7 m")           # Tail arm ac-ac vertical
 p = Q_("0. 1/s")            # initial roll rate  [rad/s]
@@ -387,7 +387,7 @@ disc_wing_h = discretize_ht(de)
 disc_wing_v = discretize_vt(dr)
 "============================================================================="
 for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
-    print(t_current)
+    #print(t_current)
     t_start_loop = time.time()
     # Calculate for WING
     for i in range(0, len(kwlst)-1): 
@@ -570,9 +570,9 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
         yaw_induced_beta  = r * l_h / V_local
         sidewash = 0.
         beta_v = round(beta_nose + roll_induced_beta + yaw_induced_beta - sidewash,3)
-        print('beta_v',beta_v)
+
         # Determine change in angle of attack due to tip vortex
-        beta_i = 0.
+        beta_i = 0.0
         running_beta_i = True
         while running_beta_i:
             beta_e = beta_v - beta_i
@@ -585,11 +585,10 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
                 running_beta_i = False
             else:
                 beta_i_new = Cl / (m.pi * AR_v * e_v)
-                if (beta_i_new-beta_i)/beta_i_new < 0.01:
+                if (beta_i-beta_i_new)/beta_i_new < 0.01:
                     running_beta_i = False
                 beta_i = beta_i_new
 
-            #print(beta_i)
         beta_v = beta_v - beta_i                                # Angle of Attack as experienced by the piece
         alpha_v  = alpha_nose                                   # Angle of Sideslip as experienced by the piece
         delta_beta = roll_induced_beta + yaw_induced_beta - beta_i - sidewash      # Difference between AoA nose and piece
@@ -696,24 +695,24 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     Theta += (q*m.cos(Phi) - r*m.sin(Phi)) * dt
     Psi += (q*m.sin(Phi)/m.cos(Theta) + r*m.cos(Phi)/m.cos(Theta)) * dt
 
-    T_matrix = T_y(gamma) * T_z(Xi) * T_z(-Psi) * T_y(-Theta) * T_x(-Phi)
+    #T_matrix = T_y(gamma) * T_z(Xi) * T_z(-Psi) * T_y(-Theta) * T_x(-Phi)
     #print(T_matrix)
 
-    alpha_nose = m.atan(T_matrix[0, 2] / T_matrix[0, 0])
-    beta_nose = m.asin(T_matrix[0, 1])
-    u_nose = m.atan(-T_matrix[2, 1] / T_matrix[1, 1])
+#    alpha_nose = m.atan(T_matrix[0, 2] / T_matrix[0, 0])
+#    beta_nose = m.asin(T_matrix[0, 1])
+#    u_nose = m.atan(-T_matrix[2, 1] / T_matrix[1, 1])
 
-    #T_matrix2 = T_x(u_nose)* T_z(beta_nose) * T_y(alpha_nose)
+#    T_matrix2 = T_x(u_nose)* T_z(beta_nose) * T_y(alpha_nose)
+#
+#    print(T_matrix2)
+#
+#
+#    print(alpha_nose, beta_nose)
+#    print(T_matrix[0, 2])
 
-    #print(T_matrix2)
-
-
-    #print(alpha_nose, beta_nose)
-    #print(T_matrix[0, 2])
-
-    #alpha_nose= Theta - gamma
-    #beta_nose = Psi - Xi
-    #print(beta_nose, t_current)
+    alpha_nose= Theta - gamma
+    beta_nose = Psi - Xi
+#    print(beta_nose, t_current)
 
     # update lists for plots
     plst[n]  = p.magnitude
