@@ -15,18 +15,18 @@ from Geometry import Geometry
 
 #Manual inputs
 #chordlength = .05 #determine part of chord used for slats
-slatwidth = Geometry.Wing.b  #width of the slats
+slatwidth = Geometry.Wing.b - 2 * Geometry.Wing.horn #width of the slats
 h = Q_('100 m') #altitude of flight
 Velocity = Q_(' 30 m/s') #aircraft velocity at which slats are deployed
 GMAC = Geometry.Wing.c_avg
-mass_sys = 20 #mass of slat system
+mass_sys = Q_('20 kg') #mass of slat system
 #%% Slat sizing for optimal max lift increase
 
 # optimization arrays:
 deflection = np.linspace(15,25,20) #deflection in degrees
 deflection_rad = np.radians(deflection)
 slatchordratio = np.linspace(0,0.15,20) #dimensionless
-verticaldeflection = np.linspace(0.05,0.0845,20) #in meter
+verticaldeflection = np.linspace(0.05,0.0825,20) #in meter
 
 #DATCOM graph interpolation
 maxLeffect_datapoints = np.array([(0,0),(.05,.84),(.1,1.2),(.15,1.44),(.2,1.6),\
@@ -94,7 +94,7 @@ lam = Q_('0.0065 K / m')
 p0 = Q_('101325 N/m**2')
 Temp = Temp0 - lam * h
 density = density_0 * (Temp / Temp0)**((g.magnitude/ lam.magnitude / R.magnitude) - 1)
-
+pressure   = (Temp/Temp0)**(-g.magnitude/(-lam.magnitude*R.magnitude))*p0
 
 # Slat force calculation
 slatarea = slatlength * slatwidth
@@ -110,9 +110,11 @@ for coor in np.arange(0,len(cp_file)):
         cp_array = np.append(cp_array, cp_file[coor,2])
     
 cp_ave = np.average(cp_array)
-F = 0.5 * density * Velocity**2 * cp_ave * slatarea
+F = (0.5 * density * Velocity**2 * cp_ave) * slatarea 
 
-acc = F.magnitude / mass_sys
+acc = F.magnitude / ( mass_sys.magnitude + density.magnitude *\
+                     slatwidth.magnitude * gapslat *\
+                     Geometry.Wing.T_Cmax * GMAC.magnitude)
 time = m.sqrt(gapslat/-acc)
 
 
@@ -122,7 +124,7 @@ print('stroke length',stroke)
 
 
 total_length = 0.2
-rod = np.linspace(0.07,.08,50)
+rod = np.linspace(0.07,.078,50)
 pushrod = stroke + 0.02
 rodangle = np.radians(np.linspace(0,90,50))
 for r in rod:
@@ -137,7 +139,7 @@ for r in rod:
         gain = midrodx - l + new_x
         if gain > gapslat:
             print('for a gain of',gain, 'a rod angle of', m.degrees(a), ' and a rod \
-                  length of ', r, ' is need')
+                  length of ', r, ' is need', 'midrod =', midrod)
             
         
 
