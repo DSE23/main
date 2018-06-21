@@ -53,10 +53,15 @@ def Get_boom_area(A_spar_caps):
 
     return B_area*ureg("m**2")
 # UNCOMMENT TO TEST GET BOOM AREA FUNCTION:
-print(Get_boom_area(Q_("1000 mm**2")))
+#print(Get_boom_area(Q_("1000 mm**2")))
 
 # Calculate base shear flow for every section of the wing box # Midas & Tobias
 def Calc_base_shear_flow(boom_areas, n):
+    """
+    :param boom_areas: Return variable from  Boom_area function
+    :param n: Number of sections that divides the perimiter
+    :return: Arrays with s's and qs's, seperated for L and D
+    """
     strs_x_coords, strs_y_coords, _ = Wing.x_y_angle_coords
     strs_x_coords.ito(ureg("m"))
     strs_y_coords.ito(ureg("m"))
@@ -367,7 +372,7 @@ def Calc_shear_stresses(qs12L, qs23L, qs35L, qs56L, qs61L, qs12D, qs23D, qs35D, 
 
     return Tau_12_L, Tau_23_L, Tau_35_L, Tau_56_L, Tau_61_L, Tau_12_D, Tau_23_D, Tau_35_D, Tau_56_D, Tau_61_D
 
-Moment_L = Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs61L)
+Moment_L = Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L+qs0L, qs23L+qs0L, qs35L+qs0L, qs56L+qs0L, qs61L+qs0L)
 print(Moment_L)
 # Calculate shear center location   #Tobias
 #units checked and correct
@@ -393,7 +398,16 @@ def Rate_of_twist(T):
     dthetadz = constant/integral
     return dthetadz
 
+# Final shear flows in each section
+def Final_shaer_flows(qs12L, qs23L, qs35L, qs56L, qs61L, qs12D, qs23D, qs35D, qs56D, qs61D, qs0_L, qs0_D, q_moment):
+    qs12 = qs12L + qs12D + qs0_D +qs0_L + q_moment
+    qs23 = qs23L + qs23D + qs0_D +qs0_L + q_moment
+    qs35 = qs35L + qs35D + qs0_D +qs0_L + q_moment
+    qs56 = qs56L + qs56D + qs0_D +qs0_L + q_moment
+    qs61 = qs61L + qs61D + qs0_D +qs0_L + q_moment
+    return qs12, qs23, qs35, qs56, qs61
+
 # Calculate shear stress
 
-##### Tau_12_LX, Tau_23_LX, Tau_35_LX, Tau_56_LX, Tau_61_LX, Tau_12_DX, Tau_23_DX, Tau_35_DX, Tau_56_DX, Tau_61_DX
-##### Tau_12_LY, Tau_23_LY, Tau_35_LY, Tau_56_LY, Tau_61_LY, Tau_12_DY, Tau_23_DY, Tau_35_DY, Tau_56_DY, Tau_61_DY
+##### qs12X, qs23X, qs35X, qs56X, qs61X
+##### qs12Y, qs23Y, qs35Y, qs56Y, qs61Y
