@@ -48,7 +48,7 @@ beta_nose  = Q_("0. rad")   # angle of sideslip of nose
 V_inf = Q_("60 m/s")     # V infinity
 t_current = Q_("0.0 s")       # Start time of sim
 dt = Q_("0.05 s")           # Time step of sim
-t_end = Q_("10. s")         # End time of sim
+t_end = Q_("6. s")         # End time of sim
 l_h = Q_("3.6444 m")        # Tail arm ac-ac horizontal
 l_v = Q_("3.7 m")           # Tail arm ac-ac vertical
 p = Q_("0. 1/s")            # initial roll rate  [rad/s]
@@ -220,7 +220,24 @@ def lookup_data(alpha, ca_c, da):
     else:
         xcp = 0.25
     return Cl, Cd, Cm, xcp
-    
+
+def T_x(angle):
+    T_x = np.matrix([[1 ,0 ,0],
+                [0, np.cos(angle), np.sin(angle)],
+                [0, - np.sin(angle), np.cos(angle)]])
+    return(T_x)
+def T_y(angle):
+    T_y = np.matrix([[np.cos(angle) ,0 ,- np.sin(angle)],
+                [0, 1, 0],
+                [np.sin(angle), 0 , np.cos(angle)]])
+    return (T_y)
+def T_z(angle):
+    T_z = np.matrix([[np.cos(angle) , np.sin(angle), 0],
+                [- np.sin(angle), np.cos(angle), 0],
+                [0, 0 , 1]])
+    return (T_z)
+
+
 # Import other forces
 T = Q_("1000 N")
 T_g_f = 0. # UPDATE REQUIRED
@@ -255,6 +272,7 @@ pdlst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 qlst  = np.zeros((1, int((t_end / dt).magnitude)))[0]
 qdlst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 Fzlst = np.zeros((1, int((t_end / dt).magnitude)))[0]
+thetalst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 tlst  = np.arange(0, t_end.magnitude, dt.magnitude)
 t2lst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 alpha_nose,de = trimming(V_inf,0.1,0.5)
@@ -594,10 +612,16 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     Phi += (p + q*m.sin(Phi)*m.tan(Theta)  + r*m.cos(Phi)*m.tan(Theta)) * dt
     Theta += (q*m.cos(Phi) - r*m.sin(Phi)) * dt
     Psi += (q*m.sin(Phi)/m.cos(Theta) + r*m.cos(Phi)/m.cos(Theta)) * dt
+
+    T_matrix = T_y(gamma) * T_z(Xi) * T_z(-Psi) * T_y(-Theta) * T_x(-Phi)
+
+
+    alpha_nose = m.atan(T_matrix[0, 2] / T_matrix[0, 0])
+    beta_nose = m.asin(T_matrix[0, 1])
+    print(alpha_nose, beta_nose)
     
-    
-    alpha_nose= Theta - gamma
-    beta_nose = Psi - Xi
+    #alpha_nose= Theta - gamma
+    #beta_nose = Psi - Xi
     
     # update lists for plots
     plst[n]  = p.magnitude
@@ -605,7 +629,8 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     qlst[n]  = q.magnitude
     qdlst[n] = q_dot.magnitude
     Fzlst[n] = Fz.magnitude
-    alst[n] = alpha_nose.magnitude
+    alst[n] = alpha_nose#.magnitude
+    thetalst[n] = Theta.magnitude
 
     
     t_end_loop = time.time()
@@ -613,7 +638,8 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     n += 1
     #print("Lw:",sum(disc_wing_w[:,11]))
 plt.plot(tlst,np.degrees(alst),label="alpha")
-plt.plot(tlst,np.degrees(qlst),label="pitch")
+plt.plot(tlst,np.degrees(qlst),label="q")
+plt.plot(tlst,np.degrees(thetalst),label="theta")
 plt.legend()
 plt.show()
 # plt.plot(pmax[:,0],pmax[:,1])
