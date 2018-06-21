@@ -45,7 +45,7 @@ y_max_list = []
 
 
 # The process will be run for all speeds between Vstall and Va
-for V in np.arange (V_stall.magnitude ,V_a.magnitude, V_step):
+for V in np.arange (V_stall.magnitude,V_a.magnitude, V_step):
     V *= Q_("m/s")
 
     # At a new V these lists have to be made empty

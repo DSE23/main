@@ -9,6 +9,7 @@ from Geometry import Geometry as GM
 from Aerodynamics import Aeroprops as Aeroprops
 from Aerodynamics import Wing as AWing
 import Performance as PF
+from Propulsion_and_systems import Propeller as Prop
 from Misc import Init_parm as IP
 import matplotlib.pyplot as plt
 import math as m
@@ -33,7 +34,8 @@ V_stall =  PF.V_stall_clean
 alpha_max = AWing.alpha_stall
 alpha_max *= Q_("deg")
 V_lof = 1.05 * V_stall
-Tmax = (P_to**2*eta_prop**2*m.pi*dp**2/2*rho)**(1/3)
+Tmax = (P_to**2*eta_prop**2*m.pi*dp**2/2*rho)**(1/3) #Prop.Tstatic #
+print (Tmax)
 
 # Set parameters. This may be changed.
 t_run = Q_("100 s")

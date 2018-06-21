@@ -26,7 +26,7 @@ C_h_delta = IP.C_h_delta
 b = GM.Wing.b
 maxdefl_aileron = GM.Wing.delta_a
 maxdefl_aileron.ito(Q_("rad"))
-Fa= Q_("140 N")                       #Newton stick force
+Fa= Q_("1000 N")                       #Newton stick force
 
 
 dt = 0.01
@@ -43,7 +43,7 @@ for V in np.arange(V_stall.magnitude, V_a.magnitude , 0.5):
         delta_aileron_force = (Fa / (
                     -d_delta_a / d_s_a * 0.5 * rho * V ** 2 * Sa * ca) - C_h_alpha * delta_alpha_a) * 2 / C_h_delta  # aileron deflection for force, hingemoment and speed
         aileron_deflection = min(abs(maxdefl_aileron), abs(delta_aileron_force))
-        print(aileron_deflection)
+        #print(aileron_deflection)
 
         p = - C_l_delta_a / C_l_p * aileron_deflection * 2 * V / b
         t = t + dt
