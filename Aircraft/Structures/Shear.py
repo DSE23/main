@@ -53,10 +53,15 @@ def Get_boom_area(A_spar_caps):
 
     return B_area*ureg("m**2")
 # UNCOMMENT TO TEST GET BOOM AREA FUNCTION:
-print(Get_boom_area(Q_("1000 mm**2")))
+#print(Get_boom_area(Q_("1000 mm**2")))
 
 # Calculate base shear flow for every section of the wing box # Midas & Tobias
 def Calc_base_shear_flow(boom_areas, n):
+    """
+    :param boom_areas: Return variable from  Boom_area function
+    :param n: Number of sections that divides the perimiter
+    :return: Arrays with s's and qs's, seperated for L and D
+    """
     strs_x_coords, strs_y_coords, _ = Wing.x_y_angle_coords
     strs_x_coords.ito(ureg("m"))
     strs_y_coords.ito(ureg("m"))
