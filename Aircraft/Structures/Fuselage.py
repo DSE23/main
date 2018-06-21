@@ -136,6 +136,7 @@ def fuselage_calc(x):
 
         if Q_('0 m') <= x <= l_sec1:
             '''section 1'''
+
             #Bending section 1
             sigma_x = My_sec1 / Iyy_sec1 * z + Mz_sec1 / Izz_sec1 * y + (ax_sec1 / (B_sec1 * 4))        #bending stress
 
@@ -242,9 +243,13 @@ def fuselage_calc(x):
         if z >= b_f_taper - Q_('0.01 m') or z <= -b_f_taper + Q_('0.01 m'):
             shear_x = q_23
 
+    '''Area calculation'''
+    Area = B_calc(x)[0]*4
+
+
     print(normal_shear_stress(x))
 
-    return sigma_x, shear_x
+    return sigma_x, shear_x, Area
 
 
 '''-----------------Tsia-Wu Failure criterion--------------------------'''
@@ -282,16 +287,21 @@ sigmalist = np.array([])
 shearlist = np.array([])
 Flist = np.array([])
 x_pos = np.array([])
+Vol = Q_('0 m**3')
 
 
 while x < l_fus:
-    sigma_x, shear_x = fuselage_calc(x)
+    sigma_x, shear_x, Area = fuselage_calc(x)
     F = Tsai_Wu(sigma_x, shear_x * Q_('m**-1'))
     sigmalist = np.append(sigmalist, sigma_x)
     shearlist = np.append(shearlist, shear_x)
     Flist = np.append(Flist, F)
     x_pos = np.append(x_pos, x)
+    Vol = Vol + Area * (l_fus/n)
     x = x + (l_fus/n)
+Mass = Vol * density
+
+print('Mass = ', Mass)
 
 plt.plot(x_pos, sigmalist)
 plt.show()
