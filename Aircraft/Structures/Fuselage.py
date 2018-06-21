@@ -244,7 +244,7 @@ def fuselage_calc(x):
 
     print(normal_shear_stress(x))
 
-    return sigma_x, shear_x, q_12, q_23, q_34, q_14
+    return sigma_x, shear_x
 
 
 '''-----------------Tsia-Wu Failure criterion--------------------------'''
