@@ -37,11 +37,11 @@ MAC_HT = Geometry.H_tail.MAC
 
 #Material properties of the chosen material.
 #Current chosen material:
-#Carbon fiber reinforced carbon matrix composite (Vf:50%)
-youngs_modulus = Q_("95 GPa")  #E
-yield_strength = Q_("23 MPa")  #tensile
-compr_strength = Q_("247 MPa") #compression
-shear_modulus = Q_("36 GPa")   #G
+#Epoxy/Carbon fiber, UD prepreg, QI lay-up
+youngs_modulus = Q_("60.1 GPa")  #E
+yield_strength = Q_("738 MPa")  #tensile
+compr_strength = Q_("657 MPa") #compression
+shear_modulus = Q_("23 GPa")   #G
 poisson = 0.31                 # maximum 0.33
 tau_max = Q_("35 MPa")
 
