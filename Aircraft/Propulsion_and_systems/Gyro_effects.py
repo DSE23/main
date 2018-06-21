@@ -57,12 +57,13 @@ def input_moment(yaw_moment, pitch_moment, yaw_rate, pitch_rate):
     omega_y_dot.ito(ureg("rad/s**2"))
     omega_z_dot.ito(ureg("rad/s**2"))
 
-    # print("Yaw acceleration: {}".format(omega_y_dot))
-    # print("Pitch acceleration: {}".format(omega_z_dot))
+    print("Yaw acceleration: {}".format(omega_y_dot))
+    print("Pitch acceleration: {}".format(omega_z_dot))
     return [omega_y_dot, omega_z_dot]
 
+
 # Test the function!
-# input_moment(0, 0, Q_("5 deg/s"), 0)
+# input_moment(0, Q_("1 N*m"), 0, 0)
 
 # Make function which calculates gyro moments from rate and acceleration inputs
 
@@ -84,9 +85,14 @@ def input_acceleration(yaw_acceleration, pitch_acceleration, yaw_rate, pitch_rat
     m_y.ito(ureg("newton * meter"))
     m_z.ito(ureg("newton * meter"))
 
-    # print("Yaw moment: {}".format(m_y))
-    # print("Pitch moment: {}".format(m_z))
+    print("Yaw moment: {}".format(m_y))
+    print("Pitch moment: {}".format(m_z))
     return [m_y, m_z]
 
 
-input_acceleration(0, 0, 0, 1)
+# Test the function!
+# input_acceleration(0, 0, 0, 1)
+
+y_acc = input_moment(0, Q_("1 N*m"), 0, 0)[0]
+z_acc = input_moment(0, Q_("1 N*m"), 0, 0)[1]
+input_acceleration(y_acc, z_acc, 0, 0)
