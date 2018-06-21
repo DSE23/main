@@ -316,7 +316,7 @@ def stiffeners_centroid(x_y_angle_coords, h_str, w_str, t_str):
 
     return(X_cen, 2*AX_cen)
 
-def Area_Skin_x_c(Spar1, Spar2):                            #Input deminsionless chordwise location of spar 1 and spar 2
+def Area_Skin_x_c(Spar1, Spar2): #Input deminsionless chordwise location of spar 1 and spar 2
     n = 100 #number of sections
     dx = ((Spar2-Spar1)/n)
     x = Spar1
