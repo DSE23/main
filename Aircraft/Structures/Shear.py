@@ -409,5 +409,5 @@ def Final_shaer_flows(qs12L, qs23L, qs35L, qs56L, qs61L, qs12D, qs23D, qs35D, qs
 
 # Calculate shear stress
 
-##### Tau_12_X, Tau_23_X, Tau_35_LX, Tau_56_LX, Tau_61_LX, Tau_12_DX, Tau_23_DX, Tau_35_DX, Tau_56_DX, Tau_61_DX
-##### Tau_12_LY, Tau_23_LY, Tau_35_LY, Tau_56_LY, Tau_61_LY, Tau_12_DY, Tau_23_DY, Tau_35_DY, Tau_56_DY, Tau_61_DY
+##### qs12X, qs23X, qs35X, qs56X, qs61X
+##### qs12Y, qs23Y, qs35Y, qs56Y, qs61Y
