@@ -47,8 +47,8 @@ alpha_nose = Q_("0. rad") # angle of attack of nose
 beta_nose  = Q_("0. rad")   # angle of sideslip of nose
 V_inf = Q_("60 m/s")     # V infinity
 t_current = Q_("0.0 s")       # Start time of sim
-dt = Q_("0.01 s")           # Time step of sim
-t_end = Q_("3. s")         # End time of sim
+dt = Q_("0.05 s")           # Time step of sim
+t_end = Q_("10. s")         # End time of sim
 l_h = Q_("3.6444 m")        # Tail arm ac-ac horizontal
 l_v = Q_("3.7 m")           # Tail arm ac-ac vertical
 p = Q_("0. 1/s")            # initial roll rate  [rad/s]
@@ -265,8 +265,6 @@ de = de[0,0]
 
 #raise ValueError("breakie breakie")
 for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
-    if t_current >= 2.:
-        de = 5
     t_start_loop = time.time()
     disc_wing_w = np.zeros((len(kwlst)-1, 20))  # 2D array discretized wing
     disc_wing_h = np.zeros((len(khlst)-1, 20))  # 2D array discretized HT
@@ -587,7 +585,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
             (I_zz-I_xx)/I_yy * p * r
     r_dot = I_xz/I_star * Mx + I_xx/I_star * Mz +\
             ((I_xx-I_yy)*I_xx + I_xz**2)/I_star * p * q +\
-            ((-I_xx+I_yy-I_zz)*I_xz)/I_star * q *r
+            ((-I_xx+I_yy-I_zz)*I_xz)/I_star * p *r
     
     p += p_dot * dt
     q += q_dot * dt
