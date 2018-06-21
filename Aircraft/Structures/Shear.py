@@ -351,6 +351,22 @@ def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs6
 
     return Moment_L
 
+def Calc_shear_stresses(qs12L, qs23L, qs35L, qs56L, qs61L, qs12D, qs23D, qs35D, qs56D, qs61D):
+
+    Tau_12_L = qs12L/(Wing.ThSpar1)
+    Tau_23_L = qs23L/(Wing.ThSkin)
+    Tau_35_L = qs35L/(Wing.ThSpar2)
+    Tau_56_L = qs56L/(Wing.ThSkin)
+    Tau_61_L = qs61L/(Wing.ThSpar1)
+
+    Tau_12_D = qs12D/(Wing.ThSpar1)
+    Tau_23_D = qs23D/(Wing.ThSkin)
+    Tau_35_D = qs35D/(Wing.ThSpar2)
+    Tau_56_D = qs56D/(Wing.ThSkin)
+    Tau_61_D = qs61D/(Wing.ThSpar1)
+
+    return Tau_12_L, Tau_23_L, Tau_35_L, Tau_56_L, Tau_61_L, Tau_12_D, Tau_23_D, Tau_35_D, Tau_56_D, Tau_61_D
+
 Moment_L = Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs61L)
 print(Moment_L)
 # Calculate shear center location   #Tobias
