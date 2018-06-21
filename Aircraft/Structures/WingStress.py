@@ -32,6 +32,7 @@ compr_strength = Q_("657 MPa") #compression
 shear_modulus = Q_("23 GPa")   #G
 poisson = 0.31                 # maximum 0.33
 tau_max = Q_("35 MPa")
+density = Q_("1560 kg/m**3")
 
 
 
