@@ -433,7 +433,7 @@ def deformation_y(zs):
 
 
 #Tsia-Wu Failure criterion
-def Tsia_Wu(sigma_zs):
+def Tsia_Wu(sigma_zs, tau_x, tau_y):
     F11=1/(yield_strength*compr_strength)
     F22 = F11
     F12 = -1/2*np.sqrt(F11*F22)
@@ -444,9 +444,9 @@ def Tsia_Wu(sigma_zs):
     sigma1 = sigma_zs
     sigma2 = 0
     sigma3 = 0
-    tau12 = 1 #DUMMY VALUE
-    tau23 = 0 #DUMMY VALUE
-    tau13 = 1 #DUMMY VALUE 
+    tau12 = tau_y
+    tau23 = 0
+    tau13 = tau_x 
     F = F11 *sigma1**2+F22*(sigma2**2+sigma3**2)+sigma2*sigma3*(2*F22-F44)
     F += 2*F12*sigma1*(sigma3+sigma2)+F1*(sigma1+sigma2) + F2*sigma3
     F += F44*tau23**2 + F66*(tau13**2+tau12**2)
