@@ -48,7 +48,7 @@ beta_nose  = Q_("0. rad")   # angle of sideslip of nose
 V_inf = Q_("60 m/s")     # V infinity
 t_current = Q_("0.0 s")       # Start time of sim
 dt = Q_("0.01 s")           # Time step of sim
-t_end = Q_("1 s")         # End time of sim
+t_end = Q_("0.8 s")         # End time of sim
 l_h = Q_("3.6444 m")        # Tail arm ac-ac horizontal
 l_v = Q_("3.7 m")           # Tail arm ac-ac vertical
 p = Q_("0. 1/s")            # initial roll rate  [rad/s]
@@ -262,7 +262,23 @@ def lookup_data_function(ca_c, da):
     Cm_local = interpolate.interp1d(localdata[:,0], localdata[:,4], 'linear', fill_value='extrapolate')  
     
     return np.array([[Cl_local], [Cd_local], [Cm_local]])
-    
+
+def T_x(angle):
+    T_x = np.matrix([[1 ,0 ,0],
+                [0, np.cos(angle), np.sin(angle)],
+                [0, - np.sin(angle), np.cos(angle)]])
+    return(T_x)
+def T_y(angle):
+    T_y = np.matrix([[np.cos(angle) ,0 ,- np.sin(angle)],
+                [0, 1, 0],
+                [np.sin(angle), np.sin(angle) , 0]])
+    return (T_y)
+def T_z(angle):
+    T_z = np.matrix([[np.cos(angle) ,0 ,- np.sin(angle)],
+                [- np.sin(angle), np.cos(angle), 0],
+                [0, 0 , 1]])
+    return (T_z)
+
 # Import other forces
 T = Q_("1000 N")
 T_g_f = 0. # UPDATE REQUIRED
@@ -677,10 +693,16 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     Phi += (p + q*m.sin(Phi)*m.tan(Theta)  + r*m.cos(Phi)*m.tan(Theta)) * dt
     Theta += (q*m.cos(Phi) - r*m.sin(Phi)) * dt
     Psi += (q*m.sin(Phi)/m.cos(Theta) + r*m.cos(Phi)/m.cos(Theta)) * dt
-    
-    
-    alpha_nose= Theta - gamma
-    beta_nose = Psi - Xi
+
+    T_matrix = T_y(gamma) * T_z(Xi) * T_z(-Psi) * T_y(-Theta) * T_x(-Phi)
+    #print(T_matrix)
+
+    alpha_nose = m.atan(T_matrix[0, 2] / T_matrix[0, 0])
+    beta_nose = m.asin(T_matrix[0, 1])
+    #print(alpha_nose, beta_nose)
+
+    #alpha_nose= Theta - gamma
+    #beta_nose = Psi - Xi
     
     # update lists for plots
     plst[n]  = p.magnitude
@@ -688,7 +710,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     qlst[n]  = q.magnitude
     qdlst[n] = q_dot.magnitude
     Fzlst[n] = Fz.magnitude
-    alst[n] = alpha_nose.magnitude
+    alst[n] = alpha_nose#.magnitude
 
     
     t_end_loop = time.time()
