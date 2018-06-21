@@ -37,7 +37,7 @@ np.seterr(all='raise')
 l_a = Q_("0.3015 m")        # Set aileron length
 l_e = Q_("0.2    m")        # Set elevator length
 cr_c= Q_("0.2     ")
-n_of_disc_w = 30            # number of parts wing is discretized
+n_of_disc_w = 20            # number of parts wing is discretized
 n_of_disc_h = 10            # number of parts HT is discretized
 n_of_disc_v = 10            # number of parts VT is discretized
 da = Q_("0 deg")            # aileron deflection
@@ -48,7 +48,7 @@ beta_nose  = Q_("0. rad")   # angle of sideslip of nose
 V_inf = Q_("60 m/s")     # V infinity
 t_current = Q_("0.0 s")       # Start time of sim
 dt = Q_("0.05 s")           # Time step of sim
-t_end = Q_("0.15 s")         # End time of sim
+t_end = Q_("10. s")         # End time of sim
 l_h = Q_("3.6444 m")        # Tail arm ac-ac horizontal
 l_v = Q_("3.7 m")           # Tail arm ac-ac vertical
 p = Q_("0. 1/s")            # initial roll rate  [rad/s]
@@ -155,11 +155,11 @@ def trimming(u,ca_c, ce_c):
 #    print((trim_cond[0]))
 #    print((trim_cond[1]))
 #    print((trim_cond[0]-2*trim_cond[0]*dCl_alpha_w/(m.pi*AR_w * e_w)))
-
+    
     alpha_t = m.degrees(alpha_t)
     de_t = trim_cond[2]
-    #de_t = m.degrees(de_t)
     return alpha_t, de_t
+
 
 # import airfoil lookup tables
 data = pd.read_csv('aerodynamic_data_ms15.dat', ' ', header=None).values
@@ -220,7 +220,6 @@ def lookup_data(alpha, ca_c, da):
     else:
         xcp = 0.25
     return Cl, Cd, Cm, xcp
-
 def T_x(angle):
     T_x = np.matrix([[1 ,0 ,0],
                 [0, np.cos(angle), np.sin(angle)],
@@ -229,17 +228,15 @@ def T_x(angle):
 def T_y(angle):
     T_y = np.matrix([[np.cos(angle) ,0 ,- np.sin(angle)],
                 [0, 1, 0],
-                [np.sin(angle), np.sin(angle) , 0]])
+                [np.sin(angle), 0 , np.cos(angle)]])
     return (T_y)
 def T_z(angle):
-    T_z = np.matrix([[np.cos(angle) ,0 ,- np.sin(angle)],
+    T_z = np.matrix([[np.cos(angle) , np.sin(angle), 0],
                 [- np.sin(angle), np.cos(angle), 0],
                 [0, 0 , 1]])
-    return (T_z)
-
-
+    return (T_z)    
 # Import other forces
-T = Q_("1500 N")
+T = Q_("1000 N")
 T_g_f = 0. # UPDATE REQUIRED
 D_fus_gear = ((0.01998*V_inf*V_inf).magnitude)*Q_("N")
 W = mtow*g0
@@ -271,23 +268,18 @@ alst  = np.zeros((1, int((t_end / dt).magnitude)))[0]
 pdlst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 qlst  = np.zeros((1, int((t_end / dt).magnitude)))[0]
 qdlst = np.zeros((1, int((t_end / dt).magnitude)))[0]
-rlst  = np.zeros((1, int((t_end / dt).magnitude)))[0]
 Fzlst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 thetalst = np.zeros((1, int((t_end / dt).magnitude)))[0]
-vlst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 tlst  = np.arange(0, t_end.magnitude, dt.magnitude)
 t2lst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 alpha_nose,de = trimming(V_inf,0.1,0.5)
-print(alpha_nose, de)
 alpha_nose = m.radians(alpha_nose)
 Theta = alpha_nose
-#de = de[0,0]
+de = de[0,0]
 
+de = -2.0
 #raise ValueError("breakie breakie")
 for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
-    de = -0.3
-    #if t_current >= 2.:
-    #   de = 5
     t_start_loop = time.time()
     disc_wing_w = np.zeros((len(kwlst)-1, 20))  # 2D array discretized wing
     disc_wing_h = np.zeros((len(khlst)-1, 20))  # 2D array discretized HT
@@ -302,7 +294,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     
     # Calculate for WING
     for i in range(0, len(kwlst)-1):
-        da_local = disc_wing_w[i][0]                        # Local aileron deflection of piece
+        da_local = disc_wing_w[i,0]                        # Local aileron deflection of piece
         b1 = kwlst[i]                                       # Y boundary left of piece
         b2 = kwlst[i+1]                                     # Y boundary right of piece
         y_i = (b1 + b2) / 2                                 # Y centre of piece
@@ -393,7 +385,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
 
     # Calculate for Horizontal Tail
     for i in range(0, len(khlst)-1):
-        de_local = disc_wing_h[i][0]                        # Local aileron deflection of piece
+        de_local = disc_wing_h[i,0]                        # Local aileron deflection of piece
         b1 = khlst[i]                                       # Y boundary left of piece
         b2 = khlst[i+1]                                     # Y boundary right of piece
         y_i = (b1 + b2) / 2                                 # Y centre of piece
@@ -417,7 +409,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
         running_alpha_i = True
         while running_alpha_i:
             alpha_e = alpha_h - alpha_i
-            Cl, Cd, Cm, xcp = lookup_data(alpha_e, ce_c, da_local)
+            Cl, Cd, Cm, xcp = lookup_data(alpha_e, ce_c, 0.0)
             if abs(Cl) <0.01:
                 alpha_i_new = 0.
                 running_alpha_i = False
@@ -475,8 +467,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
 
     # Calculate for Vertical Tail
     for i in range(0, len(kvlst)-1):
-        alst[n] = alpha_nose  # .magnitude
-        dr_local = disc_wing_v[i][0]                        # Local aileron deflection of piece
+        dr_local = disc_wing_v[i,0]                        # Local aileron deflection of piece
         b1 = kvlst[i] - Z_v                                 # Y boundary left of piece
         b2 = kvlst[i+1] - Z_v                               # Y boundary right of piece
         z_i = (b1 + b2) / 2                                 # 
@@ -515,7 +506,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
         delta_beta = roll_induced_beta + yaw_induced_beta - beta_i - sidewash      # Difference between AoA nose and piece
         
         # Lookup Aerodynamic data of the wing based on given imput
-        Cl, Cd, Cm, xcp = lookup_data(beta_v, ca_c, da_local)
+        Cl, Cd, Cm, xcp = lookup_data(beta_v, cr_c, dr_local)
         
         # Determine induced drag
         Cdi = Cl * Cl / (m.pi * AR_v * e_v)
@@ -614,47 +605,34 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     p += p_dot * dt
     q += q_dot * dt
     r += r_dot * dt
-    
+
     Phi += (p + q*m.sin(Phi)*m.tan(Theta)  + r*m.cos(Phi)*m.tan(Theta)) * dt
     Theta += (q*m.cos(Phi) - r*m.sin(Phi)) * dt
     Psi += (q*m.sin(Phi)/m.cos(Theta) + r*m.cos(Phi)/m.cos(Theta)) * dt
+
+    T_matrix = T_y(gamma) * T_z(Xi) * T_z(-Psi) * T_y(-Theta) * T_x(-Phi)
+
+
+    alpha_nose = m.atan(T_matrix[0, 2] / T_matrix[0, 0])
+    beta_nose = m.asin(T_matrix[0, 1])
     
-    T_matrix = T_y(gamma)*T_z(Xi)*T_z(-Psi) * T_y(-Theta)*T_x(-Phi)
-    print(T_matrix)
-
-    alpha_nose = m.atan(T_matrix[0,2]/ T_matrix[0,0])
-    beta_nose =  m.asin( T_matrix[0,1])
-    print(alpha_nose, beta_nose)
-
-    #alpha_nose= Theta - gamma
-    #beta_nose = Psi - Xi
-
     # update lists for plots
     plst[n]  = p.magnitude
     pdlst[n] = p_dot.magnitude
     qlst[n]  = q.magnitude
     qdlst[n] = q_dot.magnitude
-    rlst[n] = r.magnitude
     Fzlst[n] = Fz.magnitude
-    #alst[n] = alpha_nose#.magnitude
-    vlst[n] = V_inf.magnitude
+    alst[n] = alpha_nose
     thetalst[n] = Theta.magnitude
-
     
     t_end_loop = time.time()
     t2lst[n] = t_end_loop-t_start_loop
     n += 1
     #print("Lw:",sum(disc_wing_w[:,11]))
-plt.figure(1)
 plt.plot(tlst,np.degrees(alst),label="alpha")
-plt.plot(tlst,np.degrees(qlst),label="pitch")
-plt.plot(tlst,np.degrees(plst),label="roll")
-plt.plot(tlst,np.degrees(thetalst),label="theta")
-plt.plot(tlst,np.degrees(rlst),label="theta")
+plt.plot(tlst,np.degrees(qlst),label="q")
+plt.plot(tlst,np.degrees(thetalst))
 plt.legend()
-
-plt.figure(2)
-plt.plot(tlst, vlst,label="alpha")
 plt.show()
 # plt.plot(pmax[:,0],pmax[:,1])
 # plt.plot(tlst,plst)

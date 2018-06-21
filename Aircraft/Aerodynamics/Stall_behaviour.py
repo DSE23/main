@@ -27,4 +27,7 @@ CT = data[1] / 0.5 / 1.225 / V0**2 / Sref                               #thrust 
 DeltaV = V0 * (m.sqrt(1 + CT * (Sref / (Dia**2 / 4 * m.pi)) - 1))       # velocity increase due to prop
 D_con = Dia * m.sqrt((V0 + DeltaV / 2)/(V0 + DeltaV))                   # contracted slipstream dieameter
 
-v_axial = V0 + DeltaV
+v_axial = V0 + DeltaV                                                   #Axial velocity
+#waiting for control surface sizing to know how many area of surfaces
+#is in the propeller wake with v_axial
+
