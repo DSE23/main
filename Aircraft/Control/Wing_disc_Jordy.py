@@ -373,8 +373,8 @@ def discretize_vt(dr):
         z_i = (b1 + b2) / 2                                 # 
         c1 = local_chord(abs(b1), c_r_v, c_t_v, b_v)  # 
         c2 = local_chord(abs(b2), c_r_v, c_t_v, b_v)  # 
-        cc = local_chord(abs(z_i), c_r_v, c_t_v, b_v)       # Chord centre of piece
-        cr_c = (l_e / cc).magnitude                         # percentage aileron chord over local aileron
+        #cc = local_chord(abs(z_i), c_r_v, c_t_v, b_v)       # Chord centre of piece
+        cr_c = 0.2                         # percentage aileron chord over local aileron
         Sloc = (c1 + c2) / 2 * (b2 - b1)                    # Surface area of piece
         disc_wing_v[i][0] = Sloc.magnitude
         disc_wing_v[i][1] = z_i.magnitude
@@ -387,6 +387,7 @@ disc_wing_h = discretize_ht(de)
 disc_wing_v = discretize_vt(dr)
 "============================================================================="
 for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
+    print(t_current)
     t_start_loop = time.time()
     # Calculate for WING
     for i in range(0, len(kwlst)-1): 
@@ -568,8 +569,8 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
         roll_induced_beta = p * z_i / V_local
         yaw_induced_beta  = r * l_h / V_local
         sidewash = 0.
-        beta_v = round(beta_nose + roll_induced_beta + yaw_induced_beta - sidewash,2)
-        
+        beta_v = round(beta_nose + roll_induced_beta + yaw_induced_beta - sidewash,3)
+        print('beta_v',beta_v)
         # Determine change in angle of attack due to tip vortex
         beta_i = 0.
         running_beta_i = True
@@ -578,9 +579,9 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
             if dr_local >= 0:
                 Cl = Cl_func(m.degrees(beta_e))
             else:
-                Cl = -Cl_func(-m.degrees(beta_e))     
+                Cl = -Cl_func(-m.degrees(beta_e))   
             if abs(Cl) <0.01:
-                alpha_i_new = 0.
+                beta_i_new = 0.
                 running_beta_i = False
             else:
                 beta_i_new = Cl / (m.pi * AR_v * e_v)
