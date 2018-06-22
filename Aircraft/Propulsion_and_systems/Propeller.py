@@ -153,10 +153,14 @@ def initialise_propxcg(inp):
     xcg = inp
 
 
-def initialise_propinertia(inp):
+def initialise_propinertia_x(inp):
     global ixg
     ixg = inp
 
+
+def initialise_propinertia_z(inp):
+    global izg
+    izg = inp
 
 # End defining global variables
 
@@ -169,6 +173,7 @@ xcg = Q_("-20 cm")  # DUMMY VALUE, NOT KNOWN YET, negative because in front of d
 
 # Mass moment of inertia
 ixg = Q_("0.9 kg * m**2")  # Based on slightly different propeller
+izg = Q_("0.2 kg * m**2")  # DUMMY
 
 #Propeller Diameter
 D_prop = Q_("1.90 m")

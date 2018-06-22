@@ -1,1 +1,0 @@
-'''Here the inertia calculations of the fuselage will be performed'''

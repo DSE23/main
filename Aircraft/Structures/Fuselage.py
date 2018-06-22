@@ -21,6 +21,9 @@ from Misc import ureg, Q_ # Imports the unit registry from the Misc folder
 b_f = Geometry.Fuselage.b_f                   #diameter of fuselage at the fire wall
 b_f80 = b_f*0.8                               #design radius
 t = Q_('0.002 m')                             #thickness of fuselage skin
+t_ribs = Q_('0.002 m')                          #thickness of the ribs
+h_ribs = Q_('0.05 m')                           #the height of the ribs
+s_ribs = Q_('0.5 m')                            #rib spacing
 moter_w = Q_('180 kg')                          #Resultant weight of the motor
 g = Q_('9.81 m / s**2')                         #The gravity acceleration
 l_fus = Geometry.Fuselage.l_f                   #length of the fuselage in m
@@ -37,13 +40,17 @@ MAC_HT = Geometry.H_tail.MAC
 
 #Material properties of the chosen material.
 #Current chosen material:
-#Carbon fiber reinforced carbon matrix composite (Vf:50%)
-youngs_modulus = Q_("95 GPa")  #E
-yield_strength = Q_("23 MPa")  #tensile
-compr_strength = Q_("247 MPa") #compression
-shear_modulus = Q_("36 GPa")   #G
+#Epoxy/Carbon fiber, UD prepreg, QI lay-up
+youngs_modulus = Q_("60.1 GPa")  #E
+yield_strength = Q_("738 MPa")  #tensile
+compr_strength = Q_("657 MPa") #compression
+shear_modulus = Q_("23 GPa")   #G
 poisson = 0.31                 # maximum 0.33
-tau_max = Q_("35 MPa")
+tau_max = Q_("60 MPa")
+density = Q_("1560 kg/m**3")
+
+
+'''The definition that caclulates certain normal and shear stresses at specific points in the fuselage'''
 
 def fuselage_calc(x):
 
@@ -61,7 +68,7 @@ def fuselage_calc(x):
             B_sec3 = B_sec1
 
         if l_sec1 + l_sec2 < x <= l_fus:
-            b_f_taper = b_f80 / l_sec3 * x
+            b_f_taper = b_f80 - ((b_f80 / (l_sec3 + l_sec2)) * (x - l_sec2 - l_sec1))
             B_sec3 = t * (b_f_taper / 2) / 2 + t * (b_f_taper / 2) / 2
 
 
@@ -87,6 +94,7 @@ def fuselage_calc(x):
     Iyy_sec3 = (b_f_taper/2)**2 * B_sec3 * 4
     Izz_sec3 = Iyy_sec3
 
+    print(x, b_f80, b_f_taper)
     '''------------Loading force/moment calculation------------'''
 
     #Tail force calculation
@@ -109,19 +117,22 @@ def fuselage_calc(x):
 
     #Bending Loading section 2
     My_sec2 = (l_fus - x) * L_VT
+    My_sec2.ito(ureg('N * m'))
     Mx_sec2 = (b_VT * 0.33) * L_VT
+    Mx_sec2.ito(ureg('N * m'))
     Mz_sec2 = (l_fus - x) * L_HT - (b_VT * 0.33) * D_VT
+    Mz_sec2.ito(ureg('N * m'))
 
     #Bending Loading section 3
-    My_sec3 = (l_fus - x) * L_VT
-    Mx_sec3 = (b_VT * 0.33) * L_VT
-    Mz_sec3 = (l_fus - x) * L_HT - (b_VT * 0.33) * D_VT
+    My_sec3 = My_sec2
+    Mx_sec3 = Mx_sec2
+    Mz_sec3 = Mz_sec2
 
 
     #Axial Loading of section 1, 2 & 3
     ax_sec1 = Engine_mounts.f_x
     ax_sec2 = D_VT + D_HT
-    ax_sec3 = D_VT + D_HT
+    ax_sec3 = ax_sec2
 
 
     '''----------Bending stress calculations----------------'''
@@ -130,15 +141,15 @@ def fuselage_calc(x):
 
     def normal_shear_stress(x):
 
-        if Q_('0 m') < x < l_sec1:
+        if Q_('0 m') <= x <= l_sec1:
             '''section 1'''
+
             #Bending section 1
             sigma_x = My_sec1 / Iyy_sec1 * z + Mz_sec1 / Izz_sec1 * y + (ax_sec1 / (B_sec1 * 4))        #bending stress
-
             #Torsion section 1
 
-            q_x_sec1 = Mx_sec1 / (2 * b_f80 * 2)                                  #shear flow
-            shear_x = q_x_sec1 / t
+            q_x_sec1 = Mx_sec1 / (2 * b_f80 * b_f80)                                  #shear flow
+            shear_x = q_x_sec1
 
         if l_sec1 < x < l_sec1 + l_sec2:
 
@@ -146,21 +157,19 @@ def fuselage_calc(x):
             #Bending section 2
             sigma_x = My_sec2 / Iyy_sec2 * z + Mz_sec2 / Izz_sec2 * y + (ax_sec2 / (B_sec2 * 4))
 
-
             #Torsion section 2
 
-            q_x_sec2 = Mx_sec2 / (2 * b_f80 * 2)
-            shear_x = q_x_sec2 / t
+            q_x_sec2 = Mx_sec2 / (2 * b_f80 * b_f80)
+            shear_x = q_x_sec2
 
-        if l_sec1 + l_sec2 < x < l_fus:
+        if l_sec1 + l_sec2 <= x <= l_fus:
             '''section 3'''
             #Bending section 3
             sigma_x = My_sec3 / Iyy_sec3 * z + Mz_sec3 / Izz_sec3 * y + (ax_sec3 / (B_sec3 * 4))
 
             #Torsion section 3
-            q_x_sec3 = Mx_sec3 / (2 * b_f_taper * 2)
-            shear_x = q_x_sec3 / t
-
+            q_x_sec3 = Mx_sec3 / (2 * b_f_taper * b_f_taper)
+            shear_x = q_x_sec3
 
         return sigma_x, shear_x
 
@@ -178,7 +187,9 @@ def fuselage_calc(x):
     q_14 = q_12 + q_14_cor
     q_12 = q_12 + -q_12
 
+
     P = ((q_14_cor + q_23_cor) * l_sec2) / 2
+
 
     P_stress = P / B_sec3
 
@@ -189,6 +200,7 @@ def fuselage_calc(x):
 
     if l_sec1 < x < l_sec1 + l_sec2:
         sigma_x = sigma_x + P_stress
+        print('P_stress', P_stress)
 
         shear_x = q_34
 
@@ -239,26 +251,19 @@ def fuselage_calc(x):
         if z >= b_f_taper - Q_('0.01 m') or z <= -b_f_taper + Q_('0.01 m'):
             shear_x = q_23
 
-    print(M[0])
-    print('q_12', q_12)
-    print('q_34', q_34)
-    print('q_23', q_23)
-    print('q_14', q_14)
+    '''Area calculation'''
+    Area = B_calc(x)[0]*4
+    shear_x = shear_x / t
 
-    print(normal_shear_stress(x))
+    '''Fuselage Ribs'''
 
-    return sigma_x, shear_x, q_12, q_23, q_34, q_14
+    Area_ribs = b_f_taper * b_f_taper * h_ribs
 
 
-
-print(fuselage_calc(Q_('0.5 m')))
-
+    return sigma_x, shear_x, Area
 
 
-
-
-
-#Tsia-Wu Failure criterion
+'''-----------------Tsia-Wu Failure criterion--------------------------'''
 ## For section 1
 def Tsai_Wu(sigma_x, shear_x):
     F11=1/(yield_strength*compr_strength)
@@ -277,8 +282,46 @@ def Tsai_Wu(sigma_x, shear_x):
     F = F11 *sigma1**2+F22*(sigma2**2+sigma3**2)+sigma2*sigma3*(2*F22-F44)
     F += 2*F12*sigma1*(sigma3+sigma2)+F1*(sigma1+sigma2) + F2*sigma3
     F += F44*tau23**2 + F66*(tau13**2+tau12**2)
-    if F < 1:
+    F.ito(ureg('dimensionless'))
+    if F.magnitude < 1:
         print("No failure occurs")
-    else:
+    if F.magnitude >= 1:
         print("Failure occurs")
+
     return F
+
+
+'''-----------------------------Loop calcualtions----------------------------------'''
+
+x = 0
+n = 15                  #number of sections
+x *= Q_('m')
+sigmalist = np.array([])
+shearlist = np.array([])
+Flist = np.array([])
+x_pos = np.array([])
+Vol = Q_('0 m**3')
+
+
+while x < l_fus:
+    sigma_x, shear_x, Area, Area_ribs = fuselage_calc(x)
+    F = Tsai_Wu(sigma_x, shear_x)
+    sigmalist = np.append(sigmalist, sigma_x)
+    shearlist = np.append(shearlist, shear_x)
+    print('F', F)
+    Flist = np.append(Flist, F.magnitude)
+    x_pos = np.append(x_pos, x)
+    Vol = Vol + Area * (l_fus/n)
+    print(sigma_x, shear_x)
+
+    Vol_rib = Area_ribs * t_ribs
+    N_ribs = float(int(l_fus / s_ribs))
+    Vol_ribs = Vol_rib * N_ribs
+
+    x = x + (l_fus/n)
+Mass = Vol * density
+
+print('Mass = ', Mass)
+
+plt.plot(x_pos, Flist)
+plt.show()

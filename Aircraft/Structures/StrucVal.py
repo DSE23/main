@@ -16,7 +16,7 @@ Weightwing = Q_("44.46145911209566 kilogram")
 
 
 Density = Q_("1700.0 kilogram / meter ** 3")
-youngs_modulus = Q_("95 gigapascal")
+youngs_modulus = Q_("60.1 gigapascal")
 
 
 

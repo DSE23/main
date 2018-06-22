@@ -117,19 +117,19 @@ CG_elecsys = Geometry.CG.CG_elecsys
 CG_pilot = Geometry.CG.CG_pilot
 CG_fuel = Geometry.CG.CG_fuel
 
-n_Sh = 5                               # Number of different S_h
-n_Sv = 5                               # Number of different S_v
-Iter_Sh = np.linspace(1.0,3.0, n_Sh)
+n_Sh = 10                               # Number of different S_h
+n_Sv = 10                               # Number of different S_v
+Iter_Sh = np.linspace(1.5,3.5, n_Sh)
 S_h = np.tile(Iter_Sh,(n_Sv,1))
 S_h *= Q_("m**2")
-Iter_Sv = np.linspace(1.5,3.0, n_Sv)
+Iter_Sv = np.linspace(1.0,2.0, n_Sv)
 S_v = np.tile(Iter_Sv,(n_Sh, 1))
 S_v = np.rot90(S_v)
 S_v *= Q_("m**2")
 r_allowed = []
 
-for XLEMAC in (np.linspace(1.1, 2.5, 5)*Q_("m")):
-    for X_h in (np.linspace(5.5, 7, 5)*Q_("m")):
+for XLEMAC in (np.linspace(1.0, 1.6, 5)*Q_("m")):
+    for X_h in (np.linspace(5.0, 7, 10)*Q_("m")):
         X_v = X_h + X_v_h
         
         # Local CG calculation for iterations
@@ -147,7 +147,6 @@ for XLEMAC in (np.linspace(1.1, 2.5, 5)*Q_("m")):
                CG_flightcon + W_avionics * CG_avionics + W_lehld *\
               CG_lehld + W_flaperons * CG_flaperons + W_pilot * CG_pilot +\
               W_fuel * CG_fuel )/(MTOW) 
-        X_cg = Q_("1.8 m")
         X_w = XLEMAC + 0.25 * Cbar     
         l_h = X_h - X_cg
         # Stability Derivatives (Longitudinal)
@@ -223,22 +222,22 @@ for XLEMAC in (np.linspace(1.1, 2.5, 5)*Q_("m")):
         Re_ar = Clp/(4 * mu_b * K_xx)
         T_car = -1 / Re_ar * (b / V_a)
         
-        # Dutch roll (only stable, not level 1)
+        # Dutch roll (only stable, not level 1)5
         
         A_dr = 8 * mu_b**2 * K_zz
         B_dr = - 2 * mu_b * (Cnr + 2 * K_zz * CYbeta)
         RE_dr = -B_dr/(2 * A_dr)
         for i in range(n_Sh):
             for j in range(n_Sv):
-                CAPi = CAP[i,j]
+                CAPi = CAP[i, j]
                 T_cari = T_car
                 Re_phi = Re_ph[i, j]
                 RE_dri = RE_dr[i, j]
-                Damping_phi = Damping_ph[i,j]
+                Damping_phi = Damping_ph[i, j]
 #                test.append(Damping_phi.magnitude)
                 if 0.28 < CAPi.magnitude < 3.6 and T_cari.magnitude < 1.0 and RE_dri.magnitude < 0 and Re_phi < 0.0:
                     Sv = S_v[i, j]
-                    Sh = S_h[i,j]                  
+                    Sh = S_h[i, j]                  
                     r_allowed.append([Sv.magnitude, Sh.magnitude, X_h.magnitude, XLEMAC.magnitude])
 
 S_vall = []
@@ -247,7 +246,7 @@ X_hall = []
 LEMACall = []
 for i in range(len(r_allowed)):
     LEMACall.append(r_allowed[i][3])
-    if r_allowed[i][3] > 1.4:
+    if r_allowed[i][3] > 1.0:
         S_vall.append(r_allowed[i][0])
         S_hall.append(r_allowed[i][1])
         X_hall.append(r_allowed[i][2])
