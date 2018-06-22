@@ -38,8 +38,8 @@ Iyylist = np.array([])
 zarray = np.array([])
 
 z = 0
-while z < b.magnitude+0.1:
-    NS = WingStress.Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(0.15))
+while z <= b.magnitude:
+    NS = WingStress.Normal_stress_due_to_bending(0.18, Wing.airfoilordinate(0.18))
     Normalstress = np.append(Normalstress, NS.magnitude)
     zarray = np.append(zarray, z)
     z *= Q_('m')
@@ -116,7 +116,7 @@ with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
 
 '''Random Density variable here'''
 
-Density = Q_('1700 kg / m**3')
+Density = Q_('1560 kg / m**3')
 
 
 Weightspar1 = Density *Vol_mat_spar1
