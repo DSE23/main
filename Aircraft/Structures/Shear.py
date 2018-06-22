@@ -14,7 +14,7 @@ from matplotlib import pyplot as plt
 
 
 
-n = 400
+n = 200
 
 # Calculate Boom Area's [Midas]
 # Units checked and correct
@@ -319,16 +319,16 @@ def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs6
         x_loc_2 -= x_coor_AC
         F_x = q_loc * ds * np.cos(Force_angle)
         F_y = q_loc * ds * np.sin(Force_angle)
-        t_x = qs23L[i]/Wing.ThSkin * np.cos(Force_angle) + qs23D[i]/Wing.ThSkin * np.cos(Force_angle)
-        t_y = qs23L[i]/Wing.ThSkin * np.sin(Force_angle) + qs23D[i]/Wing.ThSkin * np.sin(Force_angle)
+        t_x = (qs23L[i]/Wing.ThSkin) * np.cos(Force_angle) + qs23D[i]/Wing.ThSkin * np.cos(Force_angle)
+        t_y = (qs23L[i]/Wing.ThSkin) * np.sin(Force_angle) + qs23D[i]/Wing.ThSkin * np.sin(Force_angle)
 
         t_xs23 = np.append(t_xs23, t_x.to(ureg("N/(m**2)")))
         t_ys23 = np.append(t_ys23, t_y.to(ureg("N/(m**2)")))
 
         Moment_L += -F_x*(y_loc_2 + y_loc_1)/2 + F_y*(x_loc_2 + x_loc_1)/2
 
-    t_x = qs23L[-1] / Wing.ThSkin * np.cos(Force_angle) + qs23D[-1] / Wing.ThSkin * np.cos(Force_angle)
-    t_y = qs23L[-1] / Wing.ThSkin * np.sin(Force_angle) + qs23D[-1] / Wing.ThSkin * np.sin(Force_angle)
+    t_x = (qs23L[-1] / Wing.ThSkin) * np.cos(Force_angle) + qs23D[-1] / Wing.ThSkin * np.cos(Force_angle)
+    t_y = (qs23L[-1] / Wing.ThSkin) * np.sin(Force_angle) + qs23D[-1] / Wing.ThSkin * np.sin(Force_angle)
 
     t_xs23 = np.append(t_xs23, t_x.to(ureg("N/(m**2)")))
     t_ys23 = np.append(t_ys23, t_y.to(ureg("N/(m**2)")))
@@ -404,24 +404,29 @@ def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs6
     t_ys61 *= ureg("N/(m**2)")
     return Moment_L, t_xs23, t_xs56, t_ys12, t_ys23, t_ys35, t_ys56, t_ys61
 
-def Calc_shear_stresses(qs12L, qs23L, qs35L, qs56L, qs61L, qs12D, qs23D, qs35D, qs56D, qs61D):
+# def Calc_shear_stresses(qs12L, qs23L, qs35L, qs56L, qs61L, qs12D, qs23D, qs35D, qs56D, qs61D):
+#
+#     Tau_12_L = qs12L/(Wing.ThSpar1)
+#     Tau_23_L = qs23L/(Wing.ThSkin)
+#     Tau_35_L = qs35L/(Wing.ThSpar2)
+#     Tau_56_L = qs56L/(Wing.ThSkin)
+#     Tau_61_L = qs61L/(Wing.ThSpar1)
+#
+#     Tau_12_D = qs12D/(Wing.ThSpar1)
+#     Tau_23_D = qs23D/(Wing.ThSkin)
+#     Tau_35_D = qs35D/(Wing.ThSpar2)
+#     Tau_56_D = qs56D/(Wing.ThSkin)
+#     Tau_61_D = qs61D/(Wing.ThSpar1)
+#
+#     return Tau_12_L, Tau_23_L, Tau_35_L, Tau_56_L, Tau_61_L, Tau_12_D, Tau_23_D, Tau_35_D, Tau_56_D, Tau_61_D
 
-    Tau_12_L = qs12L/(Wing.ThSpar1)
-    Tau_23_L = qs23L/(Wing.ThSkin)
-    Tau_35_L = qs35L/(Wing.ThSpar2)
-    Tau_56_L = qs56L/(Wing.ThSkin)
-    Tau_61_L = qs61L/(Wing.ThSpar1)
-
-    Tau_12_D = qs12D/(Wing.ThSpar1)
-    Tau_23_D = qs23D/(Wing.ThSkin)
-    Tau_35_D = qs35D/(Wing.ThSpar2)
-    Tau_56_D = qs56D/(Wing.ThSkin)
-    Tau_61_D = qs61D/(Wing.ThSpar1)
-
-    return Tau_12_L, Tau_23_L, Tau_35_L, Tau_56_L, Tau_61_L, Tau_12_D, Tau_23_D, Tau_35_D, Tau_56_D, Tau_61_D
-
-Moment_L = Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L+qs0L, qs23L+qs0L, qs35L+qs0L, qs56L+qs0L, qs61L+qs0L, qs12D+qs0D, qs23D+qs0D, qs35D+qs0D, qs56D+qs0D, qs61D+qs0D)
-print(Moment_L)
+Moment_L, t_xs23, t_xs56, t_ys12, t_ys23, t_ys35, t_ys56, t_ys61 = Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L+qs0L, qs23L+qs0L, qs35L+qs0L, qs56L+qs0L, qs61L+qs0L, qs12D+qs0D, qs23D+qs0D, qs35D+qs0D, qs56D+qs0D, qs61D+qs0D)
+plt.plot(s1, np.abs(t_ys12), 'b')
+plt.plot(s2, np.sqrt(t_ys23**2 + t_xs23**2), 'r')
+plt.plot(s3, np.abs(t_ys35), 'g')
+plt.plot(s4, np.sqrt(t_ys56**2 + t_xs56**2), 'y')
+plt.plot(s5, np.abs(t_ys61), 'p')
+plt.show()
 # Calculate shear center location   #Tobias
 #units checked and correct
 def Shear_center(moment_shear):
