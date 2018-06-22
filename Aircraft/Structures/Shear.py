@@ -53,7 +53,7 @@ def Get_boom_area(A_spar_caps):
     return B_area*ureg("m**2")
 # UNCOMMENT TO TEST GET BOOM AREA FUNCTION:
 #print(Get_boom_area(Q_("1000 mm**2")))
-    
+
 
 # Calculate base shear flow for every section of the wing box # Midas & Tobias
 def Calc_base_shear_flow(boom_areas, n):
@@ -326,16 +326,16 @@ def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs6
         x_loc_2 -= x_coor_AC
         F_x = q_loc * ds * np.cos(Force_angle)
         F_y = q_loc * ds * np.sin(Force_angle)
-        t_x = qs23L[i]/Wing.ThSkin * np.cos(Force_angle) + qs23D[i]/Wing.ThSkin * np.cos(Force_angle)
-        t_y = qs23L[i]/Wing.ThSkin * np.sin(Force_angle) + qs23D[i]/Wing.ThSkin * np.sin(Force_angle)
+        t_x = (qs23L[i]/Wing.ThSkin) * np.cos(Force_angle) + qs23D[i]/Wing.ThSkin * np.cos(Force_angle)
+        t_y = (qs23L[i]/Wing.ThSkin) * np.sin(Force_angle) + qs23D[i]/Wing.ThSkin * np.sin(Force_angle)
 
         t_xs23 = np.append(t_xs23, t_x.to(ureg("N/(m**2)")))
         t_ys23 = np.append(t_ys23, t_y.to(ureg("N/(m**2)")))
 
         Moment_L += -F_x*(y_loc_2 + y_loc_1)/2 + F_y*(x_loc_2 + x_loc_1)/2
 
-    t_x = qs23L[-1] / Wing.ThSkin * np.cos(Force_angle) + qs23D[-1] / Wing.ThSkin * np.cos(Force_angle)
-    t_y = qs23L[-1] / Wing.ThSkin * np.sin(Force_angle) + qs23D[-1] / Wing.ThSkin * np.sin(Force_angle)
+    t_x = (qs23L[-1] / Wing.ThSkin) * np.cos(Force_angle) + qs23D[-1] / Wing.ThSkin * np.cos(Force_angle)
+    t_y = (qs23L[-1] / Wing.ThSkin) * np.sin(Force_angle) + qs23D[-1] / Wing.ThSkin * np.sin(Force_angle)
 
     t_xs23 = np.append(t_xs23, t_x.to(ureg("N/(m**2)")))
     t_ys23 = np.append(t_ys23, t_y.to(ureg("N/(m**2)")))
@@ -441,7 +441,7 @@ def Rate_of_twist(T):
     return dthetadz
 
 dthetadz = Rate_of_twist(T)
-                         
+
 # Final shear flows in each section
 def Final_shaer_flows(qs12L, qs23L, qs35L, qs56L, qs61L, qs12D, qs23D, qs35D, qs56D, qs61D, qs0_L, qs0_D, q_moment):
     qs12 = qs12L + qs12D + qs0_D +qs0_L + q_moment
@@ -454,7 +454,7 @@ def Final_shaer_flows(qs12L, qs23L, qs35L, qs56L, qs61L, qs12D, qs23D, qs35D, qs
 qs12, qs23, qs35, qs56, qs61 = Final_shaer_flows(qs12L, qs23L, qs35L, qs56L, qs61L, qs12D, qs23D, qs35D, qs56D, qs61D, qs0_L, qs0_D, q_moment)
 # Calculate shear stress
 
-def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61):
+def Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61):
 
     t_ys12 = np.array([])
 
@@ -562,7 +562,7 @@ def Tsia_Wu(sigma_zs, tau_x, tau_y):
     sigma2 = 0
     sigma3 = 0
     tau12 = tau_y
-    tau23 = 0 
+    tau23 = 0
     tau13 = tau_x
     F = F11 *sigma1**2+F22*(sigma2**2+sigma3**2)+sigma2*sigma3*(2*F22-F44)
     F += 2*F12*sigma1*(sigma3+sigma2)+F1*(sigma1+sigma2) + F2*sigma3
