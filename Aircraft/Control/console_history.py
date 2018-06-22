@@ -9,6 +9,7 @@ from Inertia import Inertia
 from Performance import Performance
 import numpy as np
 import scipy.interpolate as interpolate
+import scipy.optimize as optimize
 import matplotlib.pyplot as plt
 import pandas as pd
 import math as m
@@ -40,7 +41,7 @@ r = Q_("0. 1/s")            # initial yaw rate   [rad/s]
 Phi   = Q_("0. rad")        # Initial euler angle around x-axis
 Psi   = Q_("0. rad")        # Initial euler angle around z-axis
 Theta = Q_("0. rad")        # Initial euler angle around y-axis
-lin_ran_alpha = 4          # Linear range of angle of attack and elevator defl.
+lin_ran_alpha = Q_("10 deg")          # Linear range of angle of attack and elevator defl.
 w = Q_("0. m/s")
 u = V_inf
 v = Q_("0. m/s")
@@ -173,6 +174,80 @@ def lookup_data(alpha, ca_c, da):
     return Cl, Cd, Cm, xcp
 
 
+V = Q_("99 m/s")
+def trimlift(angles):
+    alpha = angles[0]
+    de = angles[1]
+    Cl, Cd, Cm, xcp = lookup_data(alpha, 0.3,0.)
+    Clh, Cdh, Cmh, xcph = lookup_data(alpha, 0.5, de)
+    Cn_w = -Cl*np.cos(alpha_w) - Cd*np.sin(alpha_w)
+    Cn_h = -Clh*np.cos(alpha_w) - Cd*np.sin(alpha_w)
+    q_dp = 0.5*rho*V**2
+    L_w = - Cn_w * q_dp * S_w
+    L_h = - Cn_h * q_dp * S_h
+    F_z = W  - L_w - L_h
+    x_w = xlemac + 0.25 * MAC
+    x_h = X_h + 0.25 * MAC_htail
+    M_y = -L_w * (x_w - xcg) + Cm * q_dp * S_w * MAC + Cmh * q_dp * S_h * MAC_htail +\
+          -L_h * (x_h - xcg)
+    return M_y.magnitude**2 + F_z.magnitude**2      
+
+def trim():
+    
+    initial_guess = [0.02, -2]
+    result = optimize.minimize(trimlift, initial_guess, method='POWELL', options={'ftol': 0.00001})
+    print (result.success)
+    angles =  result.x
+    alpha_t = angles[0] * Q_("rad")
+    de_t = angles[1] * Q_("deg")
+    Cltrimw, Cdtrimw, Cmtrimw, xcp = lookup_data(alpha_t, ca_c, 0)
+    Cltrimh, Cdtrimh, Cmtrimh, xcp = lookup_data(alpha_t, ce_c, de_t)
+    q_dp = 0.5 * rho * V**2
+    Treq = (np.cos(alpha_t)*(Cdtrimw*S_w + Cdtrimh * S_h)+np.sin(alpha_t)*
+            (Cltrimw * S_w + Cltrimh * S_h)) * q_dp
+    
+    return alpha_t, de_t, Treq   
+    
+#def trim(V):
+#    lin_ran_de = Q_("10 deg")
+#    alpha_rad = 0.087
+#    Claw1, Cdaw0, Cmaw1, xcp = lookup_data(Q_("0 deg"), ca_c, 0)
+#    Claw2, dummy, Cmaw2, xcp = lookup_data(0.087, ca_c, 0)
+#    Clah1, Cdah0, Cmah1, xcp = lookup_data(Q_("0 deg"), ce_c, 0)
+#    Clah2, dummy, Cmah2, xcp = lookup_data(0.087, ce_c, 0)
+#    Cldh1, dummy, Cmdh1, xcp = lookup_data(0, ce_c, Q_("0 deg"))
+#    Cldh2, dummy, Cmdh2, xcp = lookup_data(0, ce_c, 10)
+#    
+#    print(lin_ran_de)
+#    Cl_alpha_w = (Claw2 - Claw1)/alpha_rad
+#    Cl_alpha_h = (Clah2-Clah1)/alpha_rad
+#    Cl_de_h = (Cldh2-Cldh1)/lin_ran_de
+#    print(Cl_de_h)
+#    Cm_alpha_w = (Cmaw2 - Cmaw1)/alpha_rad
+#    Cm_alpha_h = (Cmah2 - Cmah1)/alpha_rad
+#    Cm_de_h = (Cmdh2 - Cmdh1)/lin_ran_de
+#    
+#    q_dp = 0.5*rho*V**2                                       #Dynamic pressure
+#    trim_mat1 = np.matrix([[(((Cdaw0- Cl_alpha_w)*S_w+(Cdah0 - Cl_alpha_h)*S_h)*q_dp).magnitude,
+#                            (Cl_de_h * S_h * q_dp).magnitude],
+#                            [(Cl_alpha_w * q_dp * S_w * (x_w-xcg) + Cl_alpha_h * q_dp *
+#                             S_h * (x_h - xcg) + Cm_alpha_w * q_dp * S_w * MAC +
+#                             Cm_alpha_h * q_dp * S_h * MAC_htail).magnitude,
+#                             (Cl_de_h * q_dp * S_h * (x_h - xcg) +
+#                             Cm_de_h * q_dp * S_h * MAC_htail).magnitude]])
+#    trim_mat2 = np.matrix([[-W.magnitude],
+#                           [0]])
+#    trim_cond = np.linalg.solve(trim_mat1, trim_mat2)
+#    alpha_trim = trim_cond[0,0] * Q_("rad")
+#    de_trim = trim_cond[1,0] * Q_("deg")
+#    Cltrimw, Cdtrimw, Cmtrimw, xcp = lookup_data(alpha_trim, ca_c, 0)
+#    Cltrimh, Cdtrimh, Cmtrimh, xcp = lookup_data(alpha_trim, ce_c, de_trim)
+#    Treq = (np.cos(alpha_trim)*(Cdtrimw*S_w + Cdtrimh * S_h)+np.sin(alpha_trim)*
+#            (Cltrimw * S_w + Cltrimh * S_h)) * q_dp
+#    print((((Cdaw0- Cl_alpha_w)*S_w+(Cdah0 - Cl_alpha_h)*S_h)*q_dp)*trim_cond[0] + 
+#                            (Cl_de_h * S_h * q_dp)* (de_trim))
+#    print(-W)
+#    return alpha_trim, de_trim, Treq
 # For roll
 #de = -5.9
 #da = 29.5

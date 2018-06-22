@@ -193,12 +193,13 @@ def get_xy_from_perim(perim_val, start_x=0, reverse=False):
     perim = 0  # Set initial perimiter size to 0
     step = 0.001  # Step size for algorithm: increase will lead to faster computing times
     min_val = 10
+    x_cs = np.arange(start_x, 1, step)
     if reverse == False:
-        for x_c in np.arange(start_x, 1, step):
-            perim += np.sqrt((step) ** 2 + (airfoilordinate(x_c + step) - airfoilordinate(x_c)) ** 2)
+        for i in range(len(x_cs)):
+            perim += m.sqrt((step) ** 2 + (airfoilordinate(x_cs[i] + step) - airfoilordinate(x_cs[i])) ** 2)
             if abs(perim - perim_val) < min_val:
-                x_coord = 0.5 * (x_c + x_c + step)
-                y_coord = 0.5 * (airfoilordinate(x_c) + airfoilordinate(x_c + step))
+                x_coord = 0.5 * (x_cs[i] + x_cs[i] + step)
+                y_coord = 0.5 * (airfoilordinate(x_cs[i]) + airfoilordinate(x_cs[i] + step))
                 min_val = abs(perim - perim_val)
             else:
                 break
@@ -207,7 +208,7 @@ def get_xy_from_perim(perim_val, start_x=0, reverse=False):
     else:
         step *= -1
         for x_c in np.arange(start_x, 0, step):
-            perim += np.sqrt((step) ** 2 + (airfoilordinate(x_c + step) - airfoilordinate(x_c)) ** 2)
+            perim += m.sqrt((step) ** 2 + (airfoilordinate(x_c + step) - airfoilordinate(x_c)) ** 2)
             if abs(perim - perim_val) < min_val:
                 x_coord = 0.5 * (x_c + x_c + step)
                 y_coord = 0.5 * (airfoilordinate(x_c) + airfoilordinate(x_c + step))
