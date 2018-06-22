@@ -188,14 +188,22 @@ M = Q_("10000 N*m")
 # plt.show()
 
 
-def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
+def Normal_stress_due_to_bending(x, y): # Normal stress due to bending
     denominator_inertia_term = Inertia.Ixx_wb*Inertia.Iyy_wb-Inertia.Ixy_wb**2
-    inertia_term_1 = (Inertia.Iyy_wb*y-Inertia.Ixy_wb*cs)/denominator_inertia_term
-    inertia_term_2 = (Inertia.Ixx_wb*cs-Inertia.Ixy_wb*y)/denominator_inertia_term
+    inertia_term_1 = (Inertia.Iyy_wb*y*Wing.Chordlength-Inertia.Ixy_wb*x*Wing.Chordlength)/denominator_inertia_term
+    print('in1', inertia_term_1)
+    inertia_term_2 = (Inertia.Ixx_wb*x*Wing.Chordlength-Inertia.Ixy_wb*y*Wing.Chordlength)/denominator_inertia_term
+    print('in2', inertia_term_2)
     sigma_zs = D_moment*inertia_term_1 + L_moment*inertia_term_2
+    print("Dmoment", D_moment)
+    print("Lmoment", L_moment)
+    print("Sigma", sigma_zs)
     strain = sigma_zs /youngs_modulus
+    print("Strain", strain)
     return sigma_zs, strain #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
+
+NS = Normal_stress_due_to_bending(0.18, Wing.airfoilordinate(0.18))[0]
 # print('sigma_zs', Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(Wing.c)))
 
 

@@ -551,13 +551,13 @@ qs23X, qs56X, qs12Y, qs23Y, qs35Y, qs56Y, qs61Y = Calc_moment_due_to_shear(s1, s
 
 #Tsia-Wu Failure criterion
 def Tsia_Wu(sigma_zs, tau_x, tau_y):
-    F11=1/(yield_strength*compr_strength)
+    F11=1/(yield_strength*WingStress.compr_strength)
     F22 = F11
     F12 = -1/2*np.sqrt(F11*F22)
-    F1 = 1/(yield_strength)-1/(compr_strength)
-    F2 = 1/(yield_strength)-1/(compr_strength)
-    F44 = 1/tau_max**2
-    F66 = 1/tau_max**2
+    F1 = 1/(WingStress.yield_strength)-1/(WingStress.compr_strength)
+    F2 = 1/(WingStress.yield_strength)-1/(WingStress.compr_strength)
+    F44 = 1/WingStress.tau_max**2
+    F66 = 1/WingStress.tau_max**2
     sigma1 = sigma_zs
     sigma2 = 0
     sigma3 = 0
@@ -573,7 +573,7 @@ def Tsia_Wu(sigma_zs, tau_x, tau_y):
         print("Failure occurs")
     return F
 
-F = Tsia_Wu(WingStress.Normal_stress_due_to_bending(0.18, Wing.airfoilordinate(0.18)), qs23X[20], qs23Y[20])
+F = Tsia_Wu(WingStress.Normal_stress_due_to_bending(0.18, Wing.airfoilordinate(0.18))[0], qs23X[20], qs23Y[20])
 print("F =", F)
 
 #plt.plot(s3, qs3)
