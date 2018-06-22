@@ -191,10 +191,14 @@ S_wet_fus / Sref
 
 print('fuselage zero lift drag', CD0_fus)
 
+CD_canopy = Q_('0.04 m**-2') * Geometry.Fuselage.A_max_canopy
+print(CD_canopy,'cap')
+CD_lg = Q_('0.458 m**-2') * Geometry.Landing_gear.lg_wheel_d * Geometry.Landing_gear.lg_wheel_w
+print('landing gear',CD_lg)
 
 #Total zero lift drag
 CD0_tot = CD0_array [0] * Rwb + CD0_fus * Rwb * Rhtb * Rvtb + CD0_array[1] *\
- Rhtb  + CD0_array[2] * Rvtb
+ Rhtb  + CD0_array[2] * Rvtb + CD_canopy + CD_lg
 print('cdotot', CD0_tot)
 
 
@@ -206,15 +210,11 @@ Delta_CD_trim = ((CD0_array[1] + CL_trim**2 / m.pi / AR_ht / 0.5) * \
                  
         
 #miscellaneous drag
-CD_canopy = Q_('0.04 m**-2') * Geometry.Fuselage.A_max_canopy
-print(CD_canopy,'cap')
-CD_lg = Q_('0.458 m**-2') * Geometry.Landing_gear.lg_wheel_d * Geometry.Landing_gear.lg_wheel_w
-print('landing gear',CD_lg)
 
 
 #total drag calculation
 
-CD_tot = CD0_tot + CD_canopy + CD_lg + Delta_CD_trim + CDi_array[0] + CDi_array[1]  
+CD_tot = CD0_tot + Delta_CD_trim + CDi_array[0] + CDi_array[1]  
 
 Drag = 0.5 * density * velocity**2 * CD_tot * Sref
     
