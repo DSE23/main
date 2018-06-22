@@ -15,6 +15,7 @@ from scipy import interpolate
 import math as m
 from Geometry import Geometry
 
+
 from Misc import ureg, Q_ # Imports the unit registry from the Misc folder
 
 A = Geometry.Wing.A                         #Estimate aspect ratio
@@ -22,15 +23,15 @@ t = Geometry.Wing.taper                         #Estimate taper
 s = Geometry.Wing.b/2-Geometry.Wing.horn                #Estimate span (m)
 Lambda25 = 0                    #Quarter chord sweep
 CtoT = 0.15                     #Max Chord to thickness ratio
-Spar2R = 1-0.18                      #Chordwise location of second spar at the root
-Spar2T = 1-0.33                     #Chordwise location of second spar at the tip
-Spar1R = 0.15                   #Chordwise location of first spar at the root
-Spar1T = 0.15                   #Chordwise location of first spar at the tip
-ChordR = Geometry.Wing.c_r         #Length of root (m)
-ThSpar1 = Q_('0.002 m')          #Thickness of Spar 1
-ThSpar2 = Q_('0.0015 m')          #Thickness of Spar 2
-ThSkin = Q_('0.0018 m')           #Thickness of the skin
-N_stringers = 8                  #Number of stringers
+Spar2R = (1-Geometry.Wing.c_a/Geometry.Wing.c_r)  #Chordwise location of second spar at the root
+Spar2T = (1-Geometry.Wing.c_a/Geometry.Wing.c_t)  #Chordwise location of second spar at the tip
+Spar1R = 0.18                   #Chordwise location of first spar at the root
+Spar1T = 0.18                   #Chordwise location of first spar at the tip
+ChordR = Geometry.Wing.c_r      #Length of root (m)
+ThSpar1 = Q_('0.002 m')         #Thickness of Spar 1
+ThSpar2 = Q_('0.0015 m')        #Thickness of Spar 2
+ThSkin = Q_('0.0018 m')         #Thickness of the skin
+N_stringers = 8                 #Number of stringers
 ClampH = Q_('0.03 m')           #height of the clamps at the top of the spars
 ClampW = Q_('0.03 m')           #width of the clamps at the top of the spars
 

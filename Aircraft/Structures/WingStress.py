@@ -167,12 +167,14 @@ def computeloads(z):
 
 zs = b-3*Q_('m')
 
-L, D, M, L_moment, D_moment, dL, dD, dM = computeloads(zs)
+#L, D, M, L_moment, D_moment, dL, dD, dM = computeloads(zs)
 print('L', L)
 print('D', D)
 print('M', M)
 dM = 0
-
+L = Q_("40000 N")
+D = Q_("4000 N")
+M = Q_("10000 N*m")
 #
 #
 # Llist *= ureg("N/m")
