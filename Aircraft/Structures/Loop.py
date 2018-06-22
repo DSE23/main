@@ -14,6 +14,7 @@ from Geometry import Wing as GWing
 from Structures import Inertia
 from Structures import Wing
 from Structures import WingStress
+from Structures import Shear
 from matplotlib import pyplot as plt
 
 
@@ -36,12 +37,15 @@ Lmomentlist = np.array([])
 Ixxlist = np.array([])
 Iyylist = np.array([])
 zarray = np.array([])
+Farray = np.array([])
 
 z = 0
-while z < b.magnitude+0.1:
-    NS = WingStress.Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(0.15))
+while z <= b.magnitude:
+    NS = WingStress.Normal_stress_due_to_bending(0.18, Wing.airfoilordinate(0.18))
     Normalstress = np.append(Normalstress, NS.magnitude)
     zarray = np.append(zarray, z)
+    F = Shear.F
+    Farray = np.append(Farray, F)
     z *= Q_('m')
     L_moment = WingStress.computeloads(z)[3]
     z = z.magnitude
@@ -116,7 +120,7 @@ with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
 
 '''Random Density variable here'''
 
-Density = Q_('1700 kg / m**3')
+Density = Q_('1560 kg / m**3')
 
 
 Weightspar1 = Density *Vol_mat_spar1
