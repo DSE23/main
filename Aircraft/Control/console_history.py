@@ -40,7 +40,7 @@ r = Q_("0. 1/s")            # initial yaw rate   [rad/s]
 Phi   = Q_("0. rad")        # Initial euler angle around x-axis
 Psi   = Q_("0. rad")        # Initial euler angle around z-axis
 Theta = Q_("0. rad")        # Initial euler angle around y-axis
-lin_ran_alpha = 4          # Linear range of angle of attack and elevator defl.
+lin_ran_alpha = Q_("4 deg")          # Linear range of angle of attack and elevator defl.
 w = Q_("0. m/s")
 u = V_inf
 v = Q_("0. m/s")
@@ -172,7 +172,43 @@ def lookup_data(alpha, ca_c, da):
         xcp = 0.25
     return Cl, Cd, Cm, xcp
 
-
+def trim(V):
+    lin_ran_alpha.ito(Q_("deg"))
+    alpha_rad = lin_ran_alpha
+    Claw1, Cdaw0, Cmaw1, xcp = lookup_data(Q_("0 deg"), ca_c, 0)
+    Claw2, dummy, Cmaw2, xcp = lookup_data(alpha_rad, ca_c, 0)
+    Clah1, Cdah0, Cmah1, xcp = lookup_data(Q_("0 deg"), ce_c, 0)
+    Clah2, dummy, Cmah2, xcp = lookup_data(alpha_rad, ce_c, 0)
+    Cldh1, dummy, Cmdh1, xcp = lookup_data(0, ce_c, Q_("0 deg"))
+    Cldh2, dummy, Cmdh2, xcp = lookup_data(0, ce_c, lin_ran_alpha)
+    alpha_rad.ito(Q_("rad"))
+    Cl_alpha_w = (Claw2 - Claw1)/alpha_rad
+    Cl_alpha_h = (Clah2-Clah1)/alpha_rad
+    Cl_de_h = (Cldh2-Cldh1)/lin_ran_alpha
+    Cm_alpha_w = (Cmaw2 - Cmaw1)/alpha_rad
+    Cm_alpha_h = (Cmah2 - Cmah1)/alpha_rad
+    Cm_de_h = (Cmdh2 - Cmdh1)/lin_ran_alpha
+    x_w = xlemac + 0.25 * MAC
+    x_h = X_h + 0.25 * MAC_htail
+    q_dp = 0.5*rho*V**2                                       #Dynamic pressure
+    trim_mat1 = np.matrix([[(((Cdaw0- Cl_alpha_w)*S_w+(Cdah0 - Cl_alpha_h)*S_h)*q_dp).magnitude,
+                            (Cl_de_h * S_h * q_dp).magnitude],
+                            [(Cl_alpha_w * q_dp * S_w * (x_w-xcg) + Cl_alpha_h * q_dp *
+                             S_h * (x_h - xcg) + Cm_alpha_w * q_dp * S_w * MAC +
+                             Cm_alpha_h * q_dp * S_h * MAC_htail).magnitude,
+                             (Cl_de_h * q_dp * S_h * (x_h - xcg) +
+                             Cm_de_h * q_dp * S_h * MAC_htail).magnitude]])
+    trim_mat2 = np.matrix([[-W.magnitude],
+                           [0]])
+    trim_cond = np.linalg.solve(trim_mat1, trim_mat2)
+    trim_cond = trim_cond[:,0]
+    alpha_trim = trim_cond[0, 0] * Q_("rad")
+    de_trim = trim_cond[1, 0] * Q_("deg")
+    Cltrimw, Cdtrimw, Cmtrimw, xcp = lookup_data(alpha_trim, ca_c, 0)
+    Cltrimh, Cdtrimh, Cmtrimh, xcp = lookup_data(alpha_trim, ce_c, de_trim)
+    Treq = (np.cos(alpha_trim)*(Cdtrimw*S_w + Cdtrimh * S_h)+np.sin(alpha_trim)*
+            (Cltrimw * S_w + Cltrimh * S_h)) * q_dp
+    return alpha_trim, de_trim, Treq
 # For roll
 #de = -5.9
 #da = 29.5
