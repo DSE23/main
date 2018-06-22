@@ -20,8 +20,8 @@ np.seterr(all='raise')
 
 # Variables
 l_a = Q_("0.405 m")        # Set aileron length
-l_e = Q_("0.2    m")        # Set elevator length
 cr_c= Q_("0.2     ")
+ce_c= Q_("0.5 ")
 n_of_disc_w = 20            # number of parts wing is discretized
 n_of_disc_h = 10            # number of parts HT is discretized
 n_of_disc_v = 10            # number of parts VT is discretized
@@ -34,15 +34,13 @@ V_inf = Q_("118 m/s")     # V infinity
 t_current = Q_("0.0 s")       # Start time of sim
 dt = Q_("0.01 s")           # Time step of sim
 t_end = Q_("30. s")         # End time of sim
-l_h = Q_("3.6444 m")        # Tail arm ac-ac horizontal
-l_v = Q_("3.7 m")           # Tail arm ac-ac vertical
 p = Q_("0. 1/s")            # initial roll rate  [rad/s]
 q = Q_("0. 1/s")            # initial pitch rate [rad/s]
 r = Q_("0. 1/s")            # initial yaw rate   [rad/s]
 Phi   = Q_("0. rad")        # Initial euler angle around x-axis
 Psi   = Q_("0. rad")        # Initial euler angle around z-axis
 Theta = Q_("0. rad")        # Initial euler angle around y-axis
-lin_ran_alpha = 4          # Linear range of angle of attack and elevator defl.
+lin_ran_alpha = Q_("4 deg")          # Linear range of angle of attack and elevator defl.
 w = Q_("0. m/s")
 u = V_inf
 v = Q_("0. m/s")
@@ -58,6 +56,13 @@ I_xx = Inertia.I_xx
 I_zz = Inertia.I_zz
 I_xz = Inertia.I_xz
 I_star = I_xx*I_zz-I_xz**2
+
+X_h = Geometry.H_tail.X_h
+X_v = Geometry.V_tail.X_v
+MAC_h = Geometry.H_tail.MAC
+MAC_v = Geometry.V_tail.MAC
+l_h = X_h + 0.25 * MAC_h
+l_v = X_v + 0.25 * MAC_v
 
 b_w = Geometry.Wing.b
 S_w = Geometry.Wing.S
@@ -167,15 +172,51 @@ def lookup_data(alpha, ca_c, da):
         xcp = 0.25
     return Cl, Cd, Cm, xcp
 
-"============================================================================="
-
-de = -5.9
-da = 29.5
+def trim(V):
+    lin_ran_alpha.ito(Q_("deg"))
+    alpha_rad = lin_ran_alpha
+    Claw1, Cdaw0, Cmaw1, xcp = lookup_data(Q_("0 deg"), ca_c, 0)
+    Claw2, dummy, Cmaw2, xcp = lookup_data(alpha_rad, ca_c, 0)
+    Clah1, Cdah0, Cmah1, xcp = lookup_data(Q_("0 deg"), ce_c, 0)
+    Clah2, dummy, Cmah2, xcp = lookup_data(alpha_rad, ce_c, 0)
+    Cldh1, dummy, Cmdh1, xcp = lookup_data(0, ce_c, Q_("0 deg"))
+    Cldh2, dummy, Cmdh2, xcp = lookup_data(0, ce_c, lin_ran_alpha)
+    alpha_rad.ito(Q_("rad"))
+    Cl_alpha_w = (Claw2 - Claw1)/alpha_rad
+    Cl_alpha_h = (Clah2-Clah1)/alpha_rad
+    Cl_de_h = (Cldh2-Cldh1)/lin_ran_alpha
+    Cm_alpha_w = (Cmaw2 - Cmaw1)/alpha_rad
+    Cm_alpha_h = (Cmah2 - Cmah1)/alpha_rad
+    Cm_de_h = (Cmdh2 - Cmdh1)/lin_ran_alpha
+    x_w = xlemac + 0.25 * MAC
+    x_h = X_h + 0.25 * MAC_htail
+    q_dp = 0.5*rho*V**2                                       #Dynamic pressure
+    trim_mat1 = np.matrix([[(((Cdaw0- Cl_alpha_w)*S_w+(Cdah0 - Cl_alpha_h)*S_h)*q_dp).magnitude,
+                            (Cl_de_h * S_h * q_dp).magnitude],
+                            [(Cl_alpha_w * q_dp * S_w * (x_w-xcg) + Cl_alpha_h * q_dp *
+                             S_h * (x_h - xcg) + Cm_alpha_w * q_dp * S_w * MAC +
+                             Cm_alpha_h * q_dp * S_h * MAC_htail).magnitude,
+                             (Cl_de_h * q_dp * S_h * (x_h - xcg) +
+                             Cm_de_h * q_dp * S_h * MAC_htail).magnitude]])
+    trim_mat2 = np.matrix([[-W.magnitude],
+                           [0]])
+    trim_cond = np.linalg.solve(trim_mat1, trim_mat2)
+    trim_cond = trim_cond[:,0]
+    alpha_trim = trim_cond[0, 0] * Q_("rad")
+    de_trim = trim_cond[1, 0] * Q_("deg")
+    Cltrimw, Cdtrimw, Cmtrimw, xcp = lookup_data(alpha_trim, ca_c, 0)
+    Cltrimh, Cdtrimh, Cmtrimh, xcp = lookup_data(alpha_trim, ce_c, de_trim)
+    Treq = (np.cos(alpha_trim)*(Cdtrimw*S_w + Cdtrimh * S_h)+np.sin(alpha_trim)*
+            (Cltrimw * S_w + Cltrimh * S_h)) * q_dp
+    return alpha_trim, de_trim, Treq
+# For roll
+#de = -5.9
+#da = 29.5
 
 alpha_w_l = alpha_nose
 alpha_w_r = alpha_nose
 alpha_h = alpha_nose
-V_local = V_inf * m.cos(beta_nose)
+V_local = V_inf
 
 n_chords_w = int(n_of_disc_w / 2)
 kwlst = n_chords_w * [0] + [-cabin_width / 2, 0 * ureg.m, cabin_width / 2] + n_chords_w * [0]
@@ -189,65 +230,127 @@ disc_wing_w[(range(int(n_of_disc_w + 2 - n_chords_w), n_of_disc_w + 2)), 0] = -d
 plst = []
 tlst = np.arange(0,2,dt.magnitude)
 
-for t_current in tlst:
-    #Wing
-    for i in range(0, len(kwlst)-1):
-        da_local = disc_wing_w[i,0]                        # Local aileron deflection of piece
-        b1 = kwlst[i]                                       # Y boundary left of piece
-        b2 = kwlst[i+1]                                     # Y boundary right of piece
-        y_i = (b1 + b2) / 2                                 # Y centre of piece
-        c1 = local_chord(abs(b1), c_r_w, c_t_w, half_b_w)   # Chord left of piece
-        c2 = local_chord(abs(b2), c_r_w, c_t_w, half_b_w)   # Chord right of piece
-        cc = local_chord(abs(y_i), c_r_w, c_t_w, half_b_w)  # Chord centre of piece
-        ca_c = (l_a / cc).magnitude                         # percentage aileron chord over local aileron
-        Sloc = (c1 + c2) / 2 * (b2 - b1)                    # Surface area of piece
-        
-        roll_induced_alpha = p * y_i / V_local
-        alpha_w = alpha_nose + roll_induced_alpha 
-        
-        Cl, Cd, Cm, xcp = lookup_data(alpha_w, ca_c, da_local)
-        Cn_w = -Cl*m.cos(alpha_w) - Cd*m.sin(alpha_w)
-        Ct_w = Cl*m.sin(alpha_w) - Cd*m.cos(alpha_w) 
-        
-        Fn_w_d = 0.5 * rho * V_local ** 2 * Sloc * Cn_w
-        Ft_w_d = 0.5 * rho * V_local ** 2 * Sloc * Ct_w
-        
-        disc_wing_w[i,1] = Fn_w_d.magnitude
-        disc_wing_w[i,2] = Ft_w_d.magnitude
-        disc_wing_w[i,3] = (Fn_w_d*y_i).magnitude
-        
+"============================================================================="
+# ROLL
+#for t_current in tlst:
+#    #Wing
+#    for i in range(0, len(kwlst)-1):
+#        da_local = disc_wing_w[i,0]                        # Local aileron deflection of piece
+#        b1 = kwlst[i]                                       # Y boundary left of piece
+#        b2 = kwlst[i+1]                                     # Y boundary right of piece
+#        y_i = (b1 + b2) / 2                                 # Y centre of piece
+#        c1 = local_chord(abs(b1), c_r_w, c_t_w, half_b_w)   # Chord left of piece
+#        c2 = local_chord(abs(b2), c_r_w, c_t_w, half_b_w)   # Chord right of piece
+#        cc = local_chord(abs(y_i), c_r_w, c_t_w, half_b_w)  # Chord centre of piece
+#        ca_c = (l_a / cc).magnitude                         # percentage aileron chord over local aileron
+#        Sloc = (c1 + c2) / 2 * (b2 - b1)                    # Surface area of piece
+#        
+#        roll_induced_alpha = p * y_i / V_local
+#        alpha_w = alpha_nose + roll_induced_alpha 
+#        
+#        Cl, Cd, Cm, xcp = lookup_data(alpha_w, ca_c, da_local)
+#        Cn_w = -Cl*m.cos(alpha_w) - Cd*m.sin(alpha_w)
+#        Ct_w = Cl*m.sin(alpha_w) - Cd*m.cos(alpha_w) 
+#        
+#        Fn_w_d = 0.5 * rho * V_local ** 2 * Sloc * Cn_w
+#        Ft_w_d = 0.5 * rho * V_local ** 2 * Sloc * Ct_w
+#        
+#        disc_wing_w[i,1] = Fn_w_d.magnitude
+#        disc_wing_w[i,2] = Ft_w_d.magnitude
+#        disc_wing_w[i,3] = (Fn_w_d*y_i).magnitude
+#        
+#
+#    # Wing simple
+#    
+#    dx_w = (y_mac+0.25*MAC)-xcg
+#    Cl, Cd, Cm, xcp = lookup_data(alpha_nose, 0.2,0.)
+#    Cn_w = -Cl*m.cos(alpha_nose) - Cd*m.sin(alpha_nose)
+#    Ct_w = Cl*m.sin(alpha_nose) - Cd*m.cos(alpha_nose) 
+#    
+#    Fn_w = 0.5 * rho * V_local ** 2 * S_w * Cn_w
+#    Ft_w = 0.5 * rho * V_local ** 2 * S_w * Ct_w
+#
+#    #Horizontal Tail
+#    dx_h = l_h
+#    Cl, Cd, Cm, xcp = lookup_data(alpha_h, 0.5,de)
+#    Cn_h = -Cl*m.cos(alpha_h) - Cd*m.sin(alpha_h)
+#    Ct_h = Cl*m.sin(alpha_h) - Cd*m.cos(alpha_h) 
+#    
+#    Fn_h = 0.5 * rho * V_local ** 2 * S_h * Cn_h
+#    Ft_h = 0.5 * rho * V_local ** 2 * S_h * Ct_h
+#    
+#    # Moments and Forces
+#    sum_Fn_w = sum(disc_wing_w[:,1])*Q_("N")
+#    My = dx_w * sum_Fn_w + dx_h * Fn_h
+#    Mx = sum(disc_wing_w[:,3])*Q_("N*m")
+#    
+#    p_dot = Mx/I_xx
+#    q_dot = My/I_yy
+#    
+#    p += p_dot * dt
+#    q += q_dot * dt
+#    
+#    plst.append(p.to('degree/s'))
+#
+#plt.plot(tlst,plst)
+#print("Fz:",Fn_w+Fn_h+W)
+"============================================================================="
+# Wing
+de = Q_('0 degree')
+Thrust = Q_("1500 N")
+theta = Q_("0. rad")
+q = Q_("0. rad/s")
+u = V_inf
+w = Q_("0.0 m/s")
+dx_w = (y_mac+0.25*MAC)-xcg
+dx_h = l_h-xcg
 
-    # Wing simple
-    
-    dx_w = (y_mac+0.25*MAC)-xcg
-    Cl, Cd, Cm, xcp = lookup_data(alpha_nose, 0.2,0.)
-    Cn_w = -Cl*m.cos(alpha_nose) - Cd*m.sin(alpha_nose)
-    Ct_w = Cl*m.sin(alpha_nose) - Cd*m.cos(alpha_nose) 
-    
+qlst = []
+thetalst = []
+alst = []
+tlst = np.arange(0,2,dt.magnitude)
+for t_current in tlst:
+    #Main Wing
+    alpha_w = alpha_nose + q*dx_w/V_inf
+    Cl, Cd, Cm, xcp = lookup_data(alpha_w, 0.2,0.)
+    Cn_w = -Cl*m.cos(alpha_w) - Cd*m.sin(alpha_w)
+    Ct_w = Cl*m.sin(alpha_w) - Cd*m.cos(alpha_w) 
     Fn_w = 0.5 * rho * V_local ** 2 * S_w * Cn_w
     Ft_w = 0.5 * rho * V_local ** 2 * S_w * Ct_w
-
+    
     #Horizontal Tail
-    dx_h = l_h
-    Cl, Cd, Cm, xcp = lookup_data(alpha_h, 0.5,de)
+    alpha_h = alpha_nose + q*dx_h/V_inf
+    Cl, Cd, Cm, xcp = lookup_data(alpha_h, ce_c,de)
     Cn_h = -Cl*m.cos(alpha_h) - Cd*m.sin(alpha_h)
     Ct_h = Cl*m.sin(alpha_h) - Cd*m.cos(alpha_h) 
     
     Fn_h = 0.5 * rho * V_local ** 2 * S_h * Cn_h
     Ft_h = 0.5 * rho * V_local ** 2 * S_h * Ct_h
     
-    # Moments and Forces
-    sum_Fn_w = sum(disc_wing_w[:,1])*Q_("N")
-    My = dx_w * sum_Fn_w + dx_h * Fn_h
-    Mx = sum(disc_wing_w[:,3])*Q_("N*m")
+    Fx = Thrust + Ft_w + Ft_h + W * m.sin(theta)
+    Fz = Fn_w + Fn_h + W * m.cos(theta)
+    My = dx_w * Fn_w + dx_h * Fn_h
     
-    p_dot = Mx/I_xx
+    u_dot = Fx/mtow - q*w
+    w_dot = Fz/mtow + q*u
     q_dot = My/I_yy
     
-    p += p_dot * dt
+    u += u_dot * dt
+    w += w_dot * dt
     q += q_dot * dt
     
-    plst.append(m.degrees(p.magnitude))
+    theta += q * dt
+    alpha_nose = m.atan(w/u) * Q_('radian')
+    
+    V_local = np.sqrt(u**2+w**2)
+    
+    alst.append(alpha_nose.to('degree').magnitude)
+    qlst.append(q.to('degree/s').magnitude)
+    thetalst.append(theta.to('degree').magnitude)
+print('finished')
 
-plt.plot(tlst,plst)
-print("Fz:",Fn_w+Fn_h+W)
+plt.plot(tlst,qlst,label='q')
+plt.plot(tlst,thetalst,label='theta')
+plt.plot(tlst,alst,label='alpha')
+plt.legend()
+plt.show()
