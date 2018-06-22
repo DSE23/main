@@ -122,14 +122,14 @@ n_Sv = 10                               # Number of different S_v
 Iter_Sh = np.linspace(1.5,3.5, n_Sh)
 S_h = np.tile(Iter_Sh,(n_Sv,1))
 S_h *= Q_("m**2")
-Iter_Sv = np.linspace(1.5,3.0, n_Sv)
+Iter_Sv = np.linspace(1.0,2.0, n_Sv)
 S_v = np.tile(Iter_Sv,(n_Sh, 1))
 S_v = np.rot90(S_v)
 S_v *= Q_("m**2")
 r_allowed = []
 
 for XLEMAC in (np.linspace(1.0, 1.6, 5)*Q_("m")):
-    for X_h in (np.linspace(5.2, 7, 10)*Q_("m")):
+    for X_h in (np.linspace(5.0, 7, 10)*Q_("m")):
         X_v = X_h + X_v_h
         
         # Local CG calculation for iterations
@@ -147,7 +147,6 @@ for XLEMAC in (np.linspace(1.0, 1.6, 5)*Q_("m")):
                CG_flightcon + W_avionics * CG_avionics + W_lehld *\
               CG_lehld + W_flaperons * CG_flaperons + W_pilot * CG_pilot +\
               W_fuel * CG_fuel )/(MTOW) 
-        X_cg = Q_("1.8 m")
         X_w = XLEMAC + 0.25 * Cbar     
         l_h = X_h - X_cg
         # Stability Derivatives (Longitudinal)
