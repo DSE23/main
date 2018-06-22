@@ -29,11 +29,11 @@ n_of_disc_v = 10            # number of parts VT is discretized
 da = Q_("0 deg")            # aileron deflection
 dr = Q_("0 deg")            # rudder deflection
 de = Q_("0 deg")            # elevator deflection
-alpha_nose = Q_("0.012 rad") # angle of attack of nose
+alpha_nose = Q_("0.0181 rad") # angle of attack of nose
 beta_nose  = Q_("0. rad")   # angle of sideslip of nose
-V_inf = Q_("50 m/s")     # V infinity
+V_inf = Q_("96 m/s")     # V infinity
 t_current = Q_("0.0 s")       # Start time of sim
-dt = Q_("0.001 s")           # Time step of sim
+dt = Q_("0.01 s")           # Time step of sim
 t_end = Q_("30. s")         # End time of sim
 p = Q_("0. 1/s")            # initial roll rate  [rad/s]
 q = Q_("0. 1/s")            # initial pitch rate [rad/s]
@@ -119,7 +119,7 @@ data = pd.read_csv('aerodynamic_data_ms15.dat', ' ', header=None).values
 def lookup_data(alpha, ca_c, da):
     # Looksup and interpolates Cl and Cd based on alpha, ca_c and da
     alpha = round(alpha,5)
-    alpha = alpha.to('degree')
+    alpha = m.degrees(alpha)
     indexca_c = int(100*ca_c)-1
     if da == 0.:
         indexda = abs(da)//5
@@ -174,38 +174,45 @@ def lookup_data(alpha, ca_c, da):
     return Cl, Cd, Cm, xcp
 
 
-V = Q_("99 m/s")
+V = V_inf
 def trimlift(angles):
-    alpha = angles[0]
-    de = angles[1]
-    Cl, Cd, Cm, xcp = lookup_data(alpha, 0.3,0.)
+    alpha = angles[0] * Q_("rad")
+    de = angles[1] * Q_("deg")
+    Cl, Cd, Cm, xcp = lookup_data(alpha, 0.2,0.)
     Clh, Cdh, Cmh, xcph = lookup_data(alpha, 0.5, de)
-    Cn_w = -Cl*np.cos(alpha_w) - Cd*np.sin(alpha_w)
-    Cn_h = -Clh*np.cos(alpha_w) - Cd*np.sin(alpha_w)
+    Cn_w = -Cl*np.cos(alpha) - Cd*np.sin(alpha)
+    Cn_h = -Clh*np.cos(alpha) - Cdh*np.sin(alpha)
     q_dp = 0.5*rho*V**2
-    L_w = - Cn_w * q_dp * S_w
-    L_h = - Cn_h * q_dp * S_h
-    F_z = W  - L_w - L_h
+    L_w = Cn_w * q_dp * S_w
+    L_h = Cn_h * q_dp * S_h
+    F_z = W*np.cos(alpha)  + L_w + L_h
     x_w = xlemac + 0.25 * MAC
     x_h = X_h + 0.25 * MAC_htail
-    M_y = -L_w * (x_w - xcg) + Cm * q_dp * S_w * MAC + Cmh * q_dp * S_h * MAC_htail +\
-          -L_h * (x_h - xcg)
-    return M_y.magnitude**2 + F_z.magnitude**2      
+    M_y = L_w * ((X_w+0.25*MAC)-xcg) + Cm * q_dp * S_w * MAC + Cmh * q_dp * S_h * MAC_htail +\
+          L_h * (l_h - xcg)
+    print(F_z.magnitude**2 + M_y.magnitude**2)
+    return F_z.magnitude**2+M_y.magnitude**2      
 
 def trim():
     
     initial_guess = [0.02, -2]
-    result = optimize.minimize(trimlift, initial_guess, method='POWELL', options={'ftol': 0.00001})
+    angle_bound = optimize.Bounds(-30,30)
+    result = optimize.minimize(trimlift, initial_guess, method='POWELL', bounds=angle_bound, options={'ftol': 0.001, 'xtol':0.00001})
     print (result.success)
     angles =  result.x
+    print(angles)
     alpha_t = angles[0] * Q_("rad")
     de_t = angles[1] * Q_("deg")
-    Cltrimw, Cdtrimw, Cmtrimw, xcp = lookup_data(alpha_t, ca_c, 0)
-    Cltrimh, Cdtrimh, Cmtrimh, xcp = lookup_data(alpha_t, ce_c, de_t)
+    Cltrimw, Cdtrimw, Cmtrimw, xcp = lookup_data(alpha_t, 0.3, 0.)
+    Cltrimh, Cdtrimh, Cmtrimh, xcp = lookup_data(alpha_t, 0.5, de_t)
     q_dp = 0.5 * rho * V**2
+    Cn_h = -Cltrimh*np.cos(alpha_t) - Cdtrimh*np.sin(alpha_t)
+    Cn_w = -Cltrimw*np.cos(alpha_t) - Cdtrimh*np.sin(alpha_t)
+    L_h = q_dp * -Cn_h * S_h 
+    L_w = - Cn_w * S_w * q_dp
+    F_z = W*np.cos(alpha_t) + L_w + L_h
     Treq = (np.cos(alpha_t)*(Cdtrimw*S_w + Cdtrimh * S_h)+np.sin(alpha_t)*
             (Cltrimw * S_w + Cltrimh * S_h)) * q_dp
-    
     return alpha_t, de_t, Treq   
     
 #def trim(V):
@@ -252,10 +259,6 @@ def trim():
 #de = -5.9
 #da = 29.5
 
-alpha_w_l = alpha_nose
-alpha_w_r = alpha_nose
-alpha_h = alpha_nose
-V_local = V_inf
 
 n_chords_w = int(n_of_disc_w / 2)
 kwlst = n_chords_w * [0] + [-cabin_width / 2, 0 * ureg.m, cabin_width / 2] + n_chords_w * [0]
@@ -263,15 +266,27 @@ for j in range(n_chords_w):
     kwlst[j] = bloc_w * j - half_b_w
     kwlst[-1 - j] = half_b_w - bloc_w * j
 disc_wing_w = np.zeros((len(kwlst)-1, 10))
-disc_wing_w[(range(n_chords_w)), 0] = da  
-disc_wing_w[(range(int(n_of_disc_w + 2 - n_chords_w), n_of_disc_w + 2)), 0] = -da  # set aileron for negative stations
+  # set aileron for negative stations
 
-plst = []
-tlst = np.arange(0,2,dt.magnitude)
 
 "============================================================================="
 # ROLL
+#V_inf = Q_("118 m/s")
+#alpha_h = alpha_nose
+#V_local = V_inf
+#p = Q_('0. rad/s')
+#de = -1.862
+#Thrust = Q_("542 N")
+#theta = alpha_nose
+#plst = []
+#pdotlst = []
+#tlst = np.arange(0,3,dt.magnitude)
+#Mzlst = []
 #for t_current in tlst:
+#    disc_wing_w[(range(n_chords_w)), 0] = da  
+#    disc_wing_w[(range(int(n_of_disc_w + 2 - n_chords_w), n_of_disc_w + 2)), 0] = -da
+#    if t_current >2:
+#        da = 29.5
 #    #Wing
 #    for i in range(0, len(kwlst)-1):
 #        da_local = disc_wing_w[i,0]                        # Local aileron deflection of piece
@@ -297,6 +312,7 @@ tlst = np.arange(0,2,dt.magnitude)
 #        disc_wing_w[i,1] = Fn_w_d.magnitude
 #        disc_wing_w[i,2] = Ft_w_d.magnitude
 #        disc_wing_w[i,3] = (Fn_w_d*y_i).magnitude
+#        disc_wing_w[i,4] = (Ft_w_d*y_i).magnitude
 #        
 #
 #    # Wing simple
@@ -322,6 +338,7 @@ tlst = np.arange(0,2,dt.magnitude)
 #    sum_Fn_w = sum(disc_wing_w[:,1])*Q_("N")
 #    My = dx_w * sum_Fn_w + dx_h * Fn_h
 #    Mx = sum(disc_wing_w[:,3])*Q_("N*m")
+#    Mz = sum(disc_wing_w[:,4])*Q_("N*m")
 #    
 #    p_dot = Mx/I_xx
 #    q_dot = My/I_yy
@@ -329,52 +346,65 @@ tlst = np.arange(0,2,dt.magnitude)
 #    p += p_dot * dt
 #    q += q_dot * dt
 #    
-#    plst.append(p.to('degree/s'))
-#
-#plt.plot(tlst,plst)
+#    plst.append(p.to('degree/s').magnitude)
+#    pdotlst.append(p_dot.to('degree/s**2').magnitude)
+#    Mzlst.append(Mz.magnitude)
+#    
+#plt.plot(tlst,plst,label='p')
+#plt.plot(tlst,Mzlst,label='moment due to roll')
+##plt.plot(tlst,pdotlst,label='p dot')
+#plt.label()
+#plt.show()
 #print("Fz:",Fn_w+Fn_h+W)
 "============================================================================="
-# Wing
-#de = -2.55
-#Thrust = Q_("530 N")
+# Pitch
+#alpha_nose, de, Thrust = trim()
+
+#de = -1.862
+#Thrust = Q_("542 N")
 #theta = alpha_nose
 #q = Q_("0. rad/s")
 #u = m.cos(alpha_nose) * V_inf
 #w = m.sin(alpha_nose) * V_inf
 #
-#dx_w = (y_mac+0.25*MAC)-xcg 
+#dx_w = (X_w+0.25*MAC)-xcg 
 #dx_h = l_h-xcg + Q_('0 m')
 #
 #qlst = []
+#qdotlst = []
 #thetalst = []
 #alst = []
-#tlst = np.arange(0,5,dt.magnitude)
+#tlst = np.arange(0,6,dt.magnitude)
 #Vlst = []
-#
+##de_dot = Q_("-25/0.1 deg/s")
 #for t_current in tlst:
-#    if t_current >2:
+#    
+#    if t_current >1:
 #        de = -25
+#        
 #    #Main Wing
 #    alpha_w = alpha_nose + q*dx_w/V_local
+#    
 #    Cl, Cd, Cm, xcp = lookup_data(alpha_w, 0.2,0.)
-#    Cn_w = -Cl*m.cos(alpha_w) - Cd*m.sin(alpha_w)
+#    Cn_w = -Cl*np.cos(alpha_w) - Cd*np.sin(alpha_w)
+#    
 #    Ct_w = Cl*m.sin(alpha_w) - Cd*m.cos(alpha_w) 
 #    Fn_w = 0.5 * rho * V_local ** 2 * S_w * Cn_w
 #    Ft_w = 0.5 * rho * V_local ** 2 * S_w * Ct_w
 #    
 #    #Horizontal Tail
 #    alpha_h = alpha_nose + q*dx_h/V_local
-#    Cl, Cd, Cm, xcp = lookup_data(alpha_h, ce_c,de)
-#    Cn_h = -Cl*m.cos(alpha_h) - Cd*m.sin(alpha_h)
-#    Ct_h = Cl*m.sin(alpha_h) - Cd*m.cos(alpha_h) 
-#    
+#    Clh, Cdh, Cmh, xcp = lookup_data(alpha_h, ce_c,de)
+#    Cn_h = -Clh*np.cos(alpha_h) - Cdh*np.sin(alpha_h)
+#    Ct_h = Clh*m.sin(alpha_h) - Cdh*m.cos(alpha_h) 
+##    print((0.5*rho*V_local**2), Cn_h, S_h)
 #    Fn_h = 0.5 * rho * V_local ** 2 * S_h * Cn_h
 #    Ft_h = 0.5 * rho * V_local ** 2 * S_h * Ct_h
-#    
 #    Fx = Thrust + Ft_w + Ft_h - W * m.sin(theta)
 #    Fz = Fn_w + Fn_h + W * m.cos(theta)
-#    My = dx_w * Fn_w + dx_h * Fn_h
-#    
+#    My = dx_w * Fn_w + dx_h * Fn_h +\
+#            Cm*0.5*rho*V_local**2*S_w*MAC +\
+#            Cmh*0.5*rho*V_local**2*S_h*MAC_h
 #    u_dot = Fx/mtow - q*w
 #    w_dot = Fz/mtow + q*u
 #    q_dot = My/I_yy
@@ -391,23 +421,28 @@ tlst = np.arange(0,2,dt.magnitude)
 #    
 #    alst.append(alpha_nose.to('degree').magnitude)
 #    qlst.append(q.to('degree /s').magnitude)
+#    qdotlst.append(q_dot.to('degree/s**2').magnitude)
 #    thetalst.append(theta.to('degree').magnitude)
 #    
 #    Vlst.append(V_local.magnitude)
+#    
 #print('finished')
+#
 #
 #plt.figure()
 #plt.plot(tlst,qlst,label='q')
 #plt.plot(tlst,thetalst,label='theta')
 #plt.plot(tlst,alst,label='alpha')
+##plt.plot(tlst,qdotlst,label='q dot')
 #plt.legend()
 ##plt.figure()
 ##plt.plot(tlst,Vlst,label='velocity')
 ##plt.legend()
 #plt.show()
 "============================================================================="
-#Vertical Tail
+#Yaw
 dr = 0
+V_local = V_inf
 dx_v = l_v-xcg + Q_('1 m')
 u = m.cos(beta_nose) * V_inf
 v = m.sin(beta_nose) * V_inf
@@ -418,9 +453,10 @@ betalst = []
 psilst = []
 rlst = []
 tlst = []
+Mzlst = []
 for t_current in np.arange(0,4,dt.magnitude):
     if t_current>1:
-        dr = 25
+        dr = 1
         
     beta_v  = beta_nose - r*dx_v/V_inf
     
@@ -439,27 +475,29 @@ for t_current in np.arange(0,4,dt.magnitude):
     Fx = Thrust + Ft_wh + Ft_v  - W * m.sin(alpha_nose)
     Fz = Fn_v
     
-    u_dot = Fx/mtow + r*v
-    v_dot = Fz/mtow - r*u
-    
-    u += u_dot * dt
-    v += v_dot * dt
-    
+#    u_dot = Fx/mtow + r*v
+#    v_dot = Fz/mtow - r*u
+#    
+#    u += u_dot * dt
+#    v += v_dot * dt
+#    
     Mz = dx_v * Fn_v
-    r_dot = Mz/I_zz
-    
-    r += r_dot * dt
-    Psi += r * dt
-    
-    beta_nose = np.arctan(v/u)
+#    r_dot = Mz/I_zz
+#    
+#    r += r_dot * dt
+#    Psi += r * dt
+#    
+#    beta_nose = np.arctan(v/u)
     
     betalst.append(m.degrees(beta_nose))
     psilst.append(m.degrees(Psi))
     rlst.append(r.to('degree/s').magnitude)
     tlst.append(t_current)
-plt.plot(tlst, betalst, label='beta')
-plt.plot(tlst, psilst, label='psi')
-plt.plot(tlst,rlst,label='r')
+    Mzlst.append(Mz.magnitude)
+#plt.plot(tlst, betalst, label='beta')
+#plt.plot(tlst, psilst, label='psi')
+#plt.plot(tlst,rlst,label='r')
+plt.plot(tlst,Mzlst,label='moment due to rudder')
 plt.legend()
 plt.show()
 
