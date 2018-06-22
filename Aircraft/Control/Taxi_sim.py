@@ -23,7 +23,7 @@ from Inertia import Inertia
 Z_mainlg = Geometry.Landing_gear.Z_mainlg
 X_mainlg = Geometry.Landing_gear.X_mainlg
 X_taillg = Geometry.Landing_gear.X_taillg
-cgangle_fw = Q_("16 deg")
+cgangle_fw = Q_("15 deg")
 cgangle_rear = Q_("25 deg")
 X_maxfront = X_mainlg + Z_mainlg * np.tan(cgangle_fw)
 X_maxback = X_mainlg + Z_mainlg * np.tan(cgangle_rear)
