@@ -286,9 +286,9 @@ def Moment_shearflow(n):
 
 q_moment = Moment_shearflow(n)
 # Compute moments around a.c. caused by shear forces due to shear flows
-def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs61L, qs12D, qs23D, qs35D, qs56D, qs61D):
+def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs61L):
 
-    t_ys12 = np.array([])
+
 
     x_coor_AC = 0.25*Wing.Chordlength
     Moment_L = 0
@@ -298,17 +298,12 @@ def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs6
         s_loc = (s1[i] + s1[i+1])/2
         ds = s1[i+1]-s1[i]
         x_loc = Wing.ChSpar1*Wing.Chordlength - x_coor_AC
-        t_y = qs12L[i]/Wing.ThSpar1 + qs12D[i]/Wing.ThSpar1
 
-        t_ys12 = np.append(t_ys12, t_y.to(ureg("N/(m**2)")))
         F_y = q_loc * ds
         Moment_L += F_y * x_loc
 
-    t_y = qs12L[-1] / Wing.ThSpar1 + qs12D[-1] / Wing.ThSpar1
-    t_ys12 = np.append(t_ys12, t_y.to(ureg("N/(m**2)")))
     # Moments from section 2 -> 3
-    t_xs23 = np.array([])
-    t_ys23 = np.array([])
+
     for i in range(0, len(qs23L)-1):
         q_loc = (qs23L[i] + qs23L[i + 1]) / 2
         s_loc = (s2[i] + s2[i + 1]) / 2
@@ -326,19 +321,10 @@ def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs6
         x_loc_2 -= x_coor_AC
         F_x = q_loc * ds * np.cos(Force_angle)
         F_y = q_loc * ds * np.sin(Force_angle)
-        t_x = (qs23L[i]/Wing.ThSkin) * np.cos(Force_angle) + qs23D[i]/Wing.ThSkin * np.cos(Force_angle)
-        t_y = (qs23L[i]/Wing.ThSkin) * np.sin(Force_angle) + qs23D[i]/Wing.ThSkin * np.sin(Force_angle)
 
-        t_xs23 = np.append(t_xs23, t_x.to(ureg("N/(m**2)")))
-        t_ys23 = np.append(t_ys23, t_y.to(ureg("N/(m**2)")))
 
         Moment_L += -F_x*(y_loc_2 + y_loc_1)/2 + F_y*(x_loc_2 + x_loc_1)/2
 
-    t_x = (qs23L[-1] / Wing.ThSkin) * np.cos(Force_angle) + qs23D[-1] / Wing.ThSkin * np.cos(Force_angle)
-    t_y = (qs23L[-1] / Wing.ThSkin) * np.sin(Force_angle) + qs23D[-1] / Wing.ThSkin * np.sin(Force_angle)
-
-    t_xs23 = np.append(t_xs23, t_x.to(ureg("N/(m**2)")))
-    t_ys23 = np.append(t_ys23, t_y.to(ureg("N/(m**2)")))
     # Moments from section 3->5
     t_ys35 = np.array([])
     for i in range(0, len(qs35L)-1):
@@ -349,16 +335,10 @@ def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs6
 
         F_y = q_loc * ds
 
-        t_y = qs35L[i] / Wing.ThSpar2 + qs35D[i] / Wing.ThSpar2
-
-        t_ys35 = np.append(t_ys35, t_y.to(ureg("N/(m**2)")))
         Moment_L += -F_y * x_loc
-    t_y = qs35L[-1] / Wing.ThSpar2 + qs35D[-1] / Wing.ThSpar2
 
-    t_ys35 = np.append(t_ys35, t_y.to(ureg("N/(m**2)")))
     # Moments from section 5 -> 6
-    t_xs56 = np.array([])
-    t_ys56 = np.array([])
+
     for i in range(0, len(qs56L)-1):
         q_loc = (qs56L[i] + qs56L[i + 1]) / 2
         s_loc = (s4[i] + s4[i + 1]) / 2
@@ -373,47 +353,33 @@ def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs6
         y_loc_2 *= Wing.Chordlength
 
         Force_angle = np.arctan2(y_loc_2 - y_loc_1, x_loc_2 - x_loc_1)
-        t_x = qs56L[i] / Wing.ThSkin * np.cos(Force_angle) + qs56D[i] / Wing.ThSkin * np.cos(Force_angle)
-        t_y = qs56L[i] / Wing.ThSkin * np.sin(Force_angle) + qs56D[i] / Wing.ThSkin * np.sin(Force_angle)
 
-        t_xs56 = np.append(t_xs56, t_x.to(ureg("N/(m**2)")))
-        t_ys56 = np.append(t_ys56, t_y.to(ureg("N/(m**2)")))
+
         F_x = q_loc * ds * np.cos(Force_angle)
         F_y = q_loc * ds * np.sin(Force_angle)
         Moment_L += -F_x * (y_loc_2 + y_loc_1) / 2 + F_y * (x_loc_2 + x_loc_1) / 2
 
-    t_x = qs56L[-1] / Wing.ThSkin * np.cos(Force_angle) + qs56D[-1] / Wing.ThSkin * np.cos(Force_angle)
-    t_y = qs56L[-1] / Wing.ThSkin * np.sin(Force_angle) + qs56D[-1] / Wing.ThSkin * np.sin(Force_angle)
-
-    t_xs56 = np.append(t_xs56, t_x.to(ureg("N/(m**2)")))
-    t_ys56 = np.append(t_ys56, t_y.to(ureg("N/(m**2)")))
     # Moment 6 -> 1
-    t_ys61 = np.array([])
+
     for i in range(0, len(qs61L)-1):
         q_loc = (qs61L[i] + qs61L[i + 1]) / 2
         s_loc = (s5[i] + s5[i + 1]) / 2
         ds = s5[i + 1] - s5[i]
         x_loc = Wing.ChSpar1 * Wing.Chordlength - x_coor_AC
-        t_y = qs61L[i] / Wing.ThSpar1 + qs61D[i] / Wing.ThSpar1
 
-        t_ys61 = np.append(t_ys61, t_y.to(ureg("N/(m**2)")))
+
+
         F_y = q_loc * ds
         Moment_L += F_y * x_loc
-    t_y = qs61L[-1] / Wing.ThSpar1 + qs61D[-1] / Wing.ThSpar1
-    t_ys61 = np.append(t_ys61, t_y.to(ureg("N/(m**2)")))
-
-    t_xs23 *= ureg("N/(m**2)")
-    t_xs56 *= ureg("N/(m**2)")
-    t_ys12 *= ureg("N/(m**2)")
-    t_ys23 *= ureg("N/(m**2)")
-    t_ys35 *= ureg("N/(m**2)")
-    t_ys56 *= ureg("N/(m**2)")
-    t_ys61 *= ureg("N/(m**2)")
-    return Moment_L, t_xs23, t_xs56, t_ys12, t_ys23, t_ys35, t_ys56, t_ys61
 
 
 
-Moment_L, t_xs23, t_xs56, t_ys12, t_ys23, t_ys35, t_ys56, t_ys61  = Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L+qs0_L, qs23L+qs0_L, qs35L+qs0_L, qs56L+qs0_L, qs61L+qs0_L, qs12D+qs0_D, qs23D+qs0_D, qs35D+qs0_D, qs56D+qs0_D, qs61D+qs0_D)
+
+    return Moment_L
+
+
+
+Moment_L = Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L+qs0_L, qs23L+qs0_L, qs35L+qs0_L, qs56L+qs0_L, qs61L+qs0_L)
 
 print(Moment_L)
 # Calculate shear center location   #Tobias
@@ -459,7 +425,6 @@ def Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61):
     t_ys12 = np.array([])
 
     x_coor_AC = 0.25*Wing.Chordlength
-    Moment_L = 0
     # Moments from section 1 -> 2
     for i in range(0,len(qs12)-1):
         t_y = qs12[i]/Wing.ThSpar1
@@ -470,9 +435,6 @@ def Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61):
     t_xs23 = np.array([])
     t_ys23 = np.array([])
     for i in range(0, len(qs23)-1):
-        q_loc = (qs23L[i] + qs23L[i + 1]) / 2
-        s_loc = (s2[i] + s2[i + 1]) / 2
-        ds = s2[i + 1] - s2[i]
         x_loc_1, y_loc_1 = Wing.get_xy_from_perim(s2[i]/Wing.Chordlength, Wing.ChSpar1)
         x_loc_2, y_loc_2 = Wing.get_xy_from_perim(s2[i+1]/Wing.Chordlength, Wing.ChSpar1)
         x_loc_1 *= Wing.Chordlength
@@ -495,17 +457,14 @@ def Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61):
     for i in range(0, len(qs35)-1):
         t_y = qs35[i] / Wing.ThSpar2
         t_ys35 = np.append(t_ys35, t_y.to(ureg("N/(m**2)")))
-        Moment_L += -F_y * x_loc
-    t_y = qs35L[-1] / Wing.ThSpar2 + qs35D[-1] / Wing.ThSpar2
+
+    t_y = qs35[-1] / Wing.ThSpar2
 
     t_ys35 = np.append(t_ys35, t_y.to(ureg("N/(m**2)")))
     # Moments from section 5 -> 6
     t_xs56 = np.array([])
     t_ys56 = np.array([])
     for i in range(0, len(qs56)-1):
-        q_loc = (qs56[i] + qs56[i + 1]) / 2
-        s_loc = (s4[i] + s4[i + 1]) / 2
-        ds = s4[i + 1] - s4[i]
         x_loc_1, y_loc_1 = Wing.get_xy_from_perim(s4[i] / Wing.Chordlength, Wing.ChSpar2, reverse=True)
         x_loc_2, y_loc_2 = Wing.get_xy_from_perim(s4[i + 1] / Wing.Chordlength, Wing.ChSpar2, reverse=True)
         x_loc_1 *= Wing.Chordlength
@@ -522,8 +481,8 @@ def Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61):
         t_xs56 = np.append(t_xs56, t_x.to(ureg("N/(m**2)")))
         t_ys56 = np.append(t_ys56, t_y.to(ureg("N/(m**2)")))
 
-    t_x = qs56L[-1] / Wing.ThSkin * np.cos(Force_angle) + qs56D[-1] / Wing.ThSkin * np.cos(Force_angle)
-    t_y = qs56L[-1] / Wing.ThSkin * np.sin(Force_angle) + qs56D[-1] / Wing.ThSkin * np.sin(Force_angle)
+    t_x = qs56[-1] / Wing.ThSkin * np.cos(Force_angle)
+    t_y = qs56[-1] / Wing.ThSkin * np.sin(Force_angle)
 
     t_xs56 = np.append(t_xs56, t_x.to(ureg("N/(m**2)")))
     t_ys56 = np.append(t_ys56, t_y.to(ureg("N/(m**2)")))
@@ -532,7 +491,7 @@ def Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61):
     for i in range(0, len(qs61)-1):
         t_y = qs61[i] / Wing.ThSpar1
         t_ys61 = np.append(t_ys61, t_y.to(ureg("N/(m**2)")))
-    t_y = qs61L[-1] / Wing.ThSpar1 + qs61D[-1] / Wing.ThSpar1
+    t_y = qs61[-1] / Wing.ThSpar1
     t_ys61 = np.append(t_ys61, t_y.to(ureg("N/(m**2)")))
 
     t_xs23 *= ureg("N/(m**2)")
@@ -545,27 +504,26 @@ def Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61):
     return t_xs23, t_xs56, t_ys12, t_ys23, t_ys35, t_ys56, t_ys61
 
 
-qs23X, qs56X, qs12Y, qs23Y, qs35Y, qs56Y, qs61Y = Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61)
+qs23X, qs56X, qs12Y, qs23Y, qs35Y, qs56Y, qs61Y = Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61)
 
 
 
 #Tsia-Wu Failure criterion
 def Tsia_Wu(sigma_zs, tau_x, tau_y):
-    F11=1/(yield_strength*compr_strength)
+    F11=1/(WingStress.yield_strength*WingStress.compr_strength)
     F22 = F11
     F12 = -1/2*np.sqrt(F11*F22)
-    F1 = 1/(yield_strength)-1/(compr_strength)
-    F2 = 1/(yield_strength)-1/(compr_strength)
-    F44 = 1/tau_max**2
-    F66 = 1/tau_max**2
+    F1 = 1/(WingStress.yield_strength)-1/(WingStress.compr_strength)
+    F2 = 1/(WingStress.yield_strength)-1/(WingStress.compr_strength)
+    F44 = 1/WingStress.tau_max**2
+    F66 = 1/WingStress.tau_max**2
     sigma1 = sigma_zs
     sigma2 = 0
     sigma3 = 0
     tau12 = tau_y
     tau23 = 0
     tau13 = tau_x
-    F = F11 *sigma1**2+F22*(sigma2**2+sigma3**2)+sigma2*sigma3*(2*F22-F44)
-    F += 2*F12*sigma1*(sigma3+sigma2)+F1*(sigma1+sigma2) + F2*sigma3
+    F = 2*F12*sigma1*(sigma3+sigma2)+F1*(sigma1+sigma2) + F2*sigma3
     F += F44*tau23**2 + F66*(tau13**2+tau12**2)
     if F < 1:
         print("No failure occurs")
@@ -573,7 +531,7 @@ def Tsia_Wu(sigma_zs, tau_x, tau_y):
         print("Failure occurs")
     return F
 
-F = Tsia_Wu(WingStress.Normal_stress_due_to_bending(0.18, Wing.airfoilordinate(0.18)), qs23X[20], qs23Y[20])
+F = Tsia_Wu(WingStress.Normal_stress_due_to_bending(0.18, Wing.airfoilordinate(0.18))[0], qs23X[20], qs23Y[20])
 print("F =", F)
 
 #plt.plot(s3, qs3)
