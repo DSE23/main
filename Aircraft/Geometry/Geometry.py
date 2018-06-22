@@ -116,7 +116,7 @@ class Landing_gear(object):
     X_mainlg = Firewall.xcg
     X_taillg = Fuselage.l_f
     Z_tailg = Z_mainlg - (X_mainlg-X_taillg) * np.tan(Tip_angle)
-    Y_mainlg = Z_mainlg/(np.tan(Q_("25 deg")))
+    Y_mainlg = Z_mainlg*(np.tan(Q_("35 deg")))
     lg_wheel_d = Q_("0.4445 m")                     # [m] Landing gear wheel diameter
     lg_wheel_w = Q_("0.16 m")                       # [m] Lg wheel width
     
