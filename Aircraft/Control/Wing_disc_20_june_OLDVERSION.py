@@ -48,7 +48,7 @@ beta_nose  = Q_("0. rad")   # angle of sideslip of nose
 V_inf = Q_("60 m/s")     # V infinity
 t_current = Q_("0.0 s")       # Start time of sim
 dt = Q_("0.05 s")           # Time step of sim
-t_end = Q_("30. s")         # End time of sim
+t_end = Q_("10. s")         # End time of sim
 l_h = Q_("3.6444 m")        # Tail arm ac-ac horizontal
 l_v = Q_("3.7 m")           # Tail arm ac-ac vertical
 p = Q_("0. 1/s")            # initial roll rate  [rad/s]
@@ -163,8 +163,6 @@ def trimming(u,ca_c, ce_c):
 
 # import airfoil lookup tables
 data = pd.read_csv('aerodynamic_data_ms15.dat', ' ', header=None).values
-data_FX71 = pd.read_csv('aerodynamic_data_FX71.dat', ' ', header=None).values
-data_NACA0009 = pd.read_csv('aerodynamic_data_NACA0009.dat', ' ', header=None).values
 
 def lookup_data(alpha, ca_c, da):
     # Looksup and interpolates Cl and Cd based on alpha, ca_c and da
@@ -222,68 +220,6 @@ def lookup_data(alpha, ca_c, da):
     else:
         xcp = 0.25
     return Cl, Cd, Cm, xcp
-
-def lookup_data_emp(alpha, ca_c, da,data):
-    # Looksup and interpolates Cl and Cd based on alpha, ca_c and da
-    data = data
-    alpha = round(alpha,5)
-    alpha = m.degrees(alpha)
-    indexca_c = int(100*ca_c)-1
-    if da == 0.:
-        indexda = abs(da)//25
-        localdata = data[int(indexda*50*37+indexca_c*37):int(indexda*50*37+(indexca_c+1)*37),:]
-        non_zero_max = max(np.argwhere(localdata[:, 0]))[0]  # last non-zero row
-        localdata = localdata[:non_zero_max+1,:]
-    else:
-        index1da = abs(da)//25
-        index2da = abs(da)//25 + 1
-        index3da = 0
-        localdata1 = data[int(index1da*50*37+indexca_c*37):int(index1da*50*37+(indexca_c+1)*37),:]
-        localdata2 = data[int(index2da*50*37+indexca_c*37):int(index2da*50*37+(indexca_c+1)*37),:]
-        localdata3 = data[int(index3da*50*37+indexca_c*37):int(index3da*50*37+(indexca_c+1)*37),:]
-        if sum(localdata1[:,0]) == 0 or sum(localdata2[:,0]) ==0 or sum(localdata3[:,0]) == 0:
-            return 0,0,0,0
-        
-        non_zero_max1 = max(np.argwhere(localdata1[:, 0]))[0]  # last non-zero row
-        non_zero_max2 = max(np.argwhere(localdata2[:, 0]))[0]  # last non-zero row
-        non_zero_max3 = max(np.argwhere(localdata3[:, 0]))[0]  # last non-zero row
-        non_zero_max = min((non_zero_max1,non_zero_max2,non_zero_max3))
-        
-        localdata1 = localdata1[:non_zero_max+1,:]
-        localdata2 = localdata2[:non_zero_max+1,:]    
-        localdata3 = localdata3[:non_zero_max+1,:]   
-        
-        localdata_alpha = localdata2[:,0]
-        localdata_cl    = (localdata2[:,1] - localdata1[:,1])/25 *abs(da) + localdata3[:,1]
-        localdata_cd    = (localdata2[:,2] - localdata1[:,2])/25 *abs(da) + localdata3[:,2]
-        localdata_cm    = (localdata2[:,4] - localdata1[:,4])/25 *abs(da) + localdata3[:,4]
-    
-        localdata = np.array([localdata_alpha,
-                              localdata_cl,
-                              localdata_cd,
-                              localdata_cd,
-                              localdata_cm])
-        localdata = np.transpose(localdata)
-    
-    Cl_local = interpolate.interp1d(localdata[:,0], localdata[:,1], 'linear', fill_value='extrapolate')
-    Cd_local = interpolate.interp1d(localdata[:,0], localdata[:,2], 'linear', fill_value='extrapolate')
-    Cm_local = interpolate.interp1d(localdata[:,0], localdata[:,4], 'linear', fill_value='extrapolate')
-    if da >= 0:
-        Cl = Cl_local(alpha)
-        Cd = Cd_local(alpha)
-        Cm = Cm_local(alpha)
-    else:
-        Cl = -Cl_local(-alpha)
-        Cd = Cd_local(-alpha)
-        Cm = -Cm_local(-alpha)
-    
-    Cn_lookup = m.cos(m.radians(alpha))*Cl + m.sin(m.radians(alpha))*Cd
-    if Cn_lookup !=0:
-        xcp = 0.25-Cm/Cn_lookup
-    else:
-        xcp = 0.25
-    return Cl, Cd, Cm, xcp
-
 def T_x(angle):
     T_x = np.matrix([[1 ,0 ,0],
                 [0, np.cos(angle), np.sin(angle)],
@@ -298,9 +234,7 @@ def T_z(angle):
     T_z = np.matrix([[np.cos(angle) , np.sin(angle), 0],
                 [- np.sin(angle), np.cos(angle), 0],
                 [0, 0 , 1]])
-    return (T_z)
-
-
+    return (T_z)    
 # Import other forces
 T = Q_("1000 N")
 T_g_f = 0. # UPDATE REQUIRED
@@ -342,25 +276,24 @@ alpha_nose,de = trimming(V_inf,0.1,0.5)
 alpha_nose = m.radians(alpha_nose)
 Theta = alpha_nose
 de = de[0,0]
-"-----------------------------------------------------------------------------"
-disc_wing_w = np.zeros((len(kwlst)-1, 20)).astype(object)  # 2D array discretized wing
-disc_wing_h = np.zeros((len(khlst)-1, 20)).astype(object)  # 2D array discretized HT
-disc_wing_v = np.zeros((len(kvlst)-1, 20)).astype(object)  # 2D array discretized VT
 
-# Setting the control surface deflection for each station
-disc_wing_w[(range(n_chords_w)), 0] = da  
-disc_wing_w[(range(int(n_of_disc_w + 2 - n_chords_w), n_of_disc_w + 2)), 0] = -da  # set aileron for negative stations
-disc_wing_h[(range(n_chords_h)),0] = de
-disc_wing_h[(range(int(n_of_disc_h + 2 - n_chords_h), n_of_disc_h + 2)), 0] = de
-disc_wing_v[:,0] = dr
-raise ValueError('no sim')
-"-----------------------------------------------------------------------------"
+de = -2.0
+#raise ValueError("breakie breakie")
 for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     t_start_loop = time.time()
-   
+    disc_wing_w = np.zeros((len(kwlst)-1, 20))  # 2D array discretized wing
+    disc_wing_h = np.zeros((len(khlst)-1, 20))  # 2D array discretized HT
+    disc_wing_v = np.zeros((len(kvlst)-1, 20))  # 2D array discretized VT
+
+    # Setting the control surface deflection for each station
+    disc_wing_w[(range(n_chords_w)), 0] = da  
+    disc_wing_w[(range(int(n_of_disc_w + 2 - n_chords_w), n_of_disc_w + 2)), 0] = -da  # set aileron for negative stations
+    disc_wing_h[(range(n_chords_h)),0] = de
+    disc_wing_h[(range(int(n_of_disc_h + 2 - n_chords_h), n_of_disc_h + 2)), 0] = de
+    disc_wing_v[:,0] = dr
+    
     # Calculate for WING
     for i in range(0, len(kwlst)-1):
-        print (round(t_current,2))
         da_local = disc_wing_w[i,0]                        # Local aileron deflection of piece
         b1 = kwlst[i]                                       # Y boundary left of piece
         b2 = kwlst[i+1]                                     # Y boundary right of piece
@@ -672,7 +605,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     p += p_dot * dt
     q += q_dot * dt
     r += r_dot * dt
-    
+
     Phi += (p + q*m.sin(Phi)*m.tan(Theta)  + r*m.cos(Phi)*m.tan(Theta)) * dt
     Theta += (q*m.cos(Phi) - r*m.sin(Phi)) * dt
     Psi += (q*m.sin(Phi)/m.cos(Theta) + r*m.cos(Phi)/m.cos(Theta)) * dt
@@ -682,10 +615,6 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
 
     alpha_nose = m.atan(T_matrix[0, 2] / T_matrix[0, 0])
     beta_nose = m.asin(T_matrix[0, 1])
-
-    
-    #alpha_nose= Theta - gamma
-    #beta_nose = Psi - Xi
     
     # update lists for plots
     plst[n]  = p.magnitude
@@ -693,9 +622,8 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     qlst[n]  = q.magnitude
     qdlst[n] = q_dot.magnitude
     Fzlst[n] = Fz.magnitude
-    alst[n] = alpha_nose#.magnitude
+    alst[n] = alpha_nose
     thetalst[n] = Theta.magnitude
-
     
     t_end_loop = time.time()
     t2lst[n] = t_end_loop-t_start_loop
@@ -703,7 +631,7 @@ for t_current in np.arange(0,(t_end).magnitude,dt.magnitude):
     #print("Lw:",sum(disc_wing_w[:,11]))
 plt.plot(tlst,np.degrees(alst),label="alpha")
 plt.plot(tlst,np.degrees(qlst),label="q")
-plt.plot(tlst,np.degrees(thetalst),label="theta")
+plt.plot(tlst,np.degrees(thetalst))
 plt.legend()
 plt.show()
 # plt.plot(pmax[:,0],pmax[:,1])
