@@ -70,11 +70,11 @@ class Fuselage(object):
 
 class H_tail(object):
     
-    S = Q_("2.629 m**2")                 # [m^2] Horizontal tail surface
+    S = Q_("1.8m**2")                 # [m^2] Horizontal tail surface
     A = 2.86                  # Aspect ratio
     b = np.sqrt(S*A)       # [m] Span horizontal tail
     taper = 0.529               # taper ratio
-    c_r = Q_("1.329 m")                # [m] H-tail root chord
+    c_r = 2 * (b/A)/(1+taper)                # [m] H-tail root chord
     c_t = c_r * taper         # [m] H-tail tip chord
     Sweep_25 = Q_("0 deg")                 # [deg] Sweep H-tail
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))  # [m] Mean aerodynamic chord
@@ -82,7 +82,7 @@ class H_tail(object):
     S_e = Q_("1.3145 m**2")                # Elevator area
     c_e = Q_("0.50829 m")               # Elevator chord
     delta_e = Q_("30 deg")     # Max elevator deflection
-    X_h = Q_("5.27 m")                  # [m] LE location compared to the nose
+    X_h = Q_("5.0 m")                  # [m] LE location compared to the nose
     Z_h = Q_("0.55 m")                  # [m] Distance MAC_h and zero lift line wing
     i_h = Q_("0 rad")                   #incidence angle ht
     Sweep_LE = (np.arctan(np.tan((Sweep_25))-(4/A) *
@@ -90,11 +90,11 @@ class H_tail(object):
     
 class V_tail(object):
     
-    S = Q_("1.08 m**2")                                    # [m^2] V-tail surface area
+    S = Q_("1.55 m**2")                                    # [m^2] V-tail surface area
     A = 0.99                                    # Aspect ratio
     b = np.sqrt(S*A)                             # [m] Span V-tail
     taper = 0.33                                # Taper ratio
-    c_r = Q_("1.660 m")                                 # [m] V-tail root chord
+    c_r = 2 * (b/A)/(1+taper)                                  # [m] V-tail root chord
     c_t = c_r * taper                           # [m] V-tail tip chord
     Sweep = Q_("0 deg")                                   # [deg] Sweep V-tail
     Sweep_LE = (np.arctan(np.tan((Sweep))-(4/A) *
@@ -104,7 +104,7 @@ class V_tail(object):
     S_r = Q_("0.5726 m**2")                                # Rudder area
     c_ru = Q_("0.553 m")                                 # Rudder chord
     delta_r = Q_("30 deg")                     # Max rudder deflection
-    X_v = Q_("5.70 m")                                  # [m] 0.25C location compared to the nose
+    X_v = H_tail.X_h + Q_("0.43 m")                               # [m] 0.25C location compared to the nose
     Z_v = Q_("0.312 m")                                  # [m] Distance MAC_v and zero lift line wing
     t_c = 0.15                                  # [-] t/c V-tail
     
@@ -116,16 +116,17 @@ class Landing_gear(object):
     X_mainlg = Firewall.xcg
     X_taillg = Fuselage.l_f
     Z_tailg = Z_mainlg - (X_mainlg-X_taillg) * np.tan(Tip_angle)
-    Y_mainlg = Z_mainlg/(np.tan(Q_("25 deg")))
+    Y_mainlg = Z_mainlg*(np.tan(Q_("35 deg")))
     lg_wheel_d = Q_("0.4445 m")                     # [m] Landing gear wheel diameter
     lg_wheel_w = Q_("0.16 m")                       # [m] Lg wheel width
     
+
 class Masses(object):                    # !!!Structures should watch this!!!
     W_wing = StrucVal.Weightwing * 2     # Weight of the wing
-    W_htail = Q_("18 kg")                # [kg] Mass of H_tail
-    W_vtail = Q_("6 kg")                 # [kg] Mass of V_tail
+    W_htail = Q_("20 kg")                # [kg] Mass of H_tail
+    W_vtail = Q_("18 kg")                 # [kg] Mass of V_tail
     W_fus = Q_("82 kg")                  # [kg] Mass of Fuselage
-    W_gear = Q_("58 kg")                 # [kg] Mass of landing gear
+    W_gear = Q_("60 kg")                 # [kg] Mass of landing gear
     W_engine = Engine.mass               # [kg] Mass of engine
     W_prop = Prop.mass                   # [kg] Mass of propellor
     W_fuelsys = Q_("10 kg")              # [kg] Mass of fuel system
@@ -148,7 +149,7 @@ class CG(object):
     # engine in z, unless stated otherwise, For Z downward == positive, for x
     # is to the tail positive
     CG_wing_mac = 0.45                   # CG location of wing as percentage of MAC
-    XLEMAC = Q_("1.24 m")               # LEMAC position
+    XLEMAC = Q_("1.1 m")               # LEMAC position
     CG_wing = CG_wing_mac*Wing.MAC + XLEMAC     # Wing CG position relative to nose
     X_wing = XLEMAC + 0.25 * Wing.MAC
     ZCG_wing = Q_("0.0 m")

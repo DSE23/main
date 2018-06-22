@@ -297,9 +297,9 @@ dxLE_h = 0.25 * c_rh - 0.25 * c_th
 y_h = (2 * c_th * dxLE_h + c_th**2 + dxLE_h * c_rh +\
        c_th * c_rh + c_rh**2)/(3 * (c_rh + c_th))
 H_rollcoeff = y_h/(b_h/6*((c_rh + 2 * c_th)/(c_rh + c_th)))
-if not 0.95 < H_rollcoeff < 0.97:
+if not 0.91 < H_rollcoeff < 0.92:
     print('\x1b[3;37;41m' + "Change K_4"  + '\x1b[0m')
-k_4 = 0.88                              # From graphs, dependent on H_rollcoeff
+k_4 = 0.75                              # From graphs, dependent on H_rollcoeff
 I_0xh = (W_Htail * b_h**2 * k_4)/24 * ((c_rh+3 * c_th)/(c_rh + c_th))
 I_0zh = I_0yh + I_0xh
 ycgh = 0
@@ -337,8 +337,8 @@ dxLE_v = 0.25 * c_rv - 0.25*c_th
 z_vbar = (2*c_tv* dxLE_v + c_tv**2 + dxLE_v * c_rv +\
        c_tv * c_rv + c_rv**2)/(3*(c_rv + c_tv)) 
 V_rollcoef = z_vbar/((b_v/3)*(c_rv + 2* c_tv)/(c_rv + c_tv))
-k_5 = 1.4
-if not 1.6 < V_rollcoef < 1.65:
+k_5 = 1.8
+if not 1.57 < V_rollcoef < 1.60:
     print('\x1b[3;37;41m' + "Change K_5"  + '\x1b[0m')
 I_0xv = (W_Vtail * b_v**2 * k_5)/18 * (1+ (2 * c_rv * c_tv)/(c_rv + c_tv)**2)
 sigmx_v = sum(yv1 * vdx1 * x_v1) + sum(yv2 * vdx2 * x_v2) + sum(yv3 * vdx3 * x_v3)

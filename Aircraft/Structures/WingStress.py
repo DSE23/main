@@ -31,7 +31,7 @@ yield_strength = Q_("738 MPa")  #tensile
 compr_strength = Q_("657 MPa") #compression
 shear_modulus = Q_("23 GPa")   #G
 poisson = 0.31                 # maximum 0.33
-tau_max = Q_("35 MPa")
+tau_max = Q_("60 MPa")
 density = Q_("1560 kg/m**3")
 
 
@@ -431,33 +431,6 @@ def deformation_y(zs):
 #print("deformation_y=", deformation_y(GWing.b/2))
 
 
-#Tsia-Wu Failure criterion
-def Tsia_Wu(sigma_zs):
-    F11=1/(yield_strength*compr_strength)
-    F22 = F11
-    F12 = -1/2*np.sqrt(F11*F22)
-    F1 = 1/(yield_strength)-1/(compr_strength)
-    F2 = 1/(yield_strength)-1/(compr_strength)
-    F44 = 1/tau_max**2
-    F66 = 1/tau_max**2
-    sigma1 = sigma_zs
-    sigma2 = 0
-    sigma3 = 0
-    tau12 = 1 #DUMMY VALUE
-    tau23 = 0 #DUMMY VALUE
-    tau13 = 1 #DUMMY VALUE 
-    F = F11 *sigma1**2+F22*(sigma2**2+sigma3**2)+sigma2*sigma3*(2*F22-F44)
-    F += 2*F12*sigma1*(sigma3+sigma2)+F1*(sigma1+sigma2) + F2*sigma3
-    F += F44*tau23**2 + F66*(tau13**2+tau12**2)
-    if F < 1:
-        print("No failure occurs")
-    else:
-        print("Failure occurs")
-
-
-
-#plt.plot(s3, qs3)
-#plt.show()
 
 # with is like your try .. finally block in this case
 with open('StrucVal.py', 'r') as file:
