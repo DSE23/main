@@ -1,16 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jun  7
-Author: Jordy van Leeuwen
-
-This code discretizes the main wing, horizontal tail and vertical tail.
-Using non-linear EOM and lookup-tables for the aerodynamic properties, the
-manouevre rates and resulting moments are determined.
-
-To be updated:
-- Trimming the initial condition
-- Thrust
-- Drag from fuselage and gear
+Created on  Jun  22
+Author: Quinty van der Leer
 """
 
 import sys, os
@@ -47,10 +38,10 @@ dr = Q_("0 deg")  # rudder deflection
 de = Q_("0 deg")  # elevator deflection
 alpha_nose = Q_("0. rad")  # angle of attack of nose
 beta_nose = Q_("0. rad")  # angle of sideslip of nose
-V_inf = Q_("150 m/s")  # V infinity
+V_inf = Q_("118 m/s")  # V infinity
 t_current = Q_("0.0 s")  # Start time of sim
 dt = Q_("0.01 s")  # Time step of sim
-t_end = Q_("5.0 s")  # End time of sim
+t_end = Q_("1.0 s")  # End time of sim
 l_h = Q_("3.6444 m")  # Tail arm ac-ac horizontal
 l_v = Q_("3.7 m")  # Tail arm ac-ac vertical
 p = Q_("0. 1/s")  # initial roll rate  [rad/s]
@@ -273,17 +264,18 @@ thetalst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 Vlst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 tlst = np.arange(0, t_end.magnitude, dt.magnitude)
 t2lst = np.zeros((1, int((t_end / dt).magnitude)))[0]
-alpha_nose = Q_("4.5 deg")  # m.radians(alpha_nose)
+alpha_nose = Q_("5.5 deg")  # m.radians(alpha_nose)
 Theta = m.radians(alpha_nose)
 n = 0
 
-de = Q_("-.0 deg")
-T = Q_("1000 N")
+
+de = Q_("-.1 deg")
+T = Q_("2000 N")
 for t_current in np.arange(0, (t_end).magnitude, dt.magnitude):
     da = 29
     # if t_current > 10:
     #    da = 0.1#Q_("0.1 deg")
-    # print(t_current, de)
+    print(t_current)
     t_start_loop = time.time()
     disc_wing_w = np.zeros((len(kwlst) - 1, 20))  # 2D array discretized wing
     disc_wing_h = np.zeros((len(khlst) - 1, 20))  # 2D array discretized HT
@@ -452,13 +444,13 @@ for t_current in np.arange(0, (t_end).magnitude, dt.magnitude):
     Fx = T + Sum_Ft + T_g_f - W * m.sin(Theta)
     Fy = Sum_Fb + W * m.sin(Phi) * m.cos(Theta)
     Fz = Sum_Fn + W * m.cos(Theta) * m.cos(Phi)
-    print(Fx,Fy,Fz, t_current)
+    print(Sum_Fn, Sum_Fn_y)
 
 
     Mx = Sum_Fn_y + Sum_Fb_z
     My = Sum_Fn_x
     Mz = -Sum_Ft_y + Sum_Fb_y
-    print(Mx,My,Mz)
+    #print(Mx,My,Mz)
 
     # Kinematic relations
     u_dot = Fx / (mtow) - q * w + r * v
