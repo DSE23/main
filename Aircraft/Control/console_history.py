@@ -20,7 +20,7 @@ np.seterr(all='raise')
 
 # Variables
 l_a = Q_("0.405 m")        # Set aileron length
-cr_c= Q_("0.2     ")
+cr_c= Q_("0.45     ")
 ce_c= Q_("0.5 ")
 n_of_disc_w = 20            # number of parts wing is discretized
 n_of_disc_h = 10            # number of parts HT is discretized
@@ -28,11 +28,11 @@ n_of_disc_v = 10            # number of parts VT is discretized
 da = Q_("0 deg")            # aileron deflection
 dr = Q_("0 deg")            # rudder deflection
 de = Q_("0 deg")            # elevator deflection
-alpha_nose = Q_("0.05 rad") # angle of attack of nose
+alpha_nose = Q_("0.012 rad") # angle of attack of nose
 beta_nose  = Q_("0. rad")   # angle of sideslip of nose
-V_inf = Q_("118 m/s")     # V infinity
+V_inf = Q_("50 m/s")     # V infinity
 t_current = Q_("0.0 s")       # Start time of sim
-dt = Q_("0.01 s")           # Time step of sim
+dt = Q_("0.001 s")           # Time step of sim
 t_end = Q_("30. s")         # End time of sim
 p = Q_("0. 1/s")            # initial roll rate  [rad/s]
 q = Q_("0. 1/s")            # initial pitch rate [rad/s]
@@ -118,7 +118,7 @@ data = pd.read_csv('aerodynamic_data_ms15.dat', ' ', header=None).values
 def lookup_data(alpha, ca_c, da):
     # Looksup and interpolates Cl and Cd based on alpha, ca_c and da
     alpha = round(alpha,5)
-    alpha = m.degrees(alpha)
+    alpha = alpha.to('degree')
     indexca_c = int(100*ca_c)-1
     if da == 0.:
         indexda = abs(da)//5
@@ -260,61 +260,131 @@ tlst = np.arange(0,2,dt.magnitude)
 #print("Fz:",Fn_w+Fn_h+W)
 "============================================================================="
 # Wing
-de = Q_('0 degree')
-Thrust = Q_("1500 N")
-theta = Q_("0. rad")
-q = Q_("0. rad/s")
-u = V_inf
-w = Q_("0.0 m/s")
-dx_w = (y_mac+0.25*MAC)-xcg
-dx_h = l_h-xcg
-
-qlst = []
-thetalst = []
-alst = []
-tlst = np.arange(0,2,dt.magnitude)
-for t_current in tlst:
-    #Main Wing
-    alpha_w = alpha_nose + q*dx_w/V_inf
-    Cl, Cd, Cm, xcp = lookup_data(alpha_w, 0.2,0.)
-    Cn_w = -Cl*m.cos(alpha_w) - Cd*m.sin(alpha_w)
-    Ct_w = Cl*m.sin(alpha_w) - Cd*m.cos(alpha_w) 
-    Fn_w = 0.5 * rho * V_local ** 2 * S_w * Cn_w
-    Ft_w = 0.5 * rho * V_local ** 2 * S_w * Ct_w
+#de = -2.55
+#Thrust = Q_("530 N")
+#theta = alpha_nose
+#q = Q_("0. rad/s")
+#u = m.cos(alpha_nose) * V_inf
+#w = m.sin(alpha_nose) * V_inf
+#
+#dx_w = (y_mac+0.25*MAC)-xcg 
+#dx_h = l_h-xcg + Q_('0 m')
+#
+#qlst = []
+#thetalst = []
+#alst = []
+#tlst = np.arange(0,5,dt.magnitude)
+#Vlst = []
+#
+#for t_current in tlst:
+#    if t_current >2:
+#        de = -25
+#    #Main Wing
+#    alpha_w = alpha_nose + q*dx_w/V_local
+#    Cl, Cd, Cm, xcp = lookup_data(alpha_w, 0.2,0.)
+#    Cn_w = -Cl*m.cos(alpha_w) - Cd*m.sin(alpha_w)
+#    Ct_w = Cl*m.sin(alpha_w) - Cd*m.cos(alpha_w) 
+#    Fn_w = 0.5 * rho * V_local ** 2 * S_w * Cn_w
+#    Ft_w = 0.5 * rho * V_local ** 2 * S_w * Ct_w
+#    
+#    #Horizontal Tail
+#    alpha_h = alpha_nose + q*dx_h/V_local
+#    Cl, Cd, Cm, xcp = lookup_data(alpha_h, ce_c,de)
+#    Cn_h = -Cl*m.cos(alpha_h) - Cd*m.sin(alpha_h)
+#    Ct_h = Cl*m.sin(alpha_h) - Cd*m.cos(alpha_h) 
+#    
+#    Fn_h = 0.5 * rho * V_local ** 2 * S_h * Cn_h
+#    Ft_h = 0.5 * rho * V_local ** 2 * S_h * Ct_h
+#    
+#    Fx = Thrust + Ft_w + Ft_h - W * m.sin(theta)
+#    Fz = Fn_w + Fn_h + W * m.cos(theta)
+#    My = dx_w * Fn_w + dx_h * Fn_h
+#    
+#    u_dot = Fx/mtow - q*w
+#    w_dot = Fz/mtow + q*u
+#    q_dot = My/I_yy
+#    
+#    u += u_dot * dt
+#    w += w_dot * dt
+#    q += q_dot * dt
+#    
+#    theta += q * dt
+#    alpha_nose = np.arctan(w/u) 
+#
+#    
+#    V_local = np.sqrt(u**2+w**2)
+#    
+#    alst.append(alpha_nose.to('degree').magnitude)
+#    qlst.append(q.to('degree /s').magnitude)
+#    thetalst.append(theta.to('degree').magnitude)
+#    
+#    Vlst.append(V_local.magnitude)
+#print('finished')
+#
+#plt.figure()
+#plt.plot(tlst,qlst,label='q')
+#plt.plot(tlst,thetalst,label='theta')
+#plt.plot(tlst,alst,label='alpha')
+#plt.legend()
+##plt.figure()
+##plt.plot(tlst,Vlst,label='velocity')
+##plt.legend()
+#plt.show()
+"============================================================================="
+#Vertical Tail
+dr = 0
+dx_v = l_v-xcg + Q_('1 m')
+u = m.cos(beta_nose) * V_inf
+v = m.sin(beta_nose) * V_inf
+r = Q_('0. rad/s')
+Thrust = Q_('1000 N')
+alpha_v = alpha_nose
+betalst = []
+psilst = []
+rlst = []
+tlst = []
+for t_current in np.arange(0,4,dt.magnitude):
+    if t_current>1:
+        dr = 25
+        
+    beta_v  = beta_nose - r*dx_v/V_inf
     
-    #Horizontal Tail
-    alpha_h = alpha_nose + q*dx_h/V_inf
-    Cl, Cd, Cm, xcp = lookup_data(alpha_h, ce_c,de)
-    Cn_h = -Cl*m.cos(alpha_h) - Cd*m.sin(alpha_h)
-    Ct_h = Cl*m.sin(alpha_h) - Cd*m.cos(alpha_h) 
+    Cl, Cd, Cm, xcp = lookup_data(-beta_v, cr_c,dr)
+    Cn_v = -Cl*m.cos(beta_v) - Cd*m.sin(beta_v)
+    Ct_v = Cl*m.sin(beta_v) - Cd*m.cos(beta_v) 
     
-    Fn_h = 0.5 * rho * V_local ** 2 * S_h * Cn_h
-    Ft_h = 0.5 * rho * V_local ** 2 * S_h * Ct_h
+    Fn_v = 0.5 * rho * V_local ** 2 * S_v * Cn_v
+    Ft_v = 0.5 * rho * V_local ** 2 * S_v * Ct_v
     
-    Fx = Thrust + Ft_w + Ft_h + W * m.sin(theta)
-    Fz = Fn_w + Fn_h + W * m.cos(theta)
-    My = dx_w * Fn_w + dx_h * Fn_h
+    Cl_w,Cd_w,dummy,dummy = lookup_data(alpha_nose,0.1,0)
+    Cd_w = -Cl_w*m.cos(alpha_nose) - Cd_w*m.sin(alpha_nose)
+    Ft_wh = 0.5 * rho * V_local**2 * Cd_w * (S_w + S_h)
     
-    u_dot = Fx/mtow - q*w
-    w_dot = Fz/mtow + q*u
-    q_dot = My/I_yy
+    
+    Fx = Thrust + Ft_wh + Ft_v  - W * m.sin(alpha_nose)
+    Fz = Fn_v
+    
+    u_dot = Fx/mtow + r*v
+    v_dot = Fz/mtow - r*u
     
     u += u_dot * dt
-    w += w_dot * dt
-    q += q_dot * dt
+    v += v_dot * dt
     
-    theta += q * dt
-    alpha_nose = m.atan(w/u) * Q_('radian')
+    Mz = dx_v * Fn_v
+    r_dot = Mz/I_zz
     
-    V_local = np.sqrt(u**2+w**2)
+    r += r_dot * dt
+    Psi += r * dt
     
-    alst.append(alpha_nose.to('degree').magnitude)
-    qlst.append(q.to('degree/s').magnitude)
-    thetalst.append(theta.to('degree').magnitude)
-print('finished')
-
-plt.plot(tlst,qlst,label='q')
-plt.plot(tlst,thetalst,label='theta')
-plt.plot(tlst,alst,label='alpha')
+    beta_nose = np.arctan(v/u)
+    
+    betalst.append(m.degrees(beta_nose))
+    psilst.append(m.degrees(Psi))
+    rlst.append(r.to('degree/s').magnitude)
+    tlst.append(t_current)
+plt.plot(tlst, betalst, label='beta')
+plt.plot(tlst, psilst, label='psi')
+plt.plot(tlst,rlst,label='r')
 plt.legend()
 plt.show()
+
