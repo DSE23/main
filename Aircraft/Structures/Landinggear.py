@@ -172,7 +172,7 @@ def landing_stress(z):
         return sigma_zs, strain #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
     sigma, strain = Normal_stress_due_to_bending(maxT, airfoilordinate(maxT))
-
+    strain.ito(ureg('m**-1'))
     return sigma, strain
 '''-----------------Stress calculation loop-----------------------------'''
 
@@ -192,5 +192,5 @@ Vol = AreaSkin * Chordlength
 Mass = Vol * density
 print(Mass)
 
-plt.plot(zlist, sigmalist)
+plt.plot(zlist, strainlist)
 plt.show()
