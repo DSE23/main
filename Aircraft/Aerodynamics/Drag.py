@@ -21,7 +21,7 @@ import Aeroprops
 #Input variables, to be filled in by user
 
 
-AoA = Q_("2 deg") #fill in angle of attack flight condition drag to be known
+AoA = Q_("5 deg") #fill in angle of attack flight condition drag to be known
 AoA = AoA.to(ureg.rad)
 Rwb = 1.05#Read in DATCOM p1164, wing body interference factor
 Rhtb = 1.05
@@ -29,7 +29,7 @@ Rvtb= 1.05
 CL_trim = 0#lift coefficient needed to trim aircraft
 
 height = Q_('500 m') # height in m
-velocity = Q_('30  m/s') #velocity in m/s
+velocity = Q_('94  m/s') #velocity in m/s
 loc_max_tc_wing = 0 # 0 if t/c max is < 30%c, 1 if t/c max is >= 30%c
 loc_max_tc_ht = 0 # 0 if t/c max is < 30%c, 1 if t/c max is >= 30%c
 loc_max_tc_vt = 0 # 0 if t/c max is < 30%c, 1 if t/c max is >= 30%c
