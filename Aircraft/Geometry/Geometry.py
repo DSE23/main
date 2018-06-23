@@ -112,10 +112,10 @@ class Landing_gear(object):
     Prop_clear_req = Q_("0.23 m")                   # Required prop clearance CS23
     Prop_length = Prop.Diameter/2
     Z_mainlg = Prop_clear_req + Prop_length       # [m] Z_location bottom main L_G
-    Tip_angle = Q_("12 deg")                        # Should be between 10 and 15
+    Tip_angle = Q_("10 deg")                        # Should be between 10 and 15
     X_mainlg = Firewall.xcg
     X_taillg = Fuselage.l_f
-    Z_tailg = Z_mainlg - (X_mainlg-X_taillg) * np.tan(Tip_angle)
+    Z_tailg = Z_mainlg - (X_taillg-X_mainlg) * np.tan(Tip_angle)
     Y_mainlg = Z_mainlg*(np.tan(Q_("35 deg")))
     lg_wheel_d = Q_("13.5 inch")                   # [m] Landing gear wheel diameter
     lg_wheel_d.ito(Q_("m"))
