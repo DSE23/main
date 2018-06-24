@@ -67,6 +67,8 @@ print('deflection angle optimum =', m.degrees(defl_angle) )
 print('chord optimum = ', chordslat)
 print('gap optimum = ', gapslat)              
 
+AoA_increase = m.degrees(optimum / 6.5237)
+
 #%% Calculate surface manin airfoil that will be slat (length in m)
 airfoildata = np.genfromtxt("../airfoil.dat") #import airfoil
 halfairfoil = airfoildata[0:81,:] # take upper half of airfoil coordinates
@@ -179,3 +181,4 @@ print('actuator anagl', angle_actuator)
 actuator = m.sqrt(x_attach**2 + y_attach**2)
 print('actuator length',actuator)
 """
+

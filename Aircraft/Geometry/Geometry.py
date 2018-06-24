@@ -64,9 +64,9 @@ class Fuselage(object):
     b_f = Q_("1.044 m")                 # [m] Fuselage width
     h_f = Q_("1.1 m")                   # [m] Fuselage height
     front_A = Q_("0.98 m**2")              # [m^2] Frontal area
-    S_wet_f= Q_("14.94 m**2")              # [m^2] Fuselage wetted area
+    S_wet_f= Q_("16.358 m**2")              # [m^2] Fuselage wetted area
     cabin_w = Q_("0.6 m")               # [m] cabin width (inside)
-    A_max_canopy = Q_(" m**2")          # [m^2], coming from catia
+    A_max_canopy = Q_("0.14 m**2")          # [m^2], coming from catia
 
 class H_tail(object):
     
@@ -112,14 +112,15 @@ class Landing_gear(object):
     Prop_clear_req = Q_("0.23 m")                   # Required prop clearance CS23
     Prop_length = Prop.Diameter/2
     Z_mainlg = Prop_clear_req + Prop_length       # [m] Z_location bottom main L_G
-    Tip_angle = Q_("12 deg")                        # Should be between 10 and 15
+    Tip_angle = Q_("10 deg")                        # Should be between 10 and 15
     X_mainlg = Firewall.xcg
     X_taillg = Fuselage.l_f
-    Z_tailg = Z_mainlg - (X_mainlg-X_taillg) * np.tan(Tip_angle)
+    Z_tailg = Z_mainlg - (X_taillg-X_mainlg) * np.tan(Tip_angle)
     Y_mainlg = Z_mainlg*(np.tan(Q_("35 deg")))
-    lg_wheel_d = Q_("0.4445 m")                     # [m] Landing gear wheel diameter
-    lg_wheel_w = Q_("0.16 m")                       # [m] Lg wheel width
-    
+    lg_wheel_d = Q_("13.5 inch")                   # [m] Landing gear wheel diameter
+    lg_wheel_d.ito(Q_("m"))
+    lg_wheel_w = Q_("4.25 inch")                       # [m] Lg wheel width
+    lg_wheel_w.ito(Q_("m"))
 
 class Masses(object):                    # !!!Structures should watch this!!!
     W_wing = StrucVal.Weightwing * 2     # Weight of the wing
