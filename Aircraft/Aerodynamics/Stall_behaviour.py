@@ -52,24 +52,28 @@ l = Geometry.Fuselage.l_f
 for x in np.linspace(0,l,200):
     Radius_tube = Radius_p * m.sqrt((1 + a) / (1 + a * (1 + (x/(m.sqrt(Radius_p ** 2 + x **2))))))
     velocity = a*V0 + V0
-    print(Radius_tube)
+    #print(Radius_tube)
     
     if LE_wing <= x <= LE_wing + 0.03:
         area_ail = (Radius_tube - width_fus) * aileron_c * 2
         velocity_ail = velocity
+        print('aileron area in flow:', area_ail, 'velocity of flow :', velocity_ail)
         
     elif LE_ht <= x <= LE_ht + 0.03:
         lam_local = taper_ht + (1 - taper_ht)/span_ht * 2 * (span_ht/2 - Radius_tube)
         chord_l = lam_local * root_c_ht * elevator_c_ratio
         area_elevator = 2 * (chord_l + root_c_ht * elevator_c_ratio) * Radius_tube / 2
         velocity_ele = velocity
+        print('elevator area in flow:', area_elevator, 'velocity of flow :', velocity_ele)
         
     elif LE_vt <= x <= LE_vt + 0.03:
         lam_local = taper_vt + (1 - taper_vt)/span_vt * (span_vt - Radius_tube)
         chord_l = lam_local * root_c_vt * rudder_c_ratio
         area_rudder = (chord_l + root_c_vt * rudder_c_ratio) * Radius_tube / 2
+        if area_rudder > Geometry.V_tail.S_r.magnitude:
+            area_rudder = Geometry.V_tail.S_r.magnitude
         velocity_rud = velocity
-       
+        print('rudder area in flow:', area_rudder, 'velocity of flow :', velocity_rud)
 
 
 
