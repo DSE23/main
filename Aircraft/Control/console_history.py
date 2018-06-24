@@ -358,87 +358,85 @@ disc_wing_w = np.zeros((len(kwlst)-1, 10))
 #print("Fz:",Fn_w+Fn_h+W)
 "============================================================================="
 # Pitch
-#alpha_nose, de, Thrust = trim()
+alpha_nose, de, Thrust = trim()
 
-#de = -1.862
-#Thrust = Q_("542 N")
-#theta = alpha_nose
-#q = Q_("0. rad/s")
-#u = m.cos(alpha_nose) * V_inf
-#w = m.sin(alpha_nose) * V_inf
-#
-#dx_w = (X_w+0.25*MAC)-xcg 
-#dx_h = l_h-xcg + Q_('0 m')
-#
-#qlst = []
-#qdotlst = []
-#thetalst = []
-#alst = []
-#tlst = np.arange(0,6,dt.magnitude)
-#Vlst = []
-##de_dot = Q_("-25/0.1 deg/s")
-#for t_current in tlst:
-#    
-#    if t_current >1:
-#        de = -25
-#        
-#    #Main Wing
-#    alpha_w = alpha_nose + q*dx_w/V_local
-#    
-#    Cl, Cd, Cm, xcp = lookup_data(alpha_w, 0.2,0.)
-#    Cn_w = -Cl*np.cos(alpha_w) - Cd*np.sin(alpha_w)
-#    
-#    Ct_w = Cl*m.sin(alpha_w) - Cd*m.cos(alpha_w) 
-#    Fn_w = 0.5 * rho * V_local ** 2 * S_w * Cn_w
-#    Ft_w = 0.5 * rho * V_local ** 2 * S_w * Ct_w
-#    
-#    #Horizontal Tail
-#    alpha_h = alpha_nose + q*dx_h/V_local
-#    Clh, Cdh, Cmh, xcp = lookup_data(alpha_h, ce_c,de)
-#    Cn_h = -Clh*np.cos(alpha_h) - Cdh*np.sin(alpha_h)
-#    Ct_h = Clh*m.sin(alpha_h) - Cdh*m.cos(alpha_h) 
-##    print((0.5*rho*V_local**2), Cn_h, S_h)
-#    Fn_h = 0.5 * rho * V_local ** 2 * S_h * Cn_h
-#    Ft_h = 0.5 * rho * V_local ** 2 * S_h * Ct_h
-#    Fx = Thrust + Ft_w + Ft_h - W * m.sin(theta)
-#    Fz = Fn_w + Fn_h + W * m.cos(theta)
-#    My = dx_w * Fn_w + dx_h * Fn_h +\
-#            Cm*0.5*rho*V_local**2*S_w*MAC +\
-#            Cmh*0.5*rho*V_local**2*S_h*MAC_h
-#    u_dot = Fx/mtow - q*w
-#    w_dot = Fz/mtow + q*u
-#    q_dot = My/I_yy
-#    
-#    u += u_dot * dt
-#    w += w_dot * dt
-#    q += q_dot * dt
-#    
-#    theta += q * dt
-#    alpha_nose = np.arctan(w/u) 
-#
-#    
-#    V_local = np.sqrt(u**2+w**2)
-#    
-#    alst.append(alpha_nose.to('degree').magnitude)
-#    qlst.append(q.to('degree /s').magnitude)
-#    qdotlst.append(q_dot.to('degree/s**2').magnitude)
-#    thetalst.append(theta.to('degree').magnitude)
-#    
-#    Vlst.append(V_local.magnitude)
-#    
-#print('finished')
-#
-#
+V_local = V_inf
+de = -1.862
+Thrust = Q_("542 N")
+theta = alpha_nose
+q = Q_("0. rad/s")
+u = m.cos(alpha_nose) * V_inf
+w = m.sin(alpha_nose) * V_inf
+
+dx_w = (X_w+0.25*MAC)-xcg 
+dx_h = l_h-xcg + Q_('0 m')
+
+qlst = []
+qdotlst = []
+thetalst = []
+alst = []
+tlst = np.arange(0,6,dt.magnitude)
+Vlst = []
+#de_dot = Q_("-25/0.1 deg/s")
+for t_current in tlst:
+        
+    #Main Wing
+    alpha_w = alpha_nose + q*dx_w/V_local
+    
+    Cl, Cd, Cm, xcp = lookup_data(alpha_w, 0.2,0.)
+    Cn_w = -Cl*np.cos(alpha_w) - Cd*np.sin(alpha_w)
+    
+    Ct_w = Cl*m.sin(alpha_w) - Cd*m.cos(alpha_w) 
+    Fn_w = 0.5 * rho * V_local ** 2 * S_w * Cn_w
+    Ft_w = 0.5 * rho * V_local ** 2 * S_w * Ct_w
+    
+    #Horizontal Tail
+    alpha_h = alpha_nose + q*dx_h/V_local
+    Clh, Cdh, Cmh, xcp = lookup_data(alpha_h, ce_c,de)
+    Cn_h = -Clh*np.cos(alpha_h) - Cdh*np.sin(alpha_h)
+    Ct_h = Clh*m.sin(alpha_h) - Cdh*m.cos(alpha_h) 
+#    print((0.5*rho*V_local**2), Cn_h, S_h)
+    Fn_h = 0.5 * rho * V_local ** 2 * S_h * Cn_h
+    Ft_h = 0.5 * rho * V_local ** 2 * S_h * Ct_h
+    Fx = Thrust + Ft_w + Ft_h - W * m.sin(theta)
+    Fz = Fn_w + Fn_h + W * m.cos(theta)
+    My = dx_w * Fn_w + dx_h * Fn_h +\
+            Cm*0.5*rho*V_local**2*S_w*MAC +\
+            Cmh*0.5*rho*V_local**2*S_h*MAC_h
+    u_dot = Fx/mtow - q*w
+    w_dot = Fz/mtow + q*u
+    q_dot = My/I_yy
+    
+    u += u_dot * dt
+    w += w_dot * dt
+    q += q_dot * dt
+    
+    theta += q * dt
+    alpha_nose = np.arctan(w/u) 
+
+    
+    V_local = np.sqrt(u**2+w**2)
+    
+    alst.append(alpha_nose.to('degree').magnitude)
+    qlst.append(q.to('degree /s').magnitude)
+    qdotlst.append(q_dot.to('degree/s**2').magnitude)
+    thetalst.append(theta.to('degree').magnitude)
+    
+    Vlst.append(V_local.magnitude)
+    
+print('finished')
+
+
+plt.figure()
+plt.plot(tlst,qlst,label='q')
+plt.plot(tlst,thetalst,label='theta')
+plt.plot(tlst,alst,label='alpha')
+#plt.plot(tlst,qdotlst,label='q dot')
+plt.legend()
 #plt.figure()
-#plt.plot(tlst,qlst,label='q')
-#plt.plot(tlst,thetalst,label='theta')
-#plt.plot(tlst,alst,label='alpha')
-##plt.plot(tlst,qdotlst,label='q dot')
+#plt.plot(tlst,Vlst,label='velocity')
 #plt.legend()
-##plt.figure()
-##plt.plot(tlst,Vlst,label='velocity')
-##plt.legend()
-#plt.show()
+plt.show()
 "============================================================================="
 #Yaw
 dr = 0
