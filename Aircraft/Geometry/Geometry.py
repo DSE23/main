@@ -48,7 +48,7 @@ class Wing(object):
     T_Cmax = 0.1513                             #Max thickness over chord
     S_wet = 2*S                   # Wetted wing area
     S_a = Q_('2.677 m**2')                 # Aileron area
-    c_a = Q_('0.3828 m')                # Aileron chord
+    c_a = Q_('0.405 m')                # Aileron chord
     delta_a = Q_("30 deg")     # max aileron deflection
     delta_CL_max_a = 0.8267     # Max lift coeff difference due to aileron deflection
               
@@ -64,9 +64,9 @@ class Fuselage(object):
     b_f = Q_("1.044 m")                 # [m] Fuselage width
     h_f = Q_("1.1 m")                   # [m] Fuselage height
     front_A = Q_("0.98 m**2")              # [m^2] Frontal area
-    S_wet_f= Q_("14.94 m**2")              # [m^2] Fuselage wetted area
+    S_wet_f= Q_("16.358 m**2")              # [m^2] Fuselage wetted area
     cabin_w = Q_("0.6 m")               # [m] cabin width (inside)
-    A_max_canopy = Q_(" m**2")          # [m^2], coming from catia
+    A_max_canopy = Q_("0.14 m**2")          # [m^2], coming from catia
 
 class H_tail(object):
     
@@ -80,7 +80,7 @@ class H_tail(object):
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))  # [m] Mean aerodynamic chord
     S_wet = 2*S                 # [m^2] Wetted area
     S_e = Q_("1.3145 m**2")                # Elevator area
-    c_e = Q_("0.50829 m")               # Elevator chord
+    ce_c = Q_("0.45")           # percentage elevator chord over local chord
     delta_e = Q_("30 deg")     # Max elevator deflection
     X_h = Q_("5.0 m")                  # [m] LE location compared to the nose
     Z_h = Q_("0.55 m")                  # [m] Distance MAC_h and zero lift line wing
@@ -102,7 +102,7 @@ class V_tail(object):
     MAC = c_r*(2/3)*((1+taper+taper**2)/(1+taper))  # [m] Mean aerodynamic chord
     S_wet = 2*S                                   # [m^2] Wetted area
     S_r = Q_("0.5726 m**2")                                # Rudder area
-    c_ru = Q_("0.553 m")                                 # Rudder chord
+    cr_c = Q_("0.5")                            # percentage rudder chord over local chord
     delta_r = Q_("30 deg")                     # Max rudder deflection
     X_v = H_tail.X_h + Q_("0.43 m")                               # [m] 0.25C location compared to the nose
     Z_v = Q_("0.312 m")                                  # [m] Distance MAC_v and zero lift line wing
@@ -112,14 +112,15 @@ class Landing_gear(object):
     Prop_clear_req = Q_("0.23 m")                   # Required prop clearance CS23
     Prop_length = Prop.Diameter/2
     Z_mainlg = Prop_clear_req + Prop_length       # [m] Z_location bottom main L_G
-    Tip_angle = Q_("12 deg")                        # Should be between 10 and 15
+    Tip_angle = Q_("10 deg")                        # Should be between 10 and 15
     X_mainlg = Firewall.xcg
     X_taillg = Fuselage.l_f
-    Z_tailg = Z_mainlg - (X_mainlg-X_taillg) * np.tan(Tip_angle)
+    Z_tailg = Z_mainlg - (X_taillg-X_mainlg) * np.tan(Tip_angle)
     Y_mainlg = Z_mainlg*(np.tan(Q_("35 deg")))
-    lg_wheel_d = Q_("0.4445 m")                     # [m] Landing gear wheel diameter
-    lg_wheel_w = Q_("0.16 m")                       # [m] Lg wheel width
-    
+    lg_wheel_d = Q_("13.5 inch")                   # [m] Landing gear wheel diameter
+    lg_wheel_d.ito(Q_("m"))
+    lg_wheel_w = Q_("4.25 inch")                       # [m] Lg wheel width
+    lg_wheel_w.ito(Q_("m"))
 
 class Masses(object):                    # !!!Structures should watch this!!!
     W_wing = StrucVal.Weightwing * 2     # Weight of the wing

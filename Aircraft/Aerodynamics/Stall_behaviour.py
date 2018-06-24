@@ -17,17 +17,18 @@ from pint import UnitRegistry
 import Aeroprops
 from Propulsion_and_systems import Propeller
 
-
+axial_v = np.genfromtxt('../DataWalong')
+wlist = np.array([])
+for line in len(axial_v[1,:]):
+    w = np.average(axial_v[line,:])
+    wlist = np.append(alist, w)
 #Contracted slipstream diameter
 V0 = 30                                                                 #free stream velocity
-data = Propeller.Thrustcalc(V0)                                         #load propeller definition data
 Dia = Geometry.Prop.Diameter.magnitude                                  #diameter of the prop
-Sref = Geometry.Wing.S.magnitude                                        #wing area
-CT = data[1] / 0.5 / 1.225 / V0**2 / Sref                               #thrust coefficient
-DeltaV = V0 * (m.sqrt(1 + CT * (Sref / (Dia**2 / 4 * m.pi)) - 1))       # velocity increase due to prop
-D_con = Dia * m.sqrt((V0 + DeltaV / 2)/(V0 + DeltaV))                   # contracted slipstream dieameter
-
-v_axial = V0 + DeltaV                                                   #Axial velocity
-#waiting for control surface sizing to know how many area of surfaces
-#is in the propeller wake with v_axial
-
+Radius_p = Dia / 2
+#ask Gijs which a to select for which velocity
+a = w / V0
+l = Geometry.Fuselage.l_f
+for x in np.linspace(0,l,200):
+    Radius_tube = Radius_p * m.sqrt((1 + a) / (1 + a * (1 + (x/(m.sqrt(Radius_p ** 2 + x **2))))))
+    velocity = a*V0 + V0

@@ -21,7 +21,7 @@ import Aeroprops
 #Input variables, to be filled in by user
 
 
-AoA = Q_("2 deg") #fill in angle of attack flight condition drag to be known
+AoA = Q_("5 deg") #fill in angle of attack flight condition drag to be known
 AoA = AoA.to(ureg.rad)
 Rwb = 1.05#Read in DATCOM p1164, wing body interference factor
 Rhtb = 1.05
@@ -29,7 +29,7 @@ Rvtb= 1.05
 CL_trim = 0#lift coefficient needed to trim aircraft
 
 height = Q_('500 m') # height in m
-velocity = Q_('30  m/s') #velocity in m/s
+velocity = Q_('94  m/s') #velocity in m/s
 loc_max_tc_wing = 0 # 0 if t/c max is < 30%c, 1 if t/c max is >= 30%c
 loc_max_tc_ht = 0 # 0 if t/c max is < 30%c, 1 if t/c max is >= 30%c
 loc_max_tc_vt = 0 # 0 if t/c max is < 30%c, 1 if t/c max is >= 30%c
@@ -191,10 +191,14 @@ S_wet_fus / Sref
 
 print('fuselage zero lift drag', CD0_fus)
 
+CD_canopy = Q_('0.04 m**-2') * Geometry.Fuselage.A_max_canopy
+print(CD_canopy,'cap')
+CD_lg = Q_('0.458 m**-2') * Geometry.Landing_gear.lg_wheel_d * Geometry.Landing_gear.lg_wheel_w
+print('landing gear',CD_lg)
 
 #Total zero lift drag
 CD0_tot = CD0_array [0] * Rwb + CD0_fus * Rwb * Rhtb * Rvtb + CD0_array[1] *\
- Rhtb  + CD0_array[2] * Rvtb
+ Rhtb  + CD0_array[2] * Rvtb + CD_canopy + CD_lg
 print('cdotot', CD0_tot)
 
 
@@ -206,15 +210,11 @@ Delta_CD_trim = ((CD0_array[1] + CL_trim**2 / m.pi / AR_ht / 0.5) * \
                  
         
 #miscellaneous drag
-CD_canopy = Q_('0.04 m**-2') * Geometry.Fuselage.A_max_canopy
-print(CD_canopy,'cap')
-CD_lg = Q_('0.458 m**-2') * Geometry.Landing_gear.lg_wheel_d * Geometry.Landing_gear.lg_wheel_w
-print('landing gear',CD_lg)
 
 
 #total drag calculation
 
-CD_tot = CD0_tot + CD_canopy + CD_lg + Delta_CD_trim + CDi_array[0] + CDi_array[1]  
+CD_tot = CD0_tot + Delta_CD_trim + CDi_array[0] + CDi_array[1]  
 
 Drag = 0.5 * density * velocity**2 * CD_tot * Sref
     
