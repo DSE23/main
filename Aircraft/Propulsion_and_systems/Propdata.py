@@ -1,12 +1,4 @@
-"""
-Name: Propeller Data Reader
-Department: Propulsion and Aircraft Systems
-Last updated: 19/06/2018 10:54 by Ties
-"""
 
-"""
-This file provides an easy way to extract data from the DataReal.txt file
-"""
 
 import numpy as np
 import sys
@@ -16,14 +8,7 @@ sys.path.append('../')
 from Misc import ureg, Q_
 # Imports the unit registry from the Misc folder
 
-Data = np.loadtxt("../DataReal.txt", delimiter=" ", skiprows=1)
-
-for i in range(16):
-    if Data[i,0] <0 or Data[i,0] > 92:
-        Data[i] = (Data[i-1]+Data[i+1])/2
-
-data = np.savetxt("../DataReal.txt",Data)
-
+data = np.loadtxt("../DataReal.txt", delimiter=" ", skiprows=1)
 
 
 def data_reader(velocity, needed_value):

@@ -37,7 +37,7 @@ V_a = PF.V_a_clean
 Tmax = (P_to**2*eta_prop**2*m.pi*dp**2/2*rho)**(1/3)
 
 # Inputs
-V_step = 5 # m/s
+V_step = 1 # m/s
 y_step = 1 # deg
 
 # make empty lists
