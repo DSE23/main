@@ -168,9 +168,9 @@ def computeloads(z):
 zs = b-3*Q_('m')
 
 #L, D, M, L_moment, D_moment, dL, dD, dM = computeloads(zs)
-print('L', L)
-print('D', D)
-print('M', M)
+# print('L', L)
+# print('D', D)
+# print('M', M)
 dM = 0
 L = Q_("40000 N")
 D = Q_("4000 N")
@@ -191,15 +191,9 @@ M = Q_("10000 N*m")
 def Normal_stress_due_to_bending(x, y): # Normal stress due to bending
     denominator_inertia_term = Inertia.Ixx_wb*Inertia.Iyy_wb-Inertia.Ixy_wb**2
     inertia_term_1 = (Inertia.Iyy_wb*y*Wing.Chordlength-Inertia.Ixy_wb*x*Wing.Chordlength)/denominator_inertia_term
-    print('in1', inertia_term_1)
     inertia_term_2 = (Inertia.Ixx_wb*x*Wing.Chordlength-Inertia.Ixy_wb*y*Wing.Chordlength)/denominator_inertia_term
-    print('in2', inertia_term_2)
     sigma_zs = D_moment*inertia_term_1 + L_moment*inertia_term_2
-    print("Dmoment", D_moment)
-    print("Lmoment", L_moment)
-    print("Sigma", sigma_zs)
     strain = sigma_zs /youngs_modulus
-    print("Strain", strain)
     return sigma_zs, strain #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
 
