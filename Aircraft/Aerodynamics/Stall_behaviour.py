@@ -47,7 +47,7 @@ V0 = 30                                                                 #free st
 Dia = Geometry.Prop.Diameter.magnitude                                  #diameter of the prop
 Radius_p = Dia / 2
 #ask Gijs which a to select for which velocity
-a = wlist[1] / V0
+a = wlist[14] / V0
 l = Geometry.Fuselage.l_f
 for x in np.linspace(0,l,200):
     Radius_tube = Radius_p * m.sqrt((1 + a) / (1 + a * (1 + (x/(m.sqrt(Radius_p ** 2 + x **2))))))
