@@ -143,7 +143,10 @@ while V > Q_("1 m/s"):
     x_list.append(x.magnitude)
 
 
-print(x)
+print("The total landing distance is",x)
+print("The total landing time is",t)
+print(V_REF)
+
 plt.figure(1)
 plt.plot(t_list, h_list)
 plt.ylabel('height [m]')
@@ -151,8 +154,11 @@ plt.xlabel('time [s] ')
 
 plt.figure(2)
 plt.plot(x_list, h_list)
-plt.ylabel('height [m]')
-plt.xlabel('distance [m] ')
+plt.ylabel('Height [m]')
+plt.xlabel('Distance [m] ')
+plt.axis('scaled')
+plt.xlim(0,x.magnitude)
+plt.ylim(0,25)
 
 plt.figure(3)
 plt.plot(x_list, V_list)
