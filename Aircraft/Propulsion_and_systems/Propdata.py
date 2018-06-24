@@ -18,7 +18,7 @@ from Misc import ureg, Q_
 
 Data = np.loadtxt("../DataReal.txt", delimiter=" ", skiprows=1)
 
-for i in range(166):
+for i in range(16):
     if Data[i,0] <0 or Data[i,0] > 92:
         Data[i] = (Data[i-1]+Data[i+1])/2
 
@@ -33,7 +33,7 @@ def data_reader(velocity, needed_value):
     if velocity < 15:
         print("ERROR: please supply a value for velocity between 15 and 160 m/s")
         return
-    index = int(velocity) + 15
+    index = int(velocity) - 15
     if needed_value == "Propeller efficiency":
         col = 0
         unit = "none"
