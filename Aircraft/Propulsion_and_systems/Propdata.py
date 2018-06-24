@@ -16,7 +16,14 @@ sys.path.append('../')
 from Misc import ureg, Q_
 # Imports the unit registry from the Misc folder
 
-data = np.loadtxt("../DataReal.txt", delimiter=" ", skiprows=1)
+Data = np.loadtxt("../DataReal.txt", delimiter=" ", skiprows=1)
+
+for i in range(166):
+    if Data[i,0] <0 or Data[i,0] > 92:
+        Data[i] = (Data[i-1]+Data[i+1])/2
+
+data = np.savetxt("../DataReal.txt",Data)
+
 
 
 def data_reader(velocity, needed_value):
