@@ -26,19 +26,20 @@ rho = Q_("1.225 kg/(m**3)")
 C_L_alpha = AWing.CL_alpha
 C_L_alpha *= Q_("1/rad")
 C_l_max = AWing.CL_max
+C_L_0 = (AWing.dCL_flaps + AWing.dCL_slats)
 A = GM.Wing.A
 e = AWing.Oswald_e
 eta_prop = PF.eta_prop
 dp = PF.dp
-V_stall =  PF.V_stall_clean
+V_stall =  PF.V_stall_hld
 alpha_max = AWing.alpha_stall
 alpha_max *= Q_("deg")
 V_a = PF.V_a_clean
 Tmax = (P_to**2*eta_prop**2*m.pi*dp**2/2*rho)**(1/3)
 
 # Inputs
-V_step = 1 # m/s
-y_step = 1 # deg
+V_step = 0.5 # m/s
+y_step = 0.1 # deg
 
 # make empty lists
 V_list = []
@@ -62,18 +63,17 @@ for V in np.arange (V_stall.magnitude,V_a.magnitude, V_step):
     # If the thrust or AoA is higher than possible, the thrust is set to zero.
     # (The thrust is only important to determine the largest difference between thrust and drag,
     # if the required thrust is higher than the available thrust, the climb cannot be sustained)
-    while T_req < Tmax:
-
-        y = y + y_step
+    while T_req <= Tmax:
         flight_path_angle = y
         flight_path_angle *= Q_("deg")
         L_req = W * np.cos(flight_path_angle)
-        alpha_req = L_req / (0.5 * rho * V ** 2 * S * C_L_alpha)
-        C_D = C_d_0 + (C_L_alpha * alpha_req) ** 2 / (m.pi * A * e)
+        alpha_req = L_req / (0.5 * rho * V ** 2 * S * C_L_alpha) - C_L_0 / C_L_alpha
+        C_D = C_d_0 + (C_L_alpha * alpha_req + C_L_0) ** 2 / (m.pi * A * e)
         D = C_D * 0.5 * rho * V ** 2 * S
         T_req = D + W * np.sin(flight_path_angle)
         #T = min(min(P_to * eta_prop / V, Tmax).magnitude,T_req.magnitude)
         alpha_req.ito(Q_("deg"))
+        y = y + y_step
 
     y_max_list.append(y)
     V_list.append(V.magnitude)
