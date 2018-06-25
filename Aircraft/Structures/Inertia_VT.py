@@ -9,12 +9,12 @@ sys.path.append('../') # This makes sure the parent directory gets added to the 
 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import numpy as np
-from scipy import integrate
-from Structures import Wing
-from scipy.interpolate import interp1d
+
+from Structures import Wing_VT
+
 from matplotlib import pyplot as plt
 
-# print(Wing.h_str)
+# print(Wing_VT.h_str)
 Iyy_aircraft = Q_("1492.8 kg/m/m")
 Ixx_aircraft = Q_("1016.9 kg/m/m")
 Izz_aircraft = Q_("2447.2 kg/m/m")
@@ -75,8 +75,8 @@ def Calc_spar_inertia(HSpar, TSpar, ChSpar,
                       zs):  # Input height spar (m), thickness spar (m), location centroid w.r.t. chord and chordwise location (-) spar respectively (-)
     Ixx = (1 / 12) * TSpar * (HSpar ** 3)  # Calculation of Ixx
     Iyy = (1 / 12) * HSpar * (TSpar ** 3)  # Caclulation of Iyy w/o steiner term
-    Iyysteiner = TSpar * HSpar * (abs((Wing.centroid * Wing.length_chord(zs)) - (
-    ChSpar * Wing.length_chord(zs))) ** 2)  # Calculation of steiner term Iyy
+    Iyysteiner = TSpar * HSpar * (abs((Wing_VT.centroid * Wing_VT.length_chord(zs)) - (
+    ChSpar * Wing_VT.length_chord(zs))) ** 2)  # Calculation of steiner term Iyy
     Iyy = Iyy + Iyysteiner  # Adding both Iyy moments of inertia together
     return Ixx, Iyy
 
@@ -88,11 +88,11 @@ def Calc_skin_inertia_Ixx(Spar1, Spar2):
     Ixx = 0
     for i in range(n):
         x = x + dx
-        dxlength = dx * Wing.Chordlength
-        y = ((Wing.airfoilordinate(x - dx) + Wing.airfoilordinate(x)) / 2) * Wing.Chordlength
-        dy = abs(Wing.airfoilordinate(x - dx) - Wing.airfoilordinate(x)) * Wing.Chordlength
+        dxlength = dx * Wing_VT.Chordlength
+        y = ((Wing_VT.airfoilordinate(x - dx) + Wing_VT.airfoilordinate(x)) / 2) * Wing_VT.Chordlength
+        dy = abs(Wing_VT.airfoilordinate(x - dx) - Wing_VT.airfoilordinate(x)) * Wing_VT.Chordlength
         length = np.sqrt(dxlength ** 2 + dy ** 2)
-        dIxx = length * Wing.ThSkin * (y ** 2)
+        dIxx = length * Wing_VT.ThSkin * (y ** 2)
         Ixx = Ixx + dIxx
     Ixx = Ixx * 2
     return Ixx
@@ -105,12 +105,12 @@ def Calc_skin_inertia_Iyy(Spar1, Spar2):
     Iyy = 0
     for i in range(n):
         x = x + dx
-        xlength = x * Wing.Chordlength
-        dxlength = dx * Wing.Chordlength
-        y = ((Wing.airfoilordinate(x - dx) + Wing.airfoilordinate(x)) / 2) * Wing.Chordlength
-        dy = abs(Wing.airfoilordinate(x - dx) - Wing.airfoilordinate(x)) * Wing.Chordlength
+        xlength = x * Wing_VT.Chordlength
+        dxlength = dx * Wing_VT.Chordlength
+        y = ((Wing_VT.airfoilordinate(x - dx) + Wing_VT.airfoilordinate(x)) / 2) * Wing_VT.Chordlength
+        dy = abs(Wing_VT.airfoilordinate(x - dx) - Wing_VT.airfoilordinate(x)) * Wing_VT.Chordlength
         length = np.sqrt(dxlength ** 2 + dy ** 2)
-        dIyy = length * Wing.ThSkin * ((abs(xlength - (Wing.centroid * Wing.Chordlength))) ** 2)
+        dIyy = length * Wing_VT.ThSkin * ((abs(xlength - (Wing_VT.centroid * Wing_VT.Chordlength))) ** 2)
         Iyy = Iyy + dIyy
     Iyy = Iyy * 2
     return Iyy
@@ -149,32 +149,32 @@ def calc_total_stringer_inertia(x_y_angle_coords, stringer_inertias):
     for i in range(len(x_coords)):
         loc_I_xx, loc_I_yy, loc_I_xy = axis_transformation(I_xx_stringer, I_yy_stringer, I_xy_stringer, angles[i])
         I_XX_TOT += loc_I_xx + stringer_area*(y_coords[i])**2
-        I_YY_TOT += loc_I_yy + stringer_area*(x_coords[i] - Wing.centroid*Wing.Chordlength)**2
-        I_XY_TOT += loc_I_xy + stringer_area*(x_coords[i] - Wing.centroid*Wing.Chordlength)*(y_coords[i] - Y_CEN)
+        I_YY_TOT += loc_I_yy + stringer_area*(x_coords[i] - Wing_VT.centroid*Wing_VT.Chordlength)**2
+        I_XY_TOT += loc_I_xy + stringer_area*(x_coords[i] - Wing_VT.centroid*Wing_VT.Chordlength)*(y_coords[i] - Y_CEN)
 
     return I_XX_TOT, I_YY_TOT, I_XY_TOT
 # returns stiffener x,y locations and rotation
 # return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 x,y,rot)] m,m,rad
 
 #Ixx and Iyy of the clamps
-ClampsIxx = ((Wing.AreaClamps/2) * ((Wing.airfoilordinate(Wing.ChSpar1)*Wing.Chordlength)**2))*2
-ClampsIyy = ((Wing.AreaClamps/2) * ((abs(Wing.ChSpar1 - Wing.centroid)*Wing.Chordlength)**2))*2
+ClampsIxx = ((Wing_VT.AreaClamps/2) * ((Wing_VT.airfoilordinate(Wing_VT.ChSpar1)*Wing_VT.Chordlength)**2))*2
+ClampsIyy = ((Wing_VT.AreaClamps/2) * ((abs(Wing_VT.ChSpar1 - Wing_VT.centroid)*Wing_VT.Chordlength)**2))*2
 
 
-I_XX_TOT_str, I_YY_TOT_str, I_XY_TOT_str = calc_total_stringer_inertia(Wing.get_coord_from_perim(Wing.N_stringers/2, Wing.ChSpar1, Wing.ChSpar2, Wing.Chordlength)[0], calc_stringer_inertia(Wing.h_str, Wing.w_str, Wing.t_str))
-I_XX_Spar1, I_YY_Spar1 = Calc_spar_inertia(Wing.HSpar1, Wing.ThSpar1, Wing.ChSpar1, Wing.z)
-I_XX_Spar2, I_YY_Spar2 = Calc_spar_inertia(Wing.HSpar2, Wing.ThSpar2, Wing.ChSpar2, Wing.z)
+I_XX_TOT_str, I_YY_TOT_str, I_XY_TOT_str = calc_total_stringer_inertia(Wing_VT.get_coord_from_perim(Wing_VT.N_stringers/2, Wing_VT.ChSpar1, Wing_VT.ChSpar2, Wing_VT.Chordlength)[0], calc_stringer_inertia(Wing_VT.h_str, Wing_VT.w_str, Wing_VT.t_str))
+I_XX_Spar1, I_YY_Spar1 = Calc_spar_inertia(Wing_VT.HSpar1, Wing_VT.ThSpar1, Wing_VT.ChSpar1, Wing_VT.z)
+I_XX_Spar2, I_YY_Spar2 = Calc_spar_inertia(Wing_VT.HSpar2, Wing_VT.ThSpar2, Wing_VT.ChSpar2, Wing_VT.z)
 
-I_XX_Skin = Calc_skin_inertia_Ixx(Wing.ChSpar1, Wing.ChSpar2)
-I_YY_Skin = Calc_skin_inertia_Iyy(Wing.ChSpar1, Wing.ChSpar2)
+I_XX_Skin = Calc_skin_inertia_Ixx(Wing_VT.ChSpar1, Wing_VT.ChSpar2)
+I_YY_Skin = Calc_skin_inertia_Iyy(Wing_VT.ChSpar1, Wing_VT.ChSpar2)
 
 Ixx_wb = I_XX_TOT_str + I_XX_Spar1 + I_XX_Spar2 + I_XX_Skin + ClampsIxx
 Iyy_wb = I_YY_TOT_str + I_YY_Spar1 + I_YY_Spar2 + I_YY_Skin + ClampsIyy
 
 # print("I_XX TOTAL:", Ixx_wb)
 # print("I_YY TOTAL:", Iyy_wb)
-#print('this is', Calc_skin_inertia_Ixx(Wing.ChSpar1, Wing.ChSpar2))
-#print('this is', Calc_skin_inertia_Iyy(Wing.ChSpar1, Wing.ChSpar2))
+#print('this is', Calc_skin_inertia_Ixx(Wing_VT.ChSpar1, Wing_VT.ChSpar2))
+#print('this is', Calc_skin_inertia_Iyy(Wing_VT.ChSpar1, Wing_VT.ChSpar2))
 
 
 # print(calc_stringer_Inertia(Q_("50 mm"),Q_("20 mm"),Q_("2 mm")))

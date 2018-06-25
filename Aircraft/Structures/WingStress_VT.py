@@ -15,8 +15,8 @@ import math as m
 from Geometry import Geometry
 # from Geometry import Wing as GWing
 # import Wing
-from Structures import Inertia
-from Structures import Wing
+from Structures import Inertia_VT as Inertia
+from Structures import Wing_VT as Wing
 from Aerodynamics import Wing as AWing
 from Performance import Performance
 import matplotlib.pyplot as plt

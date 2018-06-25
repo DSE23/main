@@ -6,9 +6,9 @@ Last updated: 19/06/2018 12:30 by Midas
 import sys
 sys.path.append('../') # This makes sure the parent directory gets added to the system path
 from Misc import ureg, Q_ # Imports the unit registry from the Misc folder
-from Structures import WingStress
-from Structures import Wing
-from Structures import Inertia
+from Structures import WingStress_VT as WingStress
+from Structures import Wing_VT as Wing
+from Structures import Inertia_VT as Inertia
 import numpy as np
 from matplotlib import pyplot as plt
 
