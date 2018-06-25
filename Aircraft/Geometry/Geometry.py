@@ -51,6 +51,7 @@ class Wing(object):
     c_a = Q_('0.405 m')                # Aileron chord
     delta_a = Q_("30 deg")     # max aileron deflection
     delta_CL_max_a = 0.8267     # Max lift coeff difference due to aileron deflection
+    
               
 class Prop(object):
     Diameter = Q_('1.9 m')
@@ -66,7 +67,7 @@ class Fuselage(object):
     front_A = Q_("0.98 m**2")              # [m^2] Frontal area
     S_wet_f= Q_("16.358 m**2")              # [m^2] Fuselage wetted area
     cabin_w = Q_("0.6 m")               # [m] cabin width (inside)
-    A_max_canopy = Q_("0.14 m**2")          # [m^2], coming from catia
+    A_max_canopy = Q_("0.213 m**2")          # [m^2], coming from catia
 
 class H_tail(object):
     
