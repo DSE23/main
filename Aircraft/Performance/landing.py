@@ -118,7 +118,7 @@ while flight_path_angle < Q_("0 deg"):
     t_list.append(t.magnitude)
     h_list.append(h.magnitude)
     x_list.append(x.magnitude)
-
+print(V)
 print("The distance covered from screen height to touchdown is", round(x,2))
 
 while V > Q_("1 m/s"):
