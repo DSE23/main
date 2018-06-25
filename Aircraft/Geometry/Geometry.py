@@ -126,8 +126,8 @@ class Masses(object):                    # !!!Structures should watch this!!!
     W_wing = StrucVal.Weightwing * 2     # Weight of the wing
     W_htail = Q_("20 kg")                # [kg] Mass of H_tail
     W_vtail = Q_("18 kg")                 # [kg] Mass of V_tail
-    W_fus = Q_("82 kg")                  # [kg] Mass of Fuselage
-    W_gear = Q_("60 kg")                 # [kg] Mass of landing gear
+    W_fus = Q_("40 kg")                  # [kg] Mass of Fuselage
+    W_gear = Q_("35 kg")                 # [kg] Mass of landing gear
     W_engine = Engine.mass               # [kg] Mass of engine
     W_prop = Prop.mass                   # [kg] Mass of propellor
     W_fuelsys = Q_("10 kg")              # [kg] Mass of fuel system

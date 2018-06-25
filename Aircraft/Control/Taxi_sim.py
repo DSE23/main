@@ -77,7 +77,7 @@ Psy = Q_("0 deg")                             # Initial heading
 Y = 0                                       # Initial lateral position
 X = 0                                       # Initial X-position
 delta_tail = Q_("0 deg")                       # Initial Wheel deflection
-delta_taildot = Q_("15 deg/s")
+delta_taildot = Q_("60 deg/s")
 Psilist =[]
 Psidotlist =[]
 Xlist = []
@@ -96,17 +96,18 @@ w_tail = Q_("225 mm")
 w_tail.ito(Q_("m"))
 E_tail = Q_("27 *10 **6 N/m**2")
 s_tail = 0.15
-C_cc = 0.05
+C_cc = 0.15
 C_roll = 0.04
 C_ctail = C_cc * N_tail
 C_cmain = C_cc * N_main
 C_dtail = C_roll* N_tail
 C_dmain = C_roll * N_main
+test = 0
 for t in np.arange(0, t_end.magnitude + dt.magnitude, dt.magnitude):
     if delta_tail < Q_("45 deg"):
         delta_tail = delta_tail + delta_taildot * dt
     delta_w = delta_tail - (np.tan((r *(X_taillg - X_cgmtow).magnitude)/V_taxi.magnitude))
-    F_ytail = (C_ctail * np.radians(delta_w)) * np.cos(delta_w) + C_ctail * np.sin(delta_w)
+    F_ytail = (C_ctail * np.radians(delta_w)) * np.cos(delta_w) + C_dtail * np.sin(delta_w)
     #F_yrudder = 1
     M_yaw = F_ytail * (X_taillg - X_cgmtow)
     rdot = M_yaw / I_zz
