@@ -48,57 +48,57 @@ z = 0                        #spanwise posotion in meters
 z *= Q_('meter')
 c = 0                                               #Chord wise postion in ratio
 
- ## VERTICAL TAIL
- 
-VTA = Geometry.Wing.A                         #Estimate aspect ratio
-VTt = Geometry.Wing.taper                         #Estimate taper
-VTs = Geometry.Wing.b/2-Geometry.Wing.horn                #Estimate span (m)
-VTLambda25 = 0                    #Quarter chord sweep
-VTCtoT = 0.15                     #Max Chord to thickness ratio
-VTSpar2R = (1-Geometry.H_tail.cr_r)  #Chordwise location of second spar at the root
-VTSpar2T = (1-Geometry.H_tail.cr_r)  #Chordwise location of second spar at the tip
-VTSpar1R = 0.18                   #Chordwise location of first spar at the root
-VTSpar1T = 0.18                   #Chordwise location of first spar at the tip
-VTChordR = Geometry.Wing.c_r      #Length of root (m)
-VTThSpar1 = Q_('0.002 m')         #Thickness of Spar 1
-VTThSpar2 = Q_('0.002 m')        #Thickness of Spar 2
-VTThSkin = Q_('0.0018 m')         #Thickness of the skin
-VTN_stringers = 8                 #Number of stringers
-VTClampH = Q_('0.03 m')           #height of the clamps at the top of the spars
-VTClampW = Q_('0.03 m')           #width of the clamps at the top of the spars
-
-
-##Stringers                     # C stringer dimentions
-VTh_str = Q_('0.025 m')            # height of the stringer
-VTw_str = Q_('0.025 m')            #width of the stringer
-VTt_str = Q_('0.003 m')            #thickness of the stringer
-
- 
-
- ## HORIZONTAL TAIL
- 
-HTA = Geometry.H_tail.A                         #Estimate aspect ratio
-HTt = Geometry.H_tail.taper                         #Estimate taper
-HTs = Geometry.H_tail.b/2-Geometry.Wing.horn                #Estimate span (m)
-HTLambda25 = 0                    #Quarter chord sweep
-HTCtoT = 0.15                     #Max Chord to thickness ratio
-HTSpar2R = (1-Geometry.H_tail.ce_c)  #Chordwise location of second spar at the root
-HTSpar2T = (1-Geometry.H_tail.ce_c)  #Chordwise location of second spar at the tip
-HTSpar1R = 0.18                   #Chordwise location of first spar at the root
-HTSpar1T = 0.18                   #Chordwise location of first spar at the tip
-HTChordR = Geometry.H_tail.c_r      #Length of root (m)
-HTThSpar1 = Q_('0.002 m')         #Thickness of Spar 1
-HTThSpar2 = Q_('0.002 m')        #Thickness of Spar 2
-HTThSkin = Q_('0.0018 m')         #Thickness of the skin
-HTN_stringers = 8                 #Number of stringers
-HTClampH = Q_('0.03 m')           #height of the clamps at the top of the spars
-HTClampW = Q_('0.03 m')           #width of the clamps at the top of the spars
-
-
-##Stringers                     # C stringer dimentions
-HTh_str = Q_('0.025 m')            # height of the stringer
-HTw_str = Q_('0.025 m')            #width of the stringer
-HTt_str = Q_('0.003 m')            #thickness of the stringer
+# ## VERTICAL TAIL
+# 
+#VTA = Geometry.Wing.A                         #Estimate aspect ratio
+#VTt = Geometry.Wing.taper                         #Estimate taper
+#VTs = Geometry.Wing.b/2-Geometry.Wing.horn                #Estimate span (m)
+#VTLambda25 = 0                    #Quarter chord sweep
+#VTCtoT = 0.15                     #Max Chord to thickness ratio
+#VTSpar2R = (1-Geometry.H_tail.cr_r)  #Chordwise location of second spar at the root
+#VTSpar2T = (1-Geometry.H_tail.cr_r)  #Chordwise location of second spar at the tip
+#VTSpar1R = 0.18                   #Chordwise location of first spar at the root
+#VTSpar1T = 0.18                   #Chordwise location of first spar at the tip
+#VTChordR = Geometry.Wing.c_r      #Length of root (m)
+#VTThSpar1 = Q_('0.002 m')         #Thickness of Spar 1
+#VTThSpar2 = Q_('0.002 m')        #Thickness of Spar 2
+#VTThSkin = Q_('0.0018 m')         #Thickness of the skin
+#VTN_stringers = 8                 #Number of stringers
+#VTClampH = Q_('0.03 m')           #height of the clamps at the top of the spars
+#VTClampW = Q_('0.03 m')           #width of the clamps at the top of the spars
+#
+#
+###Stringers                     # C stringer dimentions
+#VTh_str = Q_('0.025 m')            # height of the stringer
+#VTw_str = Q_('0.025 m')            #width of the stringer
+#VTt_str = Q_('0.003 m')            #thickness of the stringer
+#
+# 
+#
+# ## HORIZONTAL TAIL
+# 
+#HTA = Geometry.H_tail.A                         #Estimate aspect ratio
+#HTt = Geometry.H_tail.taper                         #Estimate taper
+#HTs = Geometry.H_tail.b/2-Geometry.Wing.horn                #Estimate span (m)
+#HTLambda25 = 0                    #Quarter chord sweep
+#HTCtoT = 0.15                     #Max Chord to thickness ratio
+#HTSpar2R = (1-Geometry.H_tail.ce_c)  #Chordwise location of second spar at the root
+#HTSpar2T = (1-Geometry.H_tail.ce_c)  #Chordwise location of second spar at the tip
+#HTSpar1R = 0.18                   #Chordwise location of first spar at the root
+#HTSpar1T = 0.18                   #Chordwise location of first spar at the tip
+#HTChordR = Geometry.H_tail.c_r      #Length of root (m)
+#HTThSpar1 = Q_('0.002 m')         #Thickness of Spar 1
+#HTThSpar2 = Q_('0.002 m')        #Thickness of Spar 2
+#HTThSkin = Q_('0.0018 m')         #Thickness of the skin
+#HTN_stringers = 8                 #Number of stringers
+#HTClampH = Q_('0.03 m')           #height of the clamps at the top of the spars
+#HTClampW = Q_('0.03 m')           #width of the clamps at the top of the spars
+#
+#
+###Stringers                     # C stringer dimentions
+#HTh_str = Q_('0.025 m')            # height of the stringer
+#HTw_str = Q_('0.025 m')            #width of the stringer
+#HTt_str = Q_('0.003 m')            #thickness of the stringer
 
 
 z = 0                        #spanwise posotion in meters

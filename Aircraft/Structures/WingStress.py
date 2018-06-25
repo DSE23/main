@@ -172,9 +172,7 @@ zs = b-3*Q_('m')
 # print('D', D)
 # print('M', M)
 dM = 0
-L = Q_("40000 N")
-D = Q_("4000 N")
-M = Q_("10000 N*m")
+
 #
 #
 # Llist *= ureg("N/m")
