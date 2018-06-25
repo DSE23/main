@@ -18,12 +18,12 @@ q_qinf_ratio = 0.8558 #ratio dynamic pressure ht over infinity dyn pressure
 CL_alpha_wing = Q_("4.65 1/rad") #slope wing lift co
 CL_alpha_ht = Q_("3.23 1 / rad") #slope ht lift co, downwash not included
 de_da = 0.806 #downwash angle change over angle of attack change
-CD0_wing = Q_("0.009257381547414682")
-CD0_ht = Q_("0.0021813727043679208")
-CD0_vt = Q_("0.0008782853427946999")
-CD_canopy = Q_("0.04 dimensionless")
-CD_lg = Q_("0.032572960000000005 dimensionless")
-CD0_tot = Q_("0.01876317727130923 dimensionless")
+CD0_wing = Q_("0.007593419890783278")
+CD0_ht = Q_("0.0012936674003027845")
+CD0_vt = Q_("0.0010167110920327306")
+CD_canopy = Q_("0.005600000000000001 dimensionless")
+CD_lg = Q_("0.01695335319 dimensionless")
+CD0_tot = Q_("0.03842707439520723 dimensionless")
 
 
 

@@ -504,7 +504,7 @@ def Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61):
     return t_xs23, t_xs56, t_ys12, t_ys23, t_ys35, t_ys56, t_ys61
 
 
-qs23X, qs56X, qs12Y, qs23Y, qs35Y, qs56Y, qs61Y = Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61)
+tau23X, tau56X, tau12Y, tau23Y, tau35Y, tau56Y, tau61Y = Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61)
 
 
 
@@ -515,27 +515,28 @@ def Tsia_Wu(sigma_zs, tau_x, tau_y):
     F12 = -1/2*np.sqrt(F11*F22)
     F1 = 1/(WingStress.yield_strength)-1/(WingStress.compr_strength)
     F2 = 1/(WingStress.yield_strength)-1/(WingStress.compr_strength)
-    F44 = 1/WingStress.tau_max**2
-    F66 = 1/WingStress.tau_max**2
+    F44 = 1/(WingStress.tau_max**2)
+    print("F44", F44)
+    F66 = 1/(WingStress.tau_max**2)
+    print("F66", F66)
     sigma1 = sigma_zs
+    print("Fsigma1", sigma1)
     sigma2 = 0
     sigma3 = 0
     tau12 = tau_y
+    print("tauy", tau_y)
     tau23 = 0
     tau13 = tau_x
-    print("F11=", F11)
-    print("F22=", F22)
-    print("F44=", F44)
-    F = F11 *sigma1**2+F22*(sigma2**2+sigma3**2)+sigma2*sigma3*(2*F22-F44)
-    F += 2*F12*sigma1*(sigma3+sigma2)+F1*(sigma1+sigma2) + F2*sigma3
-    F += F44*tau23**2 + F66*(tau13**2+tau12**2)
+    F = F11 *sigma1**2#+F22*(sigma2**2+sigma3**2)+sigma2*sigma3*(2*F22-F44)
+    F += F1*(sigma1+sigma2) #+ 2*F12*sigma1*(sigma3+sigma2) + F2*sigma3
+    F += F66*(tau13**2+tau12**2) #F44*tau23**2
     if F < 1:
         print("No failure occurs")
     else:
         print("Failure occurs")
     return F
 
-F = Tsia_Wu(WingStress.Normal_stress_due_to_bending(0.18, Wing.airfoilordinate(0.18))[0], qs23X[20], qs23Y[20])
+F = Tsia_Wu(WingStress.NS, tau23X[0], tau23Y[0])
 print("F =", F)
 
 #plt.plot(s3, qs3)
