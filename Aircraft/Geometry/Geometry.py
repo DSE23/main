@@ -167,8 +167,8 @@ class CG(object):
     Z_fusorig = Q_("0.487 m")                  # Origin of fuselage in Z (lowest point)
     ZCG_fus = Q_("-0.0617m") #Inertia.ZCG_f                    # Complete fuselage Z-cg location
     YCG_fus = Q_("0 m")
-    CG_lgear = 0.23 * Fuselage.l_f             # CG LG relative to nose !!!update!!!
-    ZCG_lgear = Q_("0.69 m")
+    CG_lgear = Landing_gear.X_mainlg            # CG LG relative to nose !!!update!!!
+    ZCG_lgear = Landing_gear.Z_mainlg/2
     CG_engine = Engine.xcg                     # CG of the engine relative to nose
     CG_prop = Q_("-20 cm")  # DUMMY VALUE, NOT KNOWN YET, negative because in front of datum
     ZCG_prop = Q_("0 m")
