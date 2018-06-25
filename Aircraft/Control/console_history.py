@@ -23,7 +23,7 @@ np.seterr(all='raise')
 l_a = Q_("0.405 m")        # Set aileron length
 cr_c= Q_("0.45     ")
 ce_c= Q_("0.5 ")
-n_of_disc_w = 20            # number of parts wing is discretized
+n_of_disc_w = 30            # number of parts wing is discretized
 n_of_disc_h = 10            # number of parts HT is discretized
 n_of_disc_v = 10            # number of parts VT is discretized
 da = Q_("0 deg")            # aileron deflection
@@ -271,7 +271,7 @@ disc_wing_w = np.zeros((len(kwlst)-1, 10))
 
 "============================================================================="
 # ROLL
-#V_inf = Q_("118 m/s")
+#V_inf = Q_("96 m/s")
 #alpha_h = alpha_nose
 #V_local = V_inf
 #p = Q_('0. rad/s')
@@ -280,7 +280,7 @@ disc_wing_w = np.zeros((len(kwlst)-1, 10))
 #theta = alpha_nose
 #plst = []
 #pdotlst = []
-#tlst = np.arange(0,3,dt.magnitude)
+#tlst = np.arange(0,4,dt.magnitude)
 #Mzlst = []
 #for t_current in tlst:
 #    disc_wing_w[(range(n_chords_w)), 0] = da  
@@ -350,93 +350,98 @@ disc_wing_w = np.zeros((len(kwlst)-1, 10))
 #    pdotlst.append(p_dot.to('degree/s**2').magnitude)
 #    Mzlst.append(Mz.magnitude)
 #    
-#plt.plot(tlst,plst,label='p')
+#plt.plot(tlst,plst,label='roll rate',c='black')
 #plt.plot(tlst,Mzlst,label='moment due to roll')
 ##plt.plot(tlst,pdotlst,label='p dot')
-#plt.label()
+#plt.xlabel("time [s]")
+#plt.ylabel("roll rate [deg/s]")
+#plt.legend()
 #plt.show()
 #print("Fz:",Fn_w+Fn_h+W)
 "============================================================================="
-# Pitch
-alpha_nose, de, Thrust = trim()
-
-V_local = V_inf
-de = -1.862
-Thrust = Q_("542 N")
-theta = alpha_nose
-q = Q_("0. rad/s")
-u = m.cos(alpha_nose) * V_inf
-w = m.sin(alpha_nose) * V_inf
-
-dx_w = (X_w+0.25*MAC)-xcg 
-dx_h = l_h-xcg + Q_('0 m')
-
-qlst = []
-qdotlst = []
-thetalst = []
-alst = []
-tlst = np.arange(0,6,dt.magnitude)
-Vlst = []
-#de_dot = Q_("-25/0.1 deg/s")
-for t_current in tlst:
-        
-    #Main Wing
-    alpha_w = alpha_nose + q*dx_w/V_local
-    
-    Cl, Cd, Cm, xcp = lookup_data(alpha_w, 0.2,0.)
-    Cn_w = -Cl*np.cos(alpha_w) - Cd*np.sin(alpha_w)
-    
-    Ct_w = Cl*m.sin(alpha_w) - Cd*m.cos(alpha_w) 
-    Fn_w = 0.5 * rho * V_local ** 2 * S_w * Cn_w
-    Ft_w = 0.5 * rho * V_local ** 2 * S_w * Ct_w
-    
-    #Horizontal Tail
-    alpha_h = alpha_nose + q*dx_h/V_local
-    Clh, Cdh, Cmh, xcp = lookup_data(alpha_h, ce_c,de)
-    Cn_h = -Clh*np.cos(alpha_h) - Cdh*np.sin(alpha_h)
-    Ct_h = Clh*m.sin(alpha_h) - Cdh*m.cos(alpha_h) 
-#    print((0.5*rho*V_local**2), Cn_h, S_h)
-    Fn_h = 0.5 * rho * V_local ** 2 * S_h * Cn_h
-    Ft_h = 0.5 * rho * V_local ** 2 * S_h * Ct_h
-    Fx = Thrust + Ft_w + Ft_h - W * m.sin(theta)
-    Fz = Fn_w + Fn_h + W * m.cos(theta)
-    My = dx_w * Fn_w + dx_h * Fn_h +\
-            Cm*0.5*rho*V_local**2*S_w*MAC +\
-            Cmh*0.5*rho*V_local**2*S_h*MAC_h
-    u_dot = Fx/mtow - q*w
-    w_dot = Fz/mtow + q*u
-    q_dot = My/I_yy
-    
-    u += u_dot * dt
-    w += w_dot * dt
-    q += q_dot * dt
-    
-    theta += q * dt
-    alpha_nose = np.arctan(w/u) 
-
-    
-    V_local = np.sqrt(u**2+w**2)
-    
-    alst.append(alpha_nose.to('degree').magnitude)
-    qlst.append(q.to('degree /s').magnitude)
-    qdotlst.append(q_dot.to('degree/s**2').magnitude)
-    thetalst.append(theta.to('degree').magnitude)
-    
-    Vlst.append(V_local.magnitude)
-    
-print('finished')
-
-
-plt.figure()
-plt.plot(tlst,qlst,label='q')
-plt.plot(tlst,thetalst,label='theta')
-plt.plot(tlst,alst,label='alpha')
-#plt.plot(tlst,qdotlst,label='q dot')
-plt.legend()
+## Pitch
+##alpha_nose, de, Thrust = trim()
+#
+#V_local = V_inf
+#de = -1.862
+#Thrust = Q_("542 N")
+#theta = alpha_nose
+#q = Q_("0. rad/s")
+#u = m.cos(alpha_nose) * V_inf
+#w = m.sin(alpha_nose) * V_inf
+#
+#dx_w = (X_w+0.25*MAC)-xcg 
+#dx_h = l_h-xcg + Q_('0 m')
+#
+#qlst = []
+#qdotlst = []
+#thetalst = []
+#alst = []
+#tlst = np.arange(0,4,dt.magnitude)
+#Vlst = []
+##de_dot = Q_("-25/0.1 deg/s")
+#for t_current in tlst:
+#    if t_current >2:
+#        de = -25
+#        
+#    #Main Wing
+#    alpha_w = alpha_nose + q*dx_w/V_local
+#    
+#    Cl, Cd, Cm, xcp = lookup_data(alpha_w, 0.2,0.)
+#    Cn_w = -Cl*np.cos(alpha_w) - Cd*np.sin(alpha_w)
+#    
+#    Ct_w = Cl*m.sin(alpha_w) - Cd*m.cos(alpha_w) 
+#    Fn_w = 0.5 * rho * V_local ** 2 * S_w * Cn_w
+#    Ft_w = 0.5 * rho * V_local ** 2 * S_w * Ct_w
+#    
+#    #Horizontal Tail
+#    alpha_h = alpha_nose + q*dx_h/V_local
+#    Clh, Cdh, Cmh, xcp = lookup_data(alpha_h, ce_c,de)
+#    Cn_h = -Clh*np.cos(alpha_h) - Cdh*np.sin(alpha_h)
+#    Ct_h = Clh*m.sin(alpha_h) - Cdh*m.cos(alpha_h) 
+##    print((0.5*rho*V_local**2), Cn_h, S_h)
+#    Fn_h = 0.5 * rho * V_local ** 2 * S_h * Cn_h
+#    Ft_h = 0.5 * rho * V_local ** 2 * S_h * Ct_h
+#    Fx = Thrust + Ft_w + Ft_h - W * m.sin(theta)
+#    Fz = Fn_w + Fn_h + W * m.cos(theta)
+#    My = dx_w * Fn_w + dx_h * Fn_h +\
+#            Cm*0.5*rho*V_local**2*S_w*MAC +\
+#            Cmh*0.5*rho*V_local**2*S_h*MAC_h
+#    u_dot = Fx/mtow - q*w
+#    w_dot = Fz/mtow + q*u
+#    q_dot = My/I_yy
+#    
+#    u += u_dot * dt
+#    w += w_dot * dt
+#    q += q_dot * dt
+#    
+#    theta += q * dt
+#    alpha_nose = np.arctan(w/u) 
+#
+#    
+#    V_local = np.sqrt(u**2+w**2)
+#    
+#    alst.append(alpha_nose.to('degree').magnitude)
+#    qlst.append(q.to('degree /s').magnitude)
+#    qdotlst.append(q_dot.to('degree/s**2').magnitude)
+#    thetalst.append(theta.to('degree').magnitude)
+#    Vlst.append(V_local.magnitude)
+#    
+#print('finished')
+#
+#
 #plt.figure()
-#plt.plot(tlst,Vlst,label='velocity')
+#plt.plot(tlst,qlst,label='pitch rate',color='black')
+#plt.plot(tlst,thetalst,label='theta [deg]',color='black',ls='--')
+#plt.plot(tlst,alst,label='alpha [deg]',color='black',ls='-.')
+#plt.xlabel("time [s]")
+#plt.ylabel("pitch rate [deg/s]")
+##plt.plot(tlst,qdotlst,label='q dot')
 #plt.legend()
-plt.show()
+##plt.figure()
+##plt.plot(tlst,Vlst,label='velocity')
+##plt.legend()
+#plt.show()
 "============================================================================="
 #Yaw
 dr = 0
@@ -450,11 +455,12 @@ alpha_v = alpha_nose
 betalst = []
 psilst = []
 rlst = []
+rdotlst = []
 tlst = []
 Mzlst = []
 for t_current in np.arange(0,4,dt.magnitude):
     if t_current>1:
-        dr = 1
+        dr = 25
         
     beta_v  = beta_nose - r*dx_v/V_inf
     
@@ -473,29 +479,46 @@ for t_current in np.arange(0,4,dt.magnitude):
     Fx = Thrust + Ft_wh + Ft_v  - W * m.sin(alpha_nose)
     Fz = Fn_v
     
-#    u_dot = Fx/mtow + r*v
-#    v_dot = Fz/mtow - r*u
-#    
-#    u += u_dot * dt
-#    v += v_dot * dt
-#    
+    u_dot = Fx/mtow + r*v
+    v_dot = Fz/mtow - r*u
+    
+    u += u_dot * dt
+    v += v_dot * dt
+    
     Mz = dx_v * Fn_v
-#    r_dot = Mz/I_zz
-#    
-#    r += r_dot * dt
-#    Psi += r * dt
-#    
-#    beta_nose = np.arctan(v/u)
+    r_dot = Mz/I_zz
+    
+    r += r_dot * dt
+    Psi += r * dt
+    
+    beta_nose = np.arctan(v/u)
     
     betalst.append(m.degrees(beta_nose))
     psilst.append(m.degrees(Psi))
     rlst.append(r.to('degree/s').magnitude)
     tlst.append(t_current)
-    Mzlst.append(Mz.magnitude)
-#plt.plot(tlst, betalst, label='beta')
-#plt.plot(tlst, psilst, label='psi')
-#plt.plot(tlst,rlst,label='r')
-plt.plot(tlst,Mzlst,label='moment due to rudder')
-plt.legend()
+    rdotlst.append(r_dot)
+    Mzlst.append((Fn_v*dx_v).magnitude)
+
+fig, ax1 = plt.subplots()
+ax2 = ax1.twinx()
+
+ax1.plot(tlst,rlst,label='yaw rate',c='black')
+ax2.plot(tlst, betalst, label=r'$\beta$',c='black',ls='-.')
+ax2.plot(tlst, psilst, label=r'$\Psi$',c='black',ls='--')
+ax2.plot(np.nan,label='yaw rate',c='black')
+
+#plt.plot(tlst, betalst, label='beta [deg]',c='black',ls='-.')
+#plt.plot(tlst, psilst, label='psi [deg]',c='black',ls='--')
+#plt.plot(tlst,rlst,label='yaw rate',c='black')
+#plt.xlabel("time [s]")
+#plt.ylabel("yaw rate [deg/s]")
+
+ax1.set_xlabel('Time [s]')
+ax1.set_ylabel("Rate ["r'$^\circ$/s]', color='black')
+ax1.axis((0,4,-90,90))
+ax2.set_ylabel("Angle ["r'$^\circ$]', color='black')
+#plt.plot(tlst,Mzlst,label='moment due to rudder')
+ax2.legend()
 plt.show()
 
