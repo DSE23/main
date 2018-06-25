@@ -70,7 +70,7 @@ class Fuselage(object):
 
 class H_tail(object):
     
-    S = Q_("1.8m**2")                 # [m^2] Horizontal tail surface
+    S = Q_("1.8 m**2")                 # [m^2] Horizontal tail surface
     A = 2.86                  # Aspect ratio
     b = np.sqrt(S*A)       # [m] Span horizontal tail
     taper = 0.529               # taper ratio
