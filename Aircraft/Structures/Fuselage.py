@@ -260,7 +260,7 @@ def fuselage_calc(x):
     Area_ribs = b_f_taper * b_f_taper * h_ribs
 
 
-    return sigma_x, shear_x, Area
+    return sigma_x, shear_x, Area, Area_ribs
 
 
 '''-----------------Tsia-Wu Failure criterion--------------------------'''
