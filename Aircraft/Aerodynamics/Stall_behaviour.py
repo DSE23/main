@@ -21,7 +21,7 @@ from Propulsion_and_systems import Propeller
 #import propeller data
 axial_v = np.genfromtxt('../DataWalong.txt')
 wlist = np.array([])
-range_for = len(axial_v[1,:])
+range_for = len(axial_v[:,1])
 for line in range(0,range_for):
     w = np.average(axial_v[line,:])
     wlist = np.append(wlist, w)
@@ -43,7 +43,7 @@ taper_vt = Geometry.V_tail.taper
 rudder_c_ratio = Geometry.V_tail.cr_c.magnitude
 span_vt = Geometry.V_tail.b.magnitude
 #Contracted slipstream diameter
-V0 = 30                                                                 #free stream velocity
+V0 = 30                                                                #free stream velocity
 Dia = Geometry.Prop.Diameter.magnitude                                  #diameter of the prop
 Radius_p = Dia / 2
 #ask Gijs which a to select for which velocity
@@ -52,7 +52,7 @@ l = Geometry.Fuselage.l_f
 for x in np.linspace(0,l,200):
     Radius_tube = Radius_p * m.sqrt((1 + a) / (1 + a * (1 + (x/(m.sqrt(Radius_p ** 2 + x **2))))))
     velocity = a*V0 + V0
-    #print(Radius_tube)
+    print(Radius_tube)
     
     if LE_wing <= x <= LE_wing + 0.03:
         area_ail = (Radius_tube - width_fus) * aileron_c * 2
