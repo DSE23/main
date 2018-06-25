@@ -510,7 +510,7 @@ qs23X, qs56X, qs12Y, qs23Y, qs35Y, qs56Y, qs61Y = Get_xy_components(s1, s2, s3, 
 
 #Tsia-Wu Failure criterion
 def Tsia_Wu(sigma_zs, tau_x, tau_y):
-    F11=1/(yield_strength*WingStress.compr_strength)
+    F11=1/(WingStress.yield_strength*WingStress.compr_strength)
     F22 = F11
     F12 = -1/2*np.sqrt(F11*F22)
     F1 = 1/(WingStress.yield_strength)-1/(WingStress.compr_strength)
@@ -523,6 +523,9 @@ def Tsia_Wu(sigma_zs, tau_x, tau_y):
     tau12 = tau_y
     tau23 = 0
     tau13 = tau_x
+    print("F11=", F11)
+    print("F22=", F22)
+    print("F44=", F44)
     F = F11 *sigma1**2+F22*(sigma2**2+sigma3**2)+sigma2*sigma3*(2*F22-F44)
     F += 2*F12*sigma1*(sigma3+sigma2)+F1*(sigma1+sigma2) + F2*sigma3
     F += F44*tau23**2 + F66*(tau13**2+tau12**2)
