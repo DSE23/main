@@ -459,8 +459,8 @@ rdotlst = []
 tlst = []
 Mzlst = []
 for t_current in np.arange(0,4,dt.magnitude):
-    if t_current>0.5:
-        dr = 2
+    if t_current>1:
+        dr = 25
         
     beta_v  = beta_nose - r*dx_v/V_inf
     
@@ -500,16 +500,25 @@ for t_current in np.arange(0,4,dt.magnitude):
     rdotlst.append(r_dot)
     Mzlst.append((Fn_v*dx_v).magnitude)
 
-#fig, ax1 = plt.subplots()
-#ax2 = ax1.twinx()
+fig, ax1 = plt.subplots()
+ax2 = ax1.twinx()
 
+ax1.plot(tlst,rlst,label='yaw rate',c='black')
+ax2.plot(tlst, betalst, label=r'$\beta$',c='black',ls='-.')
+ax2.plot(tlst, psilst, label=r'$\Psi$',c='black',ls='--')
+ax2.plot(np.nan,label='yaw rate',c='black')
 
-plt.plot(tlst, betalst, label='beta [deg]',c='black',ls='-.')
-plt.plot(tlst, psilst, label='psi [deg]',c='black',ls='--')
-plt.plot(tlst,rlst,label='yaw rate',c='black')
-plt.xlabel("time [s]")
-plt.ylabel("yaw rate [deg/s]")
+#plt.plot(tlst, betalst, label='beta [deg]',c='black',ls='-.')
+#plt.plot(tlst, psilst, label='psi [deg]',c='black',ls='--')
+#plt.plot(tlst,rlst,label='yaw rate',c='black')
+#plt.xlabel("time [s]")
+#plt.ylabel("yaw rate [deg/s]")
+
+ax1.set_xlabel('Time [s]')
+ax1.set_ylabel("Rate ["r'$^\circ$/s]', color='black')
+ax1.axis((0,4,-90,90))
+ax2.set_ylabel("Angle ["r'$^\circ$]', color='black')
 #plt.plot(tlst,Mzlst,label='moment due to rudder')
-plt.legend()
+ax2.legend()
 plt.show()
 
