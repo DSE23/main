@@ -26,8 +26,8 @@ t = Geometry.V_tail.taper                         #Estimate taper
 s = Geometry.V_tail.b/2-Geometry.Wing.horn                #Estimate span (m)
 Lambda5 = 0                    #Quarter chord sweep
 CtoT = 0.15                     #Max Chord to thickness ratio
-Spar2R = (1-Geometry.V_tail.cr_r)  #Chordwise location of second spar at the root
-Spar2T = (1-Geometry.V_tail.cr_r)  #Chordwise location of second spar at the tip
+Spar2R = (1-Geometry.V_tail.cr_c)  #Chordwise location of second spar at the root
+Spar2T = (1-Geometry.V_tail.cr_c)  #Chordwise location of second spar at the tip
 Spar1R = 0.18                   #Chordwise location of first spar at the root
 Spar1T = 0.18                   #Chordwise location of first spar at the tip
 ChordR = Geometry.V_tail.c_r      #Length of root (m)
@@ -220,7 +220,7 @@ def get_xy_from_perim(perim_val, start_x=0, reverse=False):
 
         return (x_coord, -y_coord)
 
-def get_perim_from_x(x_coor, dat_file_name="../Airfoil.dat"):
+def get_perim_from_x(x_coor, dat_file_name="../FX71.dat"):
     """
     This function returns the perimeter value from the LE until the specified x-coordinate
 
@@ -247,7 +247,7 @@ def get_perim_from_x(x_coor, dat_file_name="../Airfoil.dat"):
     return perim
 
 
-def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../Airfoil.dat"):
+def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../FX71.dat"):
     """
     This function returns list of coordinate values where a stiffener is placed
     based on the spar locations and number of stiffeners. The stiffeners will

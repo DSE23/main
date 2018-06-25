@@ -9,8 +9,7 @@ sys.path.append('../') # This makes sure the parent directory gets added to the 
 
 from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import numpy as np
-from scipy import integrate
-from Structures import Wing
+from Structures import Wing_HT as Wing
 from scipy.interpolate import interp1d
 from matplotlib import pyplot as plt
 

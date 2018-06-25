@@ -10,11 +10,10 @@ from scipy import interpolate
 import math as m
 import Wing
 from Geometry import Geometry
-from Geometry import Wing as GWing
 from Structures import Inertia_VT as Inertia
 from Structures import Wing_VT as Wing
 from Structures import WingStress_VT as WingStress
-from Structures import Shear_VT as Shear_VT
+from Structures import Shear_VT as Shear
 from matplotlib import pyplot as plt
 
 

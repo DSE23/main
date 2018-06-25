@@ -106,7 +106,7 @@ z *= Q_('meter')
 c = 0  
 
 ##Ratio of height with respect to chord, airfoil coordinates
-airfoilcoordinates = np.genfromtxt("../Airfoil.dat")    #Load coordinates
+airfoilcoordinates = np.genfromtxt("../NACA0009.dat")    #Load coordinates
 numberofcoordinates = np.size(airfoilcoordinates,0)  #Count total number of coordinates
 airfoilinterpolant = sp.interpolate.interp1d(
     airfoilcoordinates[0:int(numberofcoordinates/2)+1,0],
@@ -275,7 +275,7 @@ def get_xy_from_perim(perim_val, start_x=0, reverse=False):
 
         return (x_coord, -y_coord)
 
-def get_perim_from_x(x_coor, dat_file_name="../Airfoil.dat"):
+def get_perim_from_x(x_coor, dat_file_name="../NACA0009.dat"):
     """
     This function returns the perimeter value from the LE until the specified x-coordinate
 
@@ -302,7 +302,7 @@ def get_perim_from_x(x_coor, dat_file_name="../Airfoil.dat"):
     return perim
 
 
-def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../Airfoil.dat"):
+def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../NACA0009.dat"):
     """
     This function returns list of coordinate values where a stiffener is placed
     based on the spar locations and number of stiffeners. The stiffeners will

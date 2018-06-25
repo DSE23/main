@@ -36,7 +36,7 @@ density = Q_("1560 kg/m**3")
 
 
 
-cl, cd, cm = AWing.computeloads()           #Load aerodynamic properties
+cl, cd, cm = AWing.computeloadsvt()           #Load aerodynamic properties
 n = 10                      #number of the devided sections
 b = Wing.s         #Wing span
 b = b.magnitude * ureg.meter
