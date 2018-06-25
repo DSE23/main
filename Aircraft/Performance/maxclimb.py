@@ -107,9 +107,9 @@ for V in np.arange (V_stall.magnitude,V_a.magnitude, V_step):
 #plt.axhline(min(P_to * eta_prop / V, Tmax).magnitude)
 
 plt.figure(3)
-plt.plot(V_list, y_max_list, color = 'r')
-plt.ylabel('Max sustained climb angle [deg]')
-plt.xlabel('Velocity [m/s] ')
+plt.plot(V_list, y_max_list, c='black')
+plt.ylabel('Max sustained climb angle [$^\circ$]', color='black')
+plt.xlabel('Velocity [m/s] ', color='black')
 
 
 plt.show()
