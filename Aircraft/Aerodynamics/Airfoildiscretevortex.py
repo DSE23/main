@@ -8,7 +8,7 @@ import math as m
 import numpy as np
 import matplotlib.pyplot as plt
 
-N = 40                         # Number of panels to be used in total
+N = 200                         # Number of panels to be used in total
 alpha = m.radians(0)
 Vspeed = 60
 Vvector = Vspeed*np.array([m.cos(alpha),0,m.sin(alpha)])
@@ -17,7 +17,7 @@ unity = np.array([0,1,0])
 unitz = np.array([0,0,1])
 
 def airfoilcamberline(x):
-    return 0*x
+    return 0.4*x*(1-x)*0
 
 def transformaileron(xaileron,yaileron,zaileron,da,hingeline):
     points = np.array([xaileron, yaileron, zaileron]).transpose()
@@ -34,7 +34,7 @@ def matrixconstructor(normallist,vortexlist,controllist):
         for j in range(N):
             r = controllist[i]-vortexlist[j]
             rnorm = np.linalg.norm(r)
-            matrix[i,j] = ((np.cross(-unity,r)/(2*m.pi))/rnorm**2).dot(normallist[i])
+            matrix[i,j] = ((np.cross(unity,r)/(2*m.pi))/rnorm**2).dot(normallist[i])
     return matrix
 
 def righthandsideconstructor(normallist):
@@ -77,9 +77,9 @@ def pressurecoefficientlowercalculator(tangentlist,vortexlist,controlpoint,gamma
 aileronlength = 0.25
 aileroncenter = (2-aileronlength)/2
 Naileron = int(aileronlength*N)
-hingelocation = 1.0
+hingelocation = 0.75
 xhingeline = aileroncenter + (hingelocation-0.5) * aileronlength
-da = m.radians(2)
+da = m.radians(5)
 
 ### Create panel coordinates for the aileron
 thetaaileron = np.linspace(0, m.pi,Naileron+1,endpoint=False)
