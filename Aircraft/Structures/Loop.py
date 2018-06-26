@@ -10,7 +10,6 @@ from scipy import interpolate
 import math as m
 import Wing
 from Geometry import Geometry
-from Geometry import Wing as GWing
 from Structures import Inertia
 from Structures import Wing
 from Structures import WingStress
@@ -41,7 +40,7 @@ Farray = np.array([])
 
 z = 0
 while z <= b.magnitude:
-    NS = WingStress.Normal_stress_due_to_bending(0.18, Wing.airfoilordinate(0.18))
+    NS = WingStress.Normal_stress_due_to_bending(0.18, Wing.airfoilordinate(0.18))[0]
     Normalstress = np.append(Normalstress, NS.magnitude)
     zarray = np.append(zarray, z)
     F = Shear.F
@@ -129,7 +128,7 @@ Weightskin = Density * Vol_mat_skin
 Weightstring = Density * Vol_mat_string
 Weightwing = Density * Vol_mat_wing
 
-
+print("Wingweight half span main wing", Weightwing)
 
 # with is like your try .. finally block in this case
 with open('StrucVal.py', 'r') as file:

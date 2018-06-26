@@ -39,7 +39,7 @@ Farray = np.array([])
 
 z = 0
 while z <= b.magnitude:
-    NS = WingStress.Normal_stress_due_to_bending(0.18, Wing.airfoilordinate(0.18))
+    NS = WingStress.Normal_stress_due_to_bending(0.18, Wing.airfoilordinate(0.18))[0]
     Normalstress = np.append(Normalstress, NS.magnitude)
     zarray = np.append(zarray, z)
     F = Shear.F
@@ -127,6 +127,9 @@ Weightskin = Density * Vol_mat_skin
 Weightstring = Density * Vol_mat_string
 Weightwing = Density * Vol_mat_wing
 
+
+
+print("Wingweight half span Horizontal Tail", Weightwing)
 
 
 # with is like your try .. finally block in this case
