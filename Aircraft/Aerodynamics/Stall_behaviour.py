@@ -14,7 +14,7 @@ import numpy as np
 import scipy as sp
 from Geometry import Geometry
 from pint import UnitRegistry
-import Aeroprops
+#import Aeroprops
 from Propulsion_and_systems import Propeller
 
 

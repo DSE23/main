@@ -26,23 +26,23 @@ t = Geometry.V_tail.taper                         #Estimate taper
 s = Geometry.V_tail.b/2-Geometry.Wing.horn                #Estimate span (m)
 Lambda5 = 0                    #Quarter chord sweep
 CtoT = 0.15                     #Max Chord to thickness ratio
-Spar2R = (1-Geometry.V_tail.cr_r)  #Chordwise location of second spar at the root
-Spar2T = (1-Geometry.V_tail.cr_r)  #Chordwise location of second spar at the tip
+Spar2R = (1-Geometry.V_tail.cr_c)  #Chordwise location of second spar at the root
+Spar2T = (1-Geometry.V_tail.cr_c)  #Chordwise location of second spar at the tip
 Spar1R = 0.18                   #Chordwise location of first spar at the root
 Spar1T = 0.18                   #Chordwise location of first spar at the tip
 ChordR = Geometry.V_tail.c_r      #Length of root (m)
-ThSpar1 = Q_('0.002 m')         #Thickness of Spar 1
-ThSpar2 = Q_('0.002 m')         #Thickness of Spar 2
-ThSkin = Q_('0.0018 m')         #Thickness of the skin
-N_stringers = 8                 #Number of stringers
-ClampH = Q_('0.03 m')           #height of the clamps at the top of the spars
-ClampW = Q_('0.03 m')           #width of the clamps at the top of the spars
+ThSpar1 = Q_('0.0015 m')         #Thickness of Spar 1
+ThSpar2 = Q_('0.0015 m')         #Thickness of Spar 2
+ThSkin = Q_('0.0010 m')         #Thickness of the skin
+N_stringers = 6                 #Number of stringers
+ClampH = Q_('0.015 m')           #height of the clamps at the top of the spars
+ClampW = Q_('0.015 m')           #width of the clamps at the top of the spars
 
 
 ##Stringers                     # C stringer dimentions
-h_str = Q_('0.025 m')            # height of the stringer
-w_str = Q_('0.025 m')            #width of the stringer
-t_str = Q_('0.003 m')            #thickness of the stringer
+h_str = Q_('0.015 m')            # height of the stringer
+w_str = Q_('0.015 m')            #width of the stringer
+t_str = Q_('0.0015 m')            #thickness of the stringer
 
  
 
@@ -186,9 +186,9 @@ def get_xy_from_perim(perim_val, start_x=0, reverse=False):
 
     #Air_data = np.genfromtxt(dat_file_name)  # Imports datapoints from airfoil data file
 #
-    #x_coords = Air_data[:81, 0]  # We only care about 1 half of the airfoil
+    #x_coords = Air_data[:44, 0]  # We only care about 1 half of the airfoil
     #x_coords = np.flip(x_coords, 0)  # Flip them so they are in a good order
-    #y_coords = Air_data[:81, 1]  # We only care about 1 half of the airfoilfs
+    #y_coords = Air_data[:44, 1]  # We only care about 1 half of the airfoilfs
     #y_coords = np.flip(y_coords, 0)  # Flip them so they are in a good order
     #p = interp1d(x_coords, y_coords, kind ='cubic')  # Generate a poly spline based on the airfoil points
 
@@ -196,6 +196,7 @@ def get_xy_from_perim(perim_val, start_x=0, reverse=False):
     step = 0.001  # Step size for algorithm: increase will lead to faster computing times
     min_val = 10
     x_cs = np.arange(start_x, 1, step)
+    
     if reverse == False:
         for i in range(len(x_cs)):
             perim += m.sqrt((step) ** 2 + (airfoilordinate(x_cs[i] + step) - airfoilordinate(x_cs[i])) ** 2)
@@ -220,7 +221,7 @@ def get_xy_from_perim(perim_val, start_x=0, reverse=False):
 
         return (x_coord, -y_coord)
 
-def get_perim_from_x(x_coor, dat_file_name="../Airfoil.dat"):
+def get_perim_from_x(x_coor, dat_file_name="../FX71.dat"):
     """
     This function returns the perimeter value from the LE until the specified x-coordinate
 
@@ -231,9 +232,9 @@ def get_perim_from_x(x_coor, dat_file_name="../Airfoil.dat"):
     """
     Air_data = np.genfromtxt(dat_file_name)  # Imports datapoints from airfoil data file
 
-    x_coords = Air_data[:81, 0]  # We only care about 1 half of the airfoil
+    x_coords = Air_data[:44, 0]  # We only care about 1 half of the airfoil
     x_coords = np.flip(x_coords, 0)  # Flip them so they are in a good order
-    y_coords = Air_data[:81, 1]  # We only care about 1 half of the airfoil
+    y_coords = Air_data[:44, 1]  # We only care about 1 half of the airfoil
     y_coords = np.flip(y_coords, 0)  # Flip them so they are in a good order
     p = interp1d(x_coords, y_coords, kind='cubic')  # Generate a poly spline based on the airfoil points
 
@@ -247,7 +248,7 @@ def get_perim_from_x(x_coor, dat_file_name="../Airfoil.dat"):
     return perim
 
 
-def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../Airfoil.dat"):
+def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../FX71.dat"):
     """
     This function returns list of coordinate values where a stiffener is placed
     based on the spar locations and number of stiffeners. The stiffeners will
@@ -263,9 +264,9 @@ def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../Airfoi
     Air_data = np.genfromtxt(dat_file_name)
 
 
-    x_coords = Air_data[:81, 0]
+    x_coords = Air_data[:44, 0]
     x_coords = np.flip(x_coords, 0)
-    y_coords = Air_data[:81, 1]
+    y_coords = Air_data[:44, 1]
     y_coords = np.flip(y_coords, 0)
 
     final_x_coords = np.array([])
