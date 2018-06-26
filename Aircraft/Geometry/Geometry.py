@@ -125,8 +125,8 @@ class Landing_gear(object):
 
 class Masses(object):                    # !!!Structures should watch this!!!
     W_wing = StrucVal.Weightwing * 2     # Weight of the wing
-    W_htail = Q_("20 kg")                # [kg] Mass of H_tail
-    W_vtail = Q_("18 kg")                 # [kg] Mass of V_tail
+    W_htail = Q_("3.79 kg") * 2                # [kg] Mass of H_tail
+    W_vtail = Q_("2.82 kg")                 # [kg] Mass of V_tail
     W_fus = Q_("40 kg")                  # [kg] Mass of Fuselage
     W_gear = Q_("35 kg")                 # [kg] Mass of landing gear
     W_engine = Engine.mass               # [kg] Mass of engine

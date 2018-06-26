@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on  Jun  22
-Author: Quinty van der Leer
+Pitch
 """
 
 import sys, os
@@ -27,7 +26,7 @@ t0 = time.time()
 np.seterr(all='raise')
 
 # Variables
-l_a = Q_("0.3815 m")  # Set aileron length
+l_a = Q_("0.3015 m")  # Set aileron length
 l_e = Q_("0.2    m")  # Set elevator length
 cr_c = Q_("0.2     ")
 n_of_disc_w = 30  # number of parts wing is discretized
@@ -264,15 +263,15 @@ thetalst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 Vlst = np.zeros((1, int((t_end / dt).magnitude)))[0]
 tlst = np.arange(0, t_end.magnitude, dt.magnitude)
 t2lst = np.zeros((1, int((t_end / dt).magnitude)))[0]
-alpha_nose = Q_("1.5 deg")  # m.radians(alpha_nose)
+alpha_nose = Q_(".5 deg")  # m.radians(alpha_nose)
 Theta = m.radians(alpha_nose)
 n = 0
 
 
-de = Q_("0. deg")
+de = Q_("-2.3 deg")
 T = Q_("2000 N")
 for t_current in np.arange(0, (t_end).magnitude, dt.magnitude):
-    da = 29.5
+    #da = 29
     # if t_current > 10:
     #    da = 0.1#Q_("0.1 deg")
     print(t_current)
@@ -444,7 +443,7 @@ for t_current in np.arange(0, (t_end).magnitude, dt.magnitude):
     Fx = T + Sum_Ft + T_g_f - W * m.sin(Theta)
     Fy = Sum_Fb + W * m.sin(Phi) * m.cos(Theta)
     Fz = Sum_Fn + W * m.cos(Theta) * m.cos(Phi)
-    print(Sum_Fn, Sum_Fn_y)
+    print(Sum_Fn, Sum_Fn_x)
 
 
     Mx = Sum_Fn_y + Sum_Fb_z
@@ -457,8 +456,8 @@ for t_current in np.arange(0, (t_end).magnitude, dt.magnitude):
     v_dot = Fy / (mtow) - r * u + p * w
     w_dot = Fz / (mtow) - p * v + q * u
 
-    u = u #u_dot * dt
-    w =Q_("0 m/s")#+= w_dot * dt
+    u += u_dot * dt
+    w += w_dot * dt
     v =Q_("0 m/s")#+= v_dot * dt
 
     V_inf = np.sqrt(u * u + w * w + v * v)
@@ -485,22 +484,22 @@ for t_current in np.arange(0, (t_end).magnitude, dt.magnitude):
             ((I_xx - I_yy) * I_xx + I_xz ** 2) / I_star * p * q + \
             ((-I_xx + I_yy - I_zz) * I_xz) / I_star * p * r
 
-    p += p_dot * dt
-    q = Q_("0 rad/s") #+= q_dot * dt
+    p = Q_("0 rad/s") # += p_dot * dt
+    q += q_dot * dt
     r = Q_("0 rad/s") #+= r_dot * dt
 
     Phi += (p + q * m.sin(Phi) * m.tan(Theta) + r * m.cos(Phi) * m.tan(Theta)) * dt
     Theta += (q * m.cos(Phi) - r * m.sin(Phi)) * dt
-    Psi += (q * m.sin(Phi) / m.cos(Theta) + r * m.cos(Phi) / m.cos(Theta)) * dt
+    Psi = 0 #+= (q * m.sin(Phi) / m.cos(Theta) + r * m.cos(Phi) / m.cos(Theta)) * dt
 
     T_matrix = T_y(gamma) * T_z(Xi) * T_z(-Psi) * T_y(-Theta) * T_x(-Phi)
 
-    alpha_nose = m.atan(T_matrix[0, 2] / T_matrix[0, 0])
-    beta_nose = m.asin(T_matrix[0, 1])
+    #alpha_nose = m.atan(T_matrix[0, 2] / T_matrix[0, 0])
+    #beta_nose = m.asin(T_matrix[0, 1])
     # print(alpha_nose, beta_nose)
 
-    # alpha_nose= Theta - gamma
-    # beta_nose = Psi - Xi
+    alpha_nose= Theta - gamma
+    beta_nose = Psi - Xi
 
     # update lists for plots
     plst[n] = p.magnitude
