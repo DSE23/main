@@ -171,7 +171,7 @@ zs = b-3*Q_('m')
 # print('L', L)
 # print('D', D)
 # print('M', M)
-dM = 0
+
 
 #
 #
@@ -191,6 +191,8 @@ def Normal_stress_due_to_bending(x, y): # Normal stress due to bending
     inertia_term_1 = (Inertia.Iyy_wb*y*Wing.Chordlength-Inertia.Ixy_wb*x*Wing.Chordlength)/denominator_inertia_term
     inertia_term_2 = (Inertia.Ixx_wb*x*Wing.Chordlength-Inertia.Ixy_wb*y*Wing.Chordlength)/denominator_inertia_term
     sigma_zs = D_moment*inertia_term_1 + L_moment*inertia_term_2
+    #print(D_moment)
+    #print(L_moment)
     strain = sigma_zs /youngs_modulus
     return sigma_zs, strain #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
