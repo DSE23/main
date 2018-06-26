@@ -8,7 +8,7 @@ from Misc import ureg, Q_
 from Geometry import Geometry as GM
 from Aerodynamics import Aeroprops as Aeroprops
 from Aerodynamics import Wing as AWing
-import Performance as PF
+from Performance import Performance as PF
 from Propulsion_and_systems import Propeller as Prop
 from Propulsion_and_systems import Propdata as Propdata
 from Misc import Init_parm as IP
@@ -18,7 +18,8 @@ import math as m
 
 
 # Get parameters
-P_to = PF.P_to
+P_to = PF.P_to.magnitude
+P_to = P_to * Q_("kg*m**2/s**3")
 C_d_0 = Aeroprops.CD0_tot
 mass = GM.Masses.W_MTOW
 W = mass * Q_("9.81 m/s**2")
@@ -31,11 +32,13 @@ A = GM.Wing.A
 e = AWing.Oswald_e
 eta_prop = PF.eta_prop
 dp = PF.dp
-V_stall =  PF.V_stall_clean
+V_stall =  PF.V_stall_clean.magnitude
+V_stall *=Q_("m/s")
 alpha_max = AWing.alpha_stall
 alpha_max *= Q_("deg")
 V_lof = 1.05 * V_stall
-Tmax = Prop.Tstatic #
+Tmax = Prop.Tstatic.magnitude #
+Tmax *= Q_("N")
 print (V_stall)
 
 # Set parameters. This may be changed.
