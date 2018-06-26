@@ -125,8 +125,8 @@ class Landing_gear(object):
 
 class Masses(object):                    # !!!Structures should watch this!!!
     W_wing = Q_("88 kg")#StrucVal.Weightwing * 2     # Weight of the wing
-    W_htail = Q_("3.79 kg") * 2   * 2.5       # [kg] Mass of H_tail
-    W_vtail = Q_("2.82 kg")  * 2.5            # [kg] Mass of V_tail
+    W_htail = Q_("3.79 kg") * 2   * 5       # [kg] Mass of H_tail
+    W_vtail = Q_("2.82 kg")  * 4            # [kg] Mass of V_tail
     W_fus = Q_("40 kg")                  # [kg] Mass of Fuselage
     W_gear = Q_("35 kg")                 # [kg] Mass of landing gear
     W_engine = Engine.mass               # [kg] Mass of engine
@@ -163,7 +163,7 @@ class CG(object):
     CG_vtail = V_tail.X_v + V_tail.MAC * CG_vtail_mac      # V-tail cg relative to nose
     ZCG_vtail = Q_("0.31m") - V_tail.b * 0.5
     YCG_vtail = Q_("0 m")
-    CG_fus = Q_("2.16 m")                      # CG fuselage relative to nose !!!update!!!
+    CG_fus = Q_("3 m")                      # CG fuselage relative to nose !!!update!!!
     Z_fusorig = Q_("0.487 m")                  # Origin of fuselage in Z (lowest point)
     ZCG_fus = Q_("-0.0617m") #Inertia.ZCG_f                    # Complete fuselage Z-cg location
     YCG_fus = Q_("0 m")
@@ -173,7 +173,7 @@ class CG(object):
     CG_prop = Q_("-20 cm")  # DUMMY VALUE, NOT KNOWN YET, negative because in front of datum
     ZCG_prop = Q_("0 m")
     ZCG_engine = Engine.zcg
-    CG_fuelsys = Q_("1.18 m")                  # CG fuel system !!!update!!!
+    CG_fuelsys = Q_("1.3 m")                  # CG fuel system !!!update!!!
     ZCG_fuelsys = Q_("0 m")
     CG_flightcon = Q_("2.435 m")               # CG flight controls !!!update!!!
     ZCG_flightcon = Q_("0.21 m")
@@ -187,7 +187,7 @@ class CG(object):
     ZCG_flaperons = Q_("0 m")
     CG_pilot = Q_("2.235 m")                   # CG Pilot relative to nose
     ZCG_pilot = Q_("-0.22 m")
-    CG_fuel = Q_("1.18 m")                     # CG fuel
+    CG_fuel = Q_("1.3 m")                     # CG fuel
     ZCG_fuel = Q_("0 m")
     CG_OEW = (Masses.W_wing * CG_wing + Masses.W_htail * CG_htail + Masses.W_vtail\
               * CG_vtail + Masses.W_fus * CG_fus + Masses.W_gear * CG_lgear\

@@ -159,8 +159,6 @@ if not abs(0.99*zcgf_complete) < abs(Z_CGF) < abs(1.01*zcgf_complete):
     print('\x1b[3;37;41m' + "Update ZCGf in Geometry to " + str(zcgf_complete) + '\x1b[0m')
 xcgf_complete = sum(sum(xcgf*mpm))/sum(sum(mpm))
 xcg_fusinit = Geometry.CG.CG_fus
-if not 0.99 * xcgf_complete < xcg_fusinit < 1.01 * xcgf_complete:
-    print('\x1b[3;37;41m' + "Update XCGf in Geometry to " + str(xcgf_complete) + '\x1b[0m')
 
 I_xxpmf = mpm * ((ycgf - Y_cg)**2 + (zcgf - Z_cg)**2)     
 I_yypmf = mpm * ((zcgf - Z_cg)**2 + (xcgf - X_cg)**2)
