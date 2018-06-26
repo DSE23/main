@@ -8,7 +8,7 @@ from Misc import ureg, Q_
 from Geometry import Geometry as GM
 from Aerodynamics import Aeroprops as Aeroprops
 from Aerodynamics import Wing as AWing
-import Performance as PF
+from Performance import Performance as PF
 from Misc import Init_parm as IP
 import matplotlib.pyplot as plt
 import math as m
@@ -17,12 +17,13 @@ from Propulsion_and_systems import Propdata as Propdata
 
 
 # Get parameters
-P_to = PF.P_to
+P_to = PF.P_to.magnitude
+P_to = P_to * Q_("kg*m**2/s**3")
 C_d_0 = Aeroprops.CD0_tot
 mass = GM.Masses.W_MTOW
 W = mass * Q_("9.81 m/s**2")
 S = GM.Wing.S
-rho = Q_("1.225 kg/(m**3)")
+rho = Q_("1.225 kg/m**3")
 C_L_alpha = AWing.CL_alpha
 C_L_alpha *= Q_("1/rad")
 C_l_max = AWing.CL_max
@@ -30,7 +31,8 @@ C_L_0 = (AWing.dCL_flaps + AWing.dCL_slats)
 A = GM.Wing.A
 e = AWing.Oswald_e
 eta_prop = PF.eta_prop
-dp = PF.dp
+dp = PF.dp.magnitude
+dp = dp 
 V_stall =  PF.V_stall_hld
 alpha_max = AWing.alpha_stall
 alpha_max *= Q_("deg")
@@ -77,7 +79,7 @@ for V in np.arange (V_stall.magnitude,V_a.magnitude, V_step):
 
     y_max_list.append(y)
     V_list.append(V.magnitude)
-    print(alpha_req, T_req, V, y)
+#    print(alpha_req, T_req, V, y)
 
 
     #D_list.append(D.magnitude)

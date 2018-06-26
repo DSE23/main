@@ -83,7 +83,7 @@ class H_tail(object):
     S_e = Q_("1.3145 m**2")                # Elevator area
     ce_c = Q_("0.45")           # percentage elevator chord over local chord
     delta_e = Q_("30 deg")     # Max elevator deflection
-    X_h = Q_("5.0 m")                  # [m] LE location compared to the nose
+    X_h = Q_("4.8 m")                  # [m] LE location compared to the nose
     Z_h = Q_("0.55 m")                  # [m] Distance MAC_h and zero lift line wing
     i_h = Q_("0 rad")                   #incidence angle ht
     Sweep_LE = (np.arctan(np.tan((Sweep_25))-(4/A) *
@@ -124,22 +124,21 @@ class Landing_gear(object):
     lg_wheel_w.ito(Q_("m"))
 
 class Masses(object):                    # !!!Structures should watch this!!!
-    W_wing = StrucVal.Weightwing * 2     # Weight of the wing
-    W_htail = Q_("20 kg")                # [kg] Mass of H_tail
-    W_vtail = Q_("18 kg")                 # [kg] Mass of V_tail
+    W_wing = Q_("88 kg")#StrucVal.Weightwing * 2     # Weight of the wing
+    W_htail = Q_("3.79 kg") * 2   * 5       # [kg] Mass of H_tail
+    W_vtail = Q_("2.82 kg")  * 4            # [kg] Mass of V_tail
     W_fus = Q_("40 kg")                  # [kg] Mass of Fuselage
     W_gear = Q_("35 kg")                 # [kg] Mass of landing gear
     W_engine = Engine.mass               # [kg] Mass of engine
     W_prop = Prop.mass                   # [kg] Mass of propellor
     W_fuelsys = Q_("10 kg")              # [kg] Mass of fuel system
-    W_hydraulic = Q_("1 kg")             # [kg] Mass of hydraulics
     W_flightcontrol = Q_("20 kg")        # [kg] Mass of flight control
     W_avionics = Q_("17 kg")             # [kg] Mass of Avionics
-    W_elecsys = Q_("46 kg")              # [kg] Mass of electronic systems
+    W_elecsys = Q_("15 kg")              # [kg] Mass of electronic systems
     W_lehld = Q_("16 kg")                # [kg] Mass of LE HLD's
     W_flaperons = Q_("14 kg")            # [kg] Mass of flaperons
     W_OEW = W_wing + W_htail + W_vtail + W_fus + W_gear + W_engine +\
-            W_prop + W_fuelsys + W_hydraulic + W_flightcontrol +\
+            W_prop + W_fuelsys + W_flightcontrol +\
             W_avionics + W_elecsys + W_lehld + W_flaperons
     W_pilot = Q_("100 kg")              # [kg] Mass of pilot
     W_fuel = Q_("57 kg")                # [kg] Mass of fuel
@@ -149,7 +148,7 @@ class CG(object):
     # Locations in here are referencd to the nose in x and the crankshaft of the
     # engine in z, unless stated otherwise, For Z downward == positive, for x
     # is to the tail positive
-    CG_wing_mac = 0.45                   # CG location of wing as percentage of MAC
+    CG_wing_mac = 0.462                   # CG location of wing as percentage of MAC
     XLEMAC = Q_("1.1 m")               # LEMAC position
     CG_wing = CG_wing_mac*Wing.MAC + XLEMAC     # Wing CG position relative to nose
     X_wing = XLEMAC + 0.25 * Wing.MAC
@@ -164,7 +163,7 @@ class CG(object):
     CG_vtail = V_tail.X_v + V_tail.MAC * CG_vtail_mac      # V-tail cg relative to nose
     ZCG_vtail = Q_("0.31m") - V_tail.b * 0.5
     YCG_vtail = Q_("0 m")
-    CG_fus = Q_("2.16 m")                      # CG fuselage relative to nose !!!update!!!
+    CG_fus = Q_("3 m")                      # CG fuselage relative to nose !!!update!!!
     Z_fusorig = Q_("0.487 m")                  # Origin of fuselage in Z (lowest point)
     ZCG_fus = Q_("-0.0617m") #Inertia.ZCG_f                    # Complete fuselage Z-cg location
     YCG_fus = Q_("0 m")
@@ -174,15 +173,13 @@ class CG(object):
     CG_prop = Q_("-20 cm")  # DUMMY VALUE, NOT KNOWN YET, negative because in front of datum
     ZCG_prop = Q_("0 m")
     ZCG_engine = Engine.zcg
-    CG_fuelsys = Q_("1.18 m")                  # CG fuel system !!!update!!!
+    CG_fuelsys = Q_("1.3 m")                  # CG fuel system !!!update!!!
     ZCG_fuelsys = Q_("0 m")
-    CG_hydraulics = Q_("1.115 m")              # CG hydraulics !!!update!!!
-    ZCG_hydraulics = Q_("0 m")
-    CG_flightcon = Q_("2.035 m")               # CG flight controls !!!update!!!
+    CG_flightcon = Q_("2.435 m")               # CG flight controls !!!update!!!
     ZCG_flightcon = Q_("0.21 m")
     CG_avionics = Q_("2.035 m")                # CG Avionics !!!update!!!
     ZCG_avionics = Q_("0 m")
-    CG_elecsys = Q_("1.935 m")                 # CG electronic system !!!update!!!
+    CG_elecsys = Q_("2.535 m")                 # CG electronic system !!!update!!!
     ZCG_elecsys = Q_("0 m")
     CG_lehld = XLEMAC                          # CG leading edge HLD's
     ZCG_lehld = Q_("0 m")
@@ -190,12 +187,12 @@ class CG(object):
     ZCG_flaperons = Q_("0 m")
     CG_pilot = Q_("2.235 m")                   # CG Pilot relative to nose
     ZCG_pilot = Q_("-0.22 m")
-    CG_fuel = Q_("1.18 m")                     # CG fuel
+    CG_fuel = Q_("1.3 m")                     # CG fuel
     ZCG_fuel = Q_("0 m")
     CG_OEW = (Masses.W_wing * CG_wing + Masses.W_htail * CG_htail + Masses.W_vtail\
               * CG_vtail + Masses.W_fus * CG_fus + Masses.W_gear * CG_lgear\
               + Masses.W_engine * CG_engine + Masses.W_prop * CG_prop\
-              + Masses.W_fuelsys * CG_fuelsys + Masses.W_hydraulic * CG_hydraulics\
+              + Masses.W_fuelsys * CG_fuelsys\
               + Masses.W_elecsys * CG_elecsys + Masses.W_flightcontrol *\
               CG_flightcon + Masses.W_avionics * CG_avionics + Masses.W_lehld *\
               CG_lehld + Masses.W_flaperons * CG_flaperons)/Masses.W_OEW
@@ -206,7 +203,7 @@ class CG(object):
     ZCG_OEW = (Masses.W_wing * ZCG_wing + Masses.W_htail * ZCG_htail + Masses.W_vtail\
               * ZCG_vtail + Masses.W_fus * ZCG_fus + Masses.W_gear * ZCG_lgear\
               + Masses.W_engine * ZCG_engine + Masses.W_prop * ZCG_prop\
-              + Masses.W_fuelsys * ZCG_fuelsys + Masses.W_hydraulic * ZCG_hydraulics\
+              + Masses.W_fuelsys * ZCG_fuelsys \
               + Masses.W_elecsys * ZCG_elecsys + Masses.W_flightcontrol *\
               ZCG_flightcon + Masses.W_avionics * ZCG_avionics + Masses.W_lehld *\
               ZCG_lehld + Masses.W_flaperons * ZCG_flaperons)/Masses.W_OEW

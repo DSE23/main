@@ -78,7 +78,7 @@ plt.ylabel('Thrust needed [N]')
 #plt.axhline(y= P_to.magnitude, color='r')
 
 plt.figure(2)
-plt.plot(V_list, alpha_list)
+plt.plot(V_list, alpha_list, )
 plt.xlabel('Velocity  [m/s]')
 plt.ylabel('AoA needed [rad]')
 plt.axhline(y= alpha_max, color='r')

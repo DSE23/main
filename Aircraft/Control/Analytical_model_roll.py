@@ -6,6 +6,7 @@ from Misc import ureg, Q_      # Imports the unit registry fron the Misc folder
 from Geometry import Geometry as GM
 from Misc import Init_parm as IP
 from Performance import Performance as PF
+import Stab_dev_eigenmotions as stab
 
 import math as m
 import matplotlib.pyplot as plt
@@ -20,8 +21,8 @@ d_s_a = Q_("0.41 m")                 #stick deflection
 Sa = GM.Wing.S_a                       #m2     aileron surface area
 ca = GM.Wing.c_a                       #m     aileron cord
 C_h_alpha = IP.C_h_alpha         #hinge moment
-C_l_delta_a = IP.C_l_delta_a
-C_l_p = IP.C_l_p
+C_l_delta_a = 0.433 #IP.C_l_delta_a
+C_l_p = stab.Clp
 C_h_delta = IP.C_h_delta
 b = GM.Wing.b
 maxdefl_aileron = GM.Wing.delta_a
@@ -37,12 +38,14 @@ for V in np.arange(V_stall.magnitude, V_a.magnitude , 0.5):
     V *= Q_("m/s")
     t = 0
     p = Q_("0 rad/s")
+    aileron_deflection = Q_("29 deg")  # min(abs(maxdefl_aileron), abs(delta_aileron_force))
+    aileron_deflection.ito(Q_("rad"))
 
     while t < 1:
         delta_alpha_a = (p * 0.5 * b / V) #min(p * 0.5 * b / V, 10)  # delta angle of attack at the tip
-        delta_aileron_force = (Fa / (
-                    -d_delta_a / d_s_a * 0.5 * rho * V ** 2 * Sa * ca) - C_h_alpha * delta_alpha_a) * 2 / C_h_delta  # aileron deflection for force, hingemoment and speed
-        aileron_deflection = min(abs(maxdefl_aileron), abs(delta_aileron_force))
+        #delta_aileron_force = (Fa / (
+        #            -d_delta_a / d_s_a * 0.5 * rho * V ** 2 * Sa * ca) - C_h_alpha * delta_alpha_a) * 2 / C_h_delta  # aileron deflection for force, hingemoment and speed
+
         #print(aileron_deflection)
 
         p = - C_l_delta_a / C_l_p * aileron_deflection * 2 * V / b
