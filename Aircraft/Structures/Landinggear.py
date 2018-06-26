@@ -29,14 +29,14 @@ z = Q_('0 m')
 
 #Material properties of the chosen material.
 #Current chosen material:
-#Epoxy/Carbon fiber, UD prepreg, QI lay-up
-youngs_modulus = Q_("60.1 GPa")  #E
-yield_strength = Q_("738 MPa")  #tensile
-compr_strength = Q_("657 MPa") #compression
-shear_modulus = Q_("23 GPa")   #G
+#Epoxy/S-glass fiber, UD prepref, QI lay-up
+youngs_modulus = Q_("21 GPa")  #E
+yield_strength = Q_("504 MPa")  #tensile
+compr_strength = Q_("312 MPa") #compression
+shear_modulus = Q_("9.23 GPa")   #G
 poisson = 0.31                 # maximum 0.33
-tau_max = Q_("35 MPa")
-density = Q_("1560 kg/m**3")
+tau_max = Q_("40 MPa")
+density = Q_("1970 kg/m**3")
 
 
 '''Load geometry of the airfoil of the landing gear'''

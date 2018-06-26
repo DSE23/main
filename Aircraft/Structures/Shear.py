@@ -174,8 +174,8 @@ def Calc_base_shear_flow(boom_areas, n):
 
         # Drag
         q_loc_D += -(S_x / Iyy) * (Wing.ThSkin * (x_coor - Wing.centroid) * Wing.Chordlength * ds)
-        if(str_counter < 8):
-            if (abs(x_coor * Wing.Chordlength - strs_x_coords[str_counter]) < Q_("1 cm")):
+        if(str_counter < Wing.N_stringers):
+            if abs(x_coor * Wing.Chordlength - strs_x_coords[str_counter]) < Q_("1 cm"):
                 q_loc_L += -(S_y / Ixx) * Wing.A_stringer * strs_y_coords[str_counter]
                 print(strs_x_coords[str_counter])
                 q_loc_D += -(S_x / Iyy) * Wing.A_stringer * (strs_x_coords[str_counter] / Wing.Chordlength - Wing.centroid) * Wing.Chordlength
@@ -529,7 +529,7 @@ def Tsia_Wu(sigma_zs, tau_x, tau_y):
     tau13 = tau_x
     F = F11 *sigma1**2#+F22*(sigma2**2+sigma3**2)+sigma2*sigma3*(2*F22-F44)
     F += F1*(sigma1+sigma2) #+ 2*F12*sigma1*(sigma3+sigma2) + F2*sigma3
-    F += F66*(tau13**2+tau12**2) #F44*tau23**2 
+    F += F66*(tau13**2+tau12**2) #F44*tau23**2
     if F < 1:
         print("No failure occurs")
     else:

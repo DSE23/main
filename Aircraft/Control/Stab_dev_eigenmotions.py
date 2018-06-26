@@ -140,6 +140,7 @@ Img_sp = np.sqrt(abs(Det_sp))/(2*A_sp)           # Img part of eigenvalue SP
 Eigen_abs_sp = np.sqrt(Re_sp**2+Img_sp**2)       # Abs value of eigenvalue SP
 omega_0 = Eigen_abs_sp * (V_a/Cbar)             # Undamped nat. freq. SP
 n_alpha = (CL_alpha * 0.5 * rho_a * V_a**2 * S_wing)/(MTOW * g0)    # loadfactor per AoA
+Damping_sp = -Re_sp/Eigen_abs_sp
 CAP = (omega_0**2)/n_alpha
         
 # Phugoid
@@ -164,5 +165,14 @@ T_car = -1 / Re_ar * (b / V_a)
 
 A_dr = 8 * mu_b**2 * K_zz
 B_dr = - 2 * mu_b * (Cnr + 2 * K_zz * CYbeta)
+C_dr = -Cnbeta*(CYr-4*mu_c)+CYbeta*Cnr
+Det_dr = B_dr**2 - 4*A_dr * C_dr
 RE_dr = -B_dr/(2 * A_dr)
+Img_dr = np.sqrt(abs(Det_dr))/(2*A_dr)
+Damping_dr = -RE_dr/np.sqrt(RE_dr**2+Img_dr**2)
 
+# Spiral
+
+Eigen_spir = (2*C_L*(Clbeta * Cnr - Cnbeta * Clr))/(Clp * (CYbeta * Cnr + 4 * mu_b * Cnbeta)-\
+              Cnp*(CYbeta * Clr + 4 * mu_b * Clbeta))
+T2 = np.log(2)/Eigen_spir * (b/V_a)
