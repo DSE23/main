@@ -5,7 +5,7 @@ from Misc import ureg, Q_
 from Geometry import Geometry as GM
 from Aerodynamics import Aeroprops as Aeroprops
 from Aerodynamics import Wing as AWing
-import Performance as PF
+from Performance import Performance as PF
 from Propulsion_and_systems import Propeller as Prop
 from Misc import Init_parm as IP
 import matplotlib.pyplot as plt
@@ -14,7 +14,8 @@ import math as m
 
 
 # Get parameters
-P_to = PF.P_to
+P_to = PF.P_to.magnitude
+P_to = P_to * Q_("kg*m**2/s**3")
 C_d_0 = Aeroprops.CD0_tot
 mass = GM.Masses.W_MTOW
 W = mass * Q_("9.81 m/s**2")
@@ -27,13 +28,16 @@ A = GM.Wing.A
 e = AWing.Oswald_e
 eta_prop = PF.eta_prop
 dp = PF.dp
-V_stall =  PF.V_stall_hld
+V_stall =  PF.V_stall_hld.magnitude
+V_stall *=Q_("m/s")
 alpha_max = AWing.alpha_stall
 alpha_max *= Q_("deg")
 V_REF = 1.3 * V_stall           # from CS23.73
-Tmax = Prop.Tstatic #(P_to**2*eta_prop**2*m.pi*dp**2/2*rho)**(1/3)
+Tmax = Prop.Tstatic.magnitude 
+Tmax *= Q_("N") 
 
-g = PF.g0
+g = PF.g0.magnitude
+g *= Q_("m/s**2")
 
 # initial conditions
 V = V_REF
@@ -118,7 +122,7 @@ while flight_path_angle < Q_("0 deg"):
     t_list.append(t.magnitude)
     h_list.append(h.magnitude)
     x_list.append(x.magnitude)
-
+print(V)
 print("The distance covered from screen height to touchdown is", round(x,2))
 
 while V > Q_("1 m/s"):
@@ -143,16 +147,22 @@ while V > Q_("1 m/s"):
     x_list.append(x.magnitude)
 
 
-print(x)
+print("The total landing distance is",x)
+print("The total landing time is",t)
+print(V_REF)
+
 plt.figure(1)
 plt.plot(t_list, h_list)
 plt.ylabel('height [m]')
 plt.xlabel('time [s] ')
 
 plt.figure(2)
-plt.plot(x_list, h_list)
-plt.ylabel('height [m]')
-plt.xlabel('distance [m] ')
+plt.plot(x_list, h_list,  c='black')
+plt.ylabel('Height [m]',  color='black')
+plt.xlabel('Distance [m] ',  color='black')
+plt.axis('scaled')
+plt.xlim(0,x.magnitude)
+plt.ylim(0,25)
 
 plt.figure(3)
 plt.plot(x_list, V_list)

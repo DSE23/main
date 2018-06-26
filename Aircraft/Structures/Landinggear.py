@@ -29,14 +29,14 @@ z = Q_('0 m')
 
 #Material properties of the chosen material.
 #Current chosen material:
-#Epoxy/Carbon fiber, UD prepreg, QI lay-up
-youngs_modulus = Q_("60.1 GPa")  #E
-yield_strength = Q_("738 MPa")  #tensile
-compr_strength = Q_("657 MPa") #compression
-shear_modulus = Q_("23 GPa")   #G
+#Epoxy/S-glass fiber, UD prepref, QI lay-up
+youngs_modulus = Q_("21 GPa")  #E
+yield_strength = Q_("504 MPa")  #tensile
+compr_strength = Q_("312 MPa") #compression
+shear_modulus = Q_("9.23 GPa")   #G
 poisson = 0.31                 # maximum 0.33
-tau_max = Q_("35 MPa")
-density = Q_("1560 kg/m**3")
+tau_max = Q_("40 MPa")
+density = Q_("1970 kg/m**3")
 
 
 '''Load geometry of the airfoil of the landing gear'''
@@ -165,14 +165,15 @@ def landing_stress(z):
 
     def Normal_stress_due_to_bending(cs, y): # Normal stress due to bending
         denominator_inertia_term = IxxSkin*IyySkin-IxySkin**2
-        inertia_term_1 = (IyySkin*y-IxySkin*cs)/denominator_inertia_term
-        inertia_term_2 = (IxxSkin*cs-IxySkin*y)/denominator_inertia_term
+        inertia_term_1 = (IyySkin*y*Chordlength-IxySkin*cs*Chordlength)/denominator_inertia_term
+        inertia_term_2 = (IxxSkin*cs*Chordlength-IxySkin*y*Chordlength)/denominator_inertia_term
         sigma_zs = My*inertia_term_1 + Mx*inertia_term_2
+        print(sigma_zs)
         strain = sigma_zs / youngs_modulus
         return sigma_zs, strain #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
     sigma, strain = Normal_stress_due_to_bending(maxT, airfoilordinate(maxT))
-
+    strain.ito(ureg('dimensionless'))
     return sigma, strain
 '''-----------------Stress calculation loop-----------------------------'''
 
@@ -192,5 +193,5 @@ Vol = AreaSkin * Chordlength
 Mass = Vol * density
 print(Mass)
 
-plt.plot(zlist, sigmalist)
+plt.plot(zlist, strainlist)
 plt.show()

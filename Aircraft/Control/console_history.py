@@ -23,7 +23,7 @@ np.seterr(all='raise')
 l_a = Q_("0.405 m")        # Set aileron length
 cr_c= Q_("0.45     ")
 ce_c= Q_("0.5 ")
-n_of_disc_w = 20            # number of parts wing is discretized
+n_of_disc_w = 30            # number of parts wing is discretized
 n_of_disc_h = 10            # number of parts HT is discretized
 n_of_disc_v = 10            # number of parts VT is discretized
 da = Q_("0 deg")            # aileron deflection
@@ -271,7 +271,7 @@ disc_wing_w = np.zeros((len(kwlst)-1, 10))
 
 "============================================================================="
 # ROLL
-#V_inf = Q_("118 m/s")
+#V_inf = Q_("96 m/s")
 #alpha_h = alpha_nose
 #V_local = V_inf
 #p = Q_('0. rad/s')
@@ -280,7 +280,7 @@ disc_wing_w = np.zeros((len(kwlst)-1, 10))
 #theta = alpha_nose
 #plst = []
 #pdotlst = []
-#tlst = np.arange(0,3,dt.magnitude)
+#tlst = np.arange(0,4,dt.magnitude)
 #Mzlst = []
 #for t_current in tlst:
 #    disc_wing_w[(range(n_chords_w)), 0] = da  
@@ -350,16 +350,19 @@ disc_wing_w = np.zeros((len(kwlst)-1, 10))
 #    pdotlst.append(p_dot.to('degree/s**2').magnitude)
 #    Mzlst.append(Mz.magnitude)
 #    
-#plt.plot(tlst,plst,label='p')
+#plt.plot(tlst,plst,label='roll rate',c='black')
 #plt.plot(tlst,Mzlst,label='moment due to roll')
 ##plt.plot(tlst,pdotlst,label='p dot')
-#plt.label()
+#plt.xlabel("time [s]")
+#plt.ylabel("roll rate [deg/s]")
+#plt.legend()
 #plt.show()
 #print("Fz:",Fn_w+Fn_h+W)
 "============================================================================="
-# Pitch
-#alpha_nose, de, Thrust = trim()
-
+## Pitch
+##alpha_nose, de, Thrust = trim()
+#
+#V_local = V_inf
 #de = -1.862
 #Thrust = Q_("542 N")
 #theta = alpha_nose
@@ -374,12 +377,11 @@ disc_wing_w = np.zeros((len(kwlst)-1, 10))
 #qdotlst = []
 #thetalst = []
 #alst = []
-#tlst = np.arange(0,6,dt.magnitude)
+#tlst = np.arange(0,4,dt.magnitude)
 #Vlst = []
 ##de_dot = Q_("-25/0.1 deg/s")
 #for t_current in tlst:
-#    
-#    if t_current >1:
+#    if t_current >2:
 #        de = -25
 #        
 #    #Main Wing
@@ -423,16 +425,17 @@ disc_wing_w = np.zeros((len(kwlst)-1, 10))
 #    qlst.append(q.to('degree /s').magnitude)
 #    qdotlst.append(q_dot.to('degree/s**2').magnitude)
 #    thetalst.append(theta.to('degree').magnitude)
-#    
 #    Vlst.append(V_local.magnitude)
 #    
 #print('finished')
 #
 #
 #plt.figure()
-#plt.plot(tlst,qlst,label='q')
-#plt.plot(tlst,thetalst,label='theta')
-#plt.plot(tlst,alst,label='alpha')
+#plt.plot(tlst,qlst,label='pitch rate',color='black')
+#plt.plot(tlst,thetalst,label='theta [deg]',color='black',ls='--')
+#plt.plot(tlst,alst,label='alpha [deg]',color='black',ls='-.')
+#plt.xlabel("time [s]")
+#plt.ylabel("pitch rate [deg/s]")
 ##plt.plot(tlst,qdotlst,label='q dot')
 #plt.legend()
 ##plt.figure()
@@ -452,11 +455,12 @@ alpha_v = alpha_nose
 betalst = []
 psilst = []
 rlst = []
+rdotlst = []
 tlst = []
 Mzlst = []
 for t_current in np.arange(0,4,dt.magnitude):
     if t_current>1:
-        dr = 1
+        dr = 25
         
     beta_v  = beta_nose - r*dx_v/V_inf
     
@@ -475,29 +479,46 @@ for t_current in np.arange(0,4,dt.magnitude):
     Fx = Thrust + Ft_wh + Ft_v  - W * m.sin(alpha_nose)
     Fz = Fn_v
     
-#    u_dot = Fx/mtow + r*v
-#    v_dot = Fz/mtow - r*u
-#    
-#    u += u_dot * dt
-#    v += v_dot * dt
-#    
+    u_dot = Fx/mtow + r*v
+    v_dot = Fz/mtow - r*u
+    
+    u += u_dot * dt
+    v += v_dot * dt
+    
     Mz = dx_v * Fn_v
-#    r_dot = Mz/I_zz
-#    
-#    r += r_dot * dt
-#    Psi += r * dt
-#    
-#    beta_nose = np.arctan(v/u)
+    r_dot = Mz/I_zz
+    
+    r += r_dot * dt
+    Psi += r * dt
+    
+    beta_nose = np.arctan(v/u)
     
     betalst.append(m.degrees(beta_nose))
     psilst.append(m.degrees(Psi))
     rlst.append(r.to('degree/s').magnitude)
     tlst.append(t_current)
-    Mzlst.append(Mz.magnitude)
-#plt.plot(tlst, betalst, label='beta')
-#plt.plot(tlst, psilst, label='psi')
-#plt.plot(tlst,rlst,label='r')
-plt.plot(tlst,Mzlst,label='moment due to rudder')
-plt.legend()
+    rdotlst.append(r_dot)
+    Mzlst.append((Fn_v*dx_v).magnitude)
+
+fig, ax1 = plt.subplots()
+ax2 = ax1.twinx()
+
+ax1.plot(tlst,rlst,label='yaw rate',c='black')
+ax2.plot(tlst, betalst, label=r'$\beta$',c='black',ls='-.')
+ax2.plot(tlst, psilst, label=r'$\Psi$',c='black',ls='--')
+ax2.plot(np.nan,label='yaw rate',c='black')
+
+#plt.plot(tlst, betalst, label='beta [deg]',c='black',ls='-.')
+#plt.plot(tlst, psilst, label='psi [deg]',c='black',ls='--')
+#plt.plot(tlst,rlst,label='yaw rate',c='black')
+#plt.xlabel("time [s]")
+#plt.ylabel("yaw rate [deg/s]")
+
+ax1.set_xlabel('Time [s]')
+ax1.set_ylabel("Rate ["r'$^\circ$/s]', color='black')
+ax1.axis((0,4,-90,90))
+ax2.set_ylabel("Angle ["r'$^\circ$]', color='black')
+#plt.plot(tlst,Mzlst,label='moment due to rudder')
+ax2.legend()
 plt.show()
 

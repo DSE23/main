@@ -159,8 +159,6 @@ if not abs(0.99*zcgf_complete) < abs(Z_CGF) < abs(1.01*zcgf_complete):
     print('\x1b[3;37;41m' + "Update ZCGf in Geometry to " + str(zcgf_complete) + '\x1b[0m')
 xcgf_complete = sum(sum(xcgf*mpm))/sum(sum(mpm))
 xcg_fusinit = Geometry.CG.CG_fus
-if not 0.99 * xcgf_complete < xcg_fusinit < 1.01 * xcgf_complete:
-    print('\x1b[3;37;41m' + "Update XCGf in Geometry to " + str(xcgf_complete) + '\x1b[0m')
 
 I_xxpmf = mpm * ((ycgf - Y_cg)**2 + (zcgf - Z_cg)**2)     
 I_yypmf = mpm * ((zcgf - Z_cg)**2 + (xcgf - X_cg)**2)
@@ -446,6 +444,10 @@ I_xx = I_xxnew
 I_yy = I_yynew
 I_zz = I_zznew
 I_xz = I_xznew
+#print("I_xx", I_xxf, I_xxw, I_xxv, I_xxh, I_xxe,I_xxfuel, I_xxp, I_xxlg, I_xx)
+#print("I_yy", I_yyf, I_yyw, I_yyv, I_yyh, I_yye,I_yyfuel, I_yyp, I_yylg, I_yy)
+#print("I_zz", I_zzf, I_zzw, I_zzv, I_zzh, I_zze,I_zzfuel, I_zzp, I_zzlg, I_zz)
+#print("I_xz", I_xzf, I_xzw, I_xzv, I_xzh, I_xze,I_xzfuel, I_xzp, I_xzlg, I_xz)
 #from matplotlib import pyplot as plt
 #from mpl_toolkits.mplot3d import Axes3D
 #fig = plt.figure()

@@ -8,12 +8,11 @@ from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import numpy as np
 from scipy import interpolate
 import math as m
-import Wing
 from Geometry import Geometry
-from Structures import Inertia
-from Structures import Wing
-from Structures import WingStress
-from Structures import Shear
+from Structures import Inertia_HT as Inertia 
+from Structures import Wing_HT as Wing
+from Structures import WingStress_VT as WingStress
+from Structures import Shear_HT as Shear
 from matplotlib import pyplot as plt
 
 
@@ -47,7 +46,6 @@ while z <= b.magnitude:
     Farray = np.append(Farray, F)
     z *= Q_('m')
     L_moment = WingStress.computeloads(z)[3]
-    print('L_moment', L_moment)
     z = z.magnitude
     '''Calculate all the subweights of the wing '''
     Vol_mat_spar1 = Vol_mat_spar1 + Wing.AreaSpar1*(b/n)
@@ -129,7 +127,10 @@ Weightskin = Density * Vol_mat_skin
 Weightstring = Density * Vol_mat_string
 Weightwing = Density * Vol_mat_wing
 
-print("Wingweight half span main wing", Weightwing)
+
+
+print("Wingweight half span Horizontal Tail", Weightwing)
+
 
 # with is like your try .. finally block in this case
 with open('StrucVal.py', 'r') as file:
@@ -157,7 +158,7 @@ plt.subplot(2, 2, 1)
 plt.plot(zarray, Ixxlist)
 
 plt.subplot(2, 2, 2)
-plt.plot(zarray, Farray)
+plt.plot(zarray, Iyylist)
 
 plt.subplot(2, 2, 3)
 plt.plot(zarray, Lmomentlist)

@@ -46,7 +46,7 @@ yield_strength = Q_("738 MPa")  #tensile
 compr_strength = Q_("657 MPa") #compression
 shear_modulus = Q_("23 GPa")   #G
 poisson = 0.31                 # maximum 0.33
-tau_max = Q_("60 MPa")
+tau_max = Q_("40 MPa")
 density = Q_("1560 kg/m**3")
 
 
@@ -120,7 +120,7 @@ def fuselage_calc(x):
     My_sec2.ito(ureg('N * m'))
     Mx_sec2 = (b_VT * 0.33) * L_VT
     Mx_sec2.ito(ureg('N * m'))
-    Mz_sec2 = (l_fus - x) * L_HT - (b_VT * 0.33) * D_VT
+    Mz_sec2 = -(l_fus - x) * L_HT - (b_VT * 0.33) * D_VT
     Mz_sec2.ito(ureg('N * m'))
 
     #Bending Loading section 3
@@ -181,7 +181,7 @@ def fuselage_calc(x):
     q_34_cor = (b_f80 * q_12) / b_f80
     q_23_cor = (b_f80 * q_34_cor) / b_f80
     q_14_cor = (b_f80 * q_23_cor) / b_f80
-
+    print(q_34_cor, q_23_cor, q_14_cor)
     q_34 = q_12 + -q_34_cor
     q_23 = q_12 + q_23_cor
     q_14 = q_12 + q_14_cor
@@ -260,7 +260,7 @@ def fuselage_calc(x):
     Area_ribs = b_f_taper * b_f_taper * h_ribs
 
 
-    return sigma_x, shear_x, Area
+    return sigma_x, shear_x, Area, Area_ribs
 
 
 '''-----------------Tsia-Wu Failure criterion--------------------------'''
