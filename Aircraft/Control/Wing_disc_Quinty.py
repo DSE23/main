@@ -49,10 +49,10 @@ dr = Q_("0 deg")  # rudder deflection
 de = Q_("0 deg")  # elevator deflection
 alpha_nose = Q_("0. rad")  # angle of attack of nose
 beta_nose = Q_("0. rad")  # angle of sideslip of nose
-V_inf = Q_("62 m/s")  # V infinity
+V_inf = Q_("90 m/s")  # V infinity
 t_current = Q_("0.0 s")  # Start time of sim
-dt = Q_("0.1 s")  # Time step of sim
-t_end = Q_("15.00. s")  # End time of sim
+dt = Q_("0.05 s")  # Time step of sim
+t_end = Q_(".95 s")  # End time of sim
 l_h = Q_("3.6444 m")  # Tail arm ac-ac horizontal
 l_v = Q_("3.7 m")  # Tail arm ac-ac vertical
 p = Q_("0. 1/s")  # initial roll rate  [rad/s]
@@ -319,7 +319,7 @@ alpha_nose = Q_("4.5 deg")  # m.radians(alpha_nose)
 Theta = m.radians(alpha_nose)
 n = 0
 
-de = Q_("-.3 deg")
+de = Q_("-.30 deg")
 T = Q_("300 N")
 for t_current in np.arange(0, (t_end).magnitude, dt.magnitude):
     # if t_current > 10:
@@ -331,7 +331,7 @@ for t_current in np.arange(0, (t_end).magnitude, dt.magnitude):
     disc_wing_v = np.zeros((len(kvlst) - 1, 20))  # 2D array discretized VT
 
     # Setting the control surface deflection for each station
-    disc_wing_w[(range(n_chords_w)), 0] = da
+    disc_wing_w[(range(n_chords_w)), 0] = -0.7#da
     disc_wing_w[
         (range(int(n_of_disc_w + 2 - n_chords_w), n_of_disc_w + 2)), 0] = -da  # set aileron for negative stations
     disc_wing_h[(range(n_chords_h)), 0] = de
@@ -511,85 +511,85 @@ for t_current in np.arange(0, (t_end).magnitude, dt.magnitude):
         disc_wing_h[i][19] = 0.
 
     # Calculate for Vertical Tail
-    for i in range(0, len(kvlst) - 1):
-        dr_local = disc_wing_v[i][0]  # Local aileron deflection of piece
-        b1 = kvlst[i] - Z_v  # Y boundary left of piece
-        b2 = kvlst[i + 1] - Z_v  # Y boundary right of piece
-        z_i = (b1 + b2) / 2  #
-        c1 = local_chord(abs(b1), c_r_v, c_t_v, b_v)  #
-        c2 = local_chord(abs(b2), c_r_v, c_t_v, b_v)  #
-        cc = local_chord(abs(z_i), c_r_v, c_t_v, b_v)  # Chord centre of piece
-        ca_c = (l_e / cc).magnitude  # percentage aileron chord over local aileron
-        Sloc = (c1 + c2) / 2 * (b2 - b1)  # Surface area of piece
-
-        # Determine change in relative airspeed due to yaw
-        V_local = V_inf * m.cos(alpha_nose)
-
-        # Determine change in angle of attack due to roll
-        roll_induced_beta = p * z_i / V_local
-        yaw_induced_beta = r * l_h / V_local
-        sidewash = 0.
-        beta_v = round(beta_nose + roll_induced_beta + yaw_induced_beta - sidewash, 2)
-
-        # Determine change in angle of attack due to tip vortex
-        beta_i = 0.
-        running_beta_i = True
-        while running_beta_i:
-            beta_e = beta_v - beta_i
-            Cl, Cd, Cm, xcp = lookup_data(beta_e, ca_c, dr_local)
-            if abs(Cl) < 0.01:
-                alpha_i_new = 0.
-                running_beta_i = False
-            else:
-                beta_i_new = Cl / (m.pi * AR_v * e_v)
-                if abs((beta_i_new - beta_i) / beta_i_new) < 0.01:
-                    running_beta_i = False
-                beta_i = beta_i_new
-
-        beta_v = beta_v - beta_i  # Angle of Attack as experienced by the piece
-        alpha_v = alpha_nose  # Angle of Sideslip as experienced by the piece
-        delta_beta = roll_induced_beta + yaw_induced_beta - beta_i - sidewash  # Difference between AoA nose and piece
-
-        # Lookup Aerodynamic data of the wing based on given imput
-        Cl, Cd, Cm, xcp = lookup_data(beta_v, ca_c, dr_local)
-
-        # Determine induced drag
-        Cdi = Cl * Cl / (m.pi * AR_v * e_v)
-        Cd = Cd + Cdi
-
-        # Normal and tangental coefficients (wrt body frame):
-        Cb = -Cl * m.cos(beta_v) - Cd * m.sin(beta_v)
-        Ct = Cl * m.sin(beta_v) - Cd * m.cos(beta_v)
-
-        Ft = 0.5 * rho * V_local ** 2 * Sloc * Ct
-        Fb = 0.5 * rho * V_local ** 2 * Sloc * Cb
-
-        # Calculate lift and drag in local aerodynamic frame
-        Lift = 0.5 * rho * V_local ** 2 * Sloc * Cl
-        Drag = 0.5 * rho * V_local ** 2 * Sloc * Cd
-        # Calculate lift and drag in general arodynamic frame
-        Lift_aero = Lift * m.cos(delta_alpha) - Drag * m.sin(delta_alpha)
-        Drag_aero = Drag * m.cos(delta_alpha) + Lift * m.sin(delta_alpha)
-
-        # Add everything to the 2D array
-        disc_wing_v[i][1] = y_i.magnitude
-        disc_wing_v[i][2] = Drag_aero.magnitude
-        disc_wing_v[i][3] = Lift_aero.magnitude
-        disc_wing_v[i][4] = (Drag * y_i).magnitude
-        disc_wing_v[i][5] = (Lift * y_i).magnitude
-        disc_wing_v[i][6] = (x_i * Lift).magnitude
-        disc_wing_v[i][7] = (x_i * Drag).magnitude
-        disc_wing_v[i][8] = downwash_angle
-
-        disc_wing_v[i][11] = 0.
-        disc_wing_v[i][12] = Ft.magnitude
-        disc_wing_v[i][13] = Fb.magnitude
-        disc_wing_v[i][14] = 0.
-        disc_wing_v[i][15] = 0.
-        disc_wing_v[i][16] = 0.
-        disc_wing_v[i][17] = (Ft * z_i).magnitude
-        disc_wing_v[i][18] = (Fb * z_i).magnitude
-        disc_wing_v[i][19] = (Fb * l_v).magnitude
+    # for i in range(0, len(kvlst) - 1):
+    #     dr_local = disc_wing_v[i][0]  # Local aileron deflection of piece
+    #     b1 = kvlst[i] - Z_v  # Y boundary left of piece
+    #     b2 = kvlst[i + 1] - Z_v  # Y boundary right of piece
+    #     z_i = (b1 + b2) / 2  #
+    #     c1 = local_chord(abs(b1), c_r_v, c_t_v, b_v)  #
+    #     c2 = local_chord(abs(b2), c_r_v, c_t_v, b_v)  #
+    #     cc = local_chord(abs(z_i), c_r_v, c_t_v, b_v)  # Chord centre of piece
+    #     ca_c = (l_e / cc).magnitude  # percentage aileron chord over local aileron
+    #     Sloc = (c1 + c2) / 2 * (b2 - b1)  # Surface area of piece
+    #
+    #     # Determine change in relative airspeed due to yaw
+    #     V_local = V_inf * m.cos(alpha_nose)
+    #
+    #     # Determine change in angle of attack due to roll
+    #     roll_induced_beta = p * z_i / V_local
+    #     yaw_induced_beta = r * l_h / V_local
+    #     sidewash = 0.
+    #     beta_v = round(beta_nose + roll_induced_beta + yaw_induced_beta - sidewash, 2)
+    #
+    #     # Determine change in angle of attack due to tip vortex
+    #     beta_i = 0.
+    #     running_beta_i = True
+    #     while running_beta_i:
+    #         beta_e = beta_v - beta_i
+    #         Cl, Cd, Cm, xcp = lookup_data(beta_e, ca_c, dr_local)
+    #         if abs(Cl) < 0.01:
+    #             alpha_i_new = 0.
+    #             running_beta_i = False
+    #         else:
+    #             beta_i_new = Cl / (m.pi * AR_v * e_v)
+    #             if abs((beta_i_new - beta_i) / beta_i_new) < 0.01:
+    #                 running_beta_i = False
+    #             beta_i = beta_i_new
+    #
+    #     beta_v = beta_v - beta_i  # Angle of Attack as experienced by the piece
+    #     alpha_v = alpha_nose  # Angle of Sideslip as experienced by the piece
+    #     delta_beta = roll_induced_beta + yaw_induced_beta - beta_i - sidewash  # Difference between AoA nose and piece
+    #
+    #     # Lookup Aerodynamic data of the wing based on given imput
+    #     Cl, Cd, Cm, xcp = lookup_data(beta_v, ca_c, dr_local)
+    #
+    #     # Determine induced drag
+    #     Cdi = Cl * Cl / (m.pi * AR_v * e_v)
+    #     Cd = Cd + Cdi
+    #
+    #     # Normal and tangental coefficients (wrt body frame):
+    #     Cb = -Cl * m.cos(beta_v) - Cd * m.sin(beta_v)
+    #     Ct = Cl * m.sin(beta_v) - Cd * m.cos(beta_v)
+    #
+    #     Ft = 0.5 * rho * V_local ** 2 * Sloc * Ct
+    #     Fb = 0.5 * rho * V_local ** 2 * Sloc * Cb
+    #
+    #     # Calculate lift and drag in local aerodynamic frame
+    #     Lift = 0.5 * rho * V_local ** 2 * Sloc * Cl
+    #     Drag = 0.5 * rho * V_local ** 2 * Sloc * Cd
+    #     # Calculate lift and drag in general arodynamic frame
+    #     Lift_aero = Lift * m.cos(delta_alpha) - Drag * m.sin(delta_alpha)
+    #     Drag_aero = Drag * m.cos(delta_alpha) + Lift * m.sin(delta_alpha)
+    #
+    #     # Add everything to the 2D array
+    #     disc_wing_v[i][1] = y_i.magnitude
+    #     disc_wing_v[i][2] = Drag_aero.magnitude
+    #     disc_wing_v[i][3] = Lift_aero.magnitude
+    #     disc_wing_v[i][4] = (Drag * y_i).magnitude
+    #     disc_wing_v[i][5] = (Lift * y_i).magnitude
+    #     disc_wing_v[i][6] = (x_i * Lift).magnitude
+    #     disc_wing_v[i][7] = (x_i * Drag).magnitude
+    #     disc_wing_v[i][8] = downwash_angle
+    #
+    #     disc_wing_v[i][11] = 0.
+    #     disc_wing_v[i][12] = Ft.magnitude
+    #     disc_wing_v[i][13] = Fb.magnitude
+    #     disc_wing_v[i][14] = 0.
+    #     disc_wing_v[i][15] = 0.
+    #     disc_wing_v[i][16] = 0.
+    #     disc_wing_v[i][17] = (Ft * z_i).magnitude
+    #     disc_wing_v[i][18] = (Fb * z_i).magnitude
+    #     disc_wing_v[i][19] = (Fb * l_v).magnitude
 
     # New forces and moments
     Sum_Fn = (sum(disc_wing_w[:, 11]) + sum(disc_wing_h[:, 11]) + sum(disc_wing_v[:, 11])) * Q_("N")
@@ -608,6 +608,7 @@ for t_current in np.arange(0, (t_end).magnitude, dt.magnitude):
     Fz = Sum_Fn + W * m.cos(Theta) * m.cos(Phi)
 
     Mx = Sum_Fn_y + Sum_Fb_z
+    print(Mx)
     My = Sum_Fn_x
     Mz = -Sum_Ft_y + Sum_Fb_y
 
@@ -617,8 +618,8 @@ for t_current in np.arange(0, (t_end).magnitude, dt.magnitude):
     w_dot = Fz / (mtow) - p * v + q * u
 
     u += u_dot * dt
-    w += w_dot * dt
-    v += v_dot * dt
+    w =Q_("0 m/s")#+= w_dot * dt
+    v =Q_("0 m/s")#+= v_dot * dt
 
     V_inf = np.sqrt(u * u + w * w + v * v)
 
@@ -644,9 +645,9 @@ for t_current in np.arange(0, (t_end).magnitude, dt.magnitude):
             ((I_xx - I_yy) * I_xx + I_xz ** 2) / I_star * p * q + \
             ((-I_xx + I_yy - I_zz) * I_xz) / I_star * p * r
 
-    p += p_dot * dt
-    q += q_dot * dt
-    r += r_dot * dt
+    p = Q_("0 rad/s") # += p_dot * dt
+    q  += q_dot * dt
+    r = Q_("0 rad/s") #+= r_dot * dt
 
     Phi += (p + q * m.sin(Phi) * m.tan(Theta) + r * m.cos(Phi) * m.tan(Theta)) * dt
     Theta += (q * m.cos(Phi) - r * m.sin(Phi)) * dt

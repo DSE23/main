@@ -14,9 +14,9 @@ from scipy import interpolate
 import math as m
 from Geometry import Geometry
 # from Geometry import Wing as GWing
-# import Wing
-from Structures import Inertia
-from Structures import Wing
+import Wing
+from Structures import Inertia_VT as Inertia
+from Structures import Wing_VT as Wing
 from Aerodynamics import Wing as AWing
 from Performance import Performance
 import matplotlib.pyplot as plt
@@ -36,7 +36,7 @@ density = Q_("1560 kg/m**3")
 
 
 
-cl, cd, cm = AWing.computeloads()           #Load aerodynamic properties
+cl, cd, cm = AWing.computeloadsvt()           #Load aerodynamic properties
 n = 10                      #number of the devided sections
 b = Wing.s         #Wing span
 b = b.magnitude * ureg.meter

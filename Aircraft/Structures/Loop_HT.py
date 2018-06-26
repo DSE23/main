@@ -8,12 +8,11 @@ from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 import numpy as np
 from scipy import interpolate
 import math as m
-import Wing
 from Geometry import Geometry
-from Structures import Inertia
-from Structures import Wing
-from Structures import WingStress
-from Structures import Shear
+from Structures import Inertia_HT as Inertia 
+from Structures import Wing_HT as Wing
+from Structures import WingStress_VT as WingStress
+from Structures import Shear_HT as Shear
 from matplotlib import pyplot as plt
 
 
@@ -128,7 +127,10 @@ Weightskin = Density * Vol_mat_skin
 Weightstring = Density * Vol_mat_string
 Weightwing = Density * Vol_mat_wing
 
-print("Wingweight half span main wing", Weightwing)
+
+
+print("Wingweight half span Horizontal Tail", Weightwing)
+
 
 # with is like your try .. finally block in this case
 with open('StrucVal.py', 'r') as file:
