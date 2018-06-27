@@ -23,7 +23,7 @@ N = 40                         # Number of panels to be used in total
 Nwakes = 100
 t = 0.
 dt = 0.01
-tmax = 20
+tmax = 0.01
 
 ### Basics
 Vvector = Vspeed*np.array([m.cos(alpha),0,m.sin(alpha)])
