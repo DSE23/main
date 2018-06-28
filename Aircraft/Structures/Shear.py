@@ -528,8 +528,8 @@ def Tsia_Wu(sigma_zs, tau_x, tau_y):
     tau23 = 0
     tau13 = tau_x
     F = F11 *sigma1**2#+F22*(sigma2**2+sigma3**2)+sigma2*sigma3*(2*F22-F44)
-    F += F1*(sigma1+sigma2) #+ 2*F12*sigma1*(sigma3+sigma2) + F2*sigma3
-    F += F66*(tau13**2+tau12**2) #F44*tau23**2
+    F = F.magnitude + F1.magnitude*sigma1.magnitude #+ 2*F12*sigma1*(sigma3+sigma2) + F2*sigma3
+    F = F + F66.magnitude*(tau13.magnitude**2+tau12.magnitude**2) #F44*tau23**2
     if F < 1:
         print("No failure occurs")
     else:

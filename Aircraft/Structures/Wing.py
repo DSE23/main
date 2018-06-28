@@ -439,3 +439,31 @@ centroidlength = Area_x_c/Area
 
 print(centroid)
 # print(ChSpar1)
+
+
+''''Calculate volume of the '''
+
+def Vol_wingbox(Spar1, Spar2, Chordlength):                            #Input deminsionless chordwise location of spar 1 and spar 2
+    n = 100 #number of sections
+    dx = ((Spar2-Spar1)/n)
+    x = Spar1
+    Area = 0
+    for i in range(n):
+        y = airfoilordinate(x)
+        Area = Area + y*dx*(Chordlength**2)
+        x = x + dx
+    Area = Area * 2                                 # Area of both sides of the airfoil
+    return Area
+
+nx = 30
+tankstop = Q_('1 m')
+z = Q_('0 m')
+Voltank = Q_('0 m**3')
+
+while z < tankstop:
+    Areatank = Vol_wingbox(Chord_loc_Spar(z, Spar1R, Spar1T), Chord_loc_Spar(z, Spar2R, Spar2T), length_chord(z))
+    section = tankstop/nx
+    Voltank = Voltank + Areatank * section
+    z = z + section
+print('Voltank', Voltank)
+
