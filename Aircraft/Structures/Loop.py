@@ -39,6 +39,9 @@ zarray = np.array([])
 Farray = np.array([])
 SSYarray = np.array([])
 SSXarray = np.array([])
+test = np.array([])
+test2 = np.array([])
+test3 = np.array([])
 
 z = 0
 while z <= b.magnitude:
@@ -49,6 +52,9 @@ while z <= b.magnitude:
     SSY =  Shear.tauyat2
     SSYarray = np.append(SSYarray, SSY)
     SSXarray = np.append(SSXarray, SSX)
+    test = np.append(test, Wing.Chordlength)
+    test2 = np.append(test, Wing.HSpar1)
+    test3 = np.append(test, Wing.HSpar2)
     F = Shear.F
     Farray = np.append(Farray, F)
     z *= Q_('m')
@@ -111,6 +117,7 @@ while z <= b.magnitude:
     importlib.reload(Wing)
     importlib.reload(Inertia)
     importlib.reload(WingStress)
+    importlib.reload(Shear)
 
 text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
 replacement_text = 'N_stringers = ' + str(Old_N_stringers)
