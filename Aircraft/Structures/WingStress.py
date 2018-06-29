@@ -163,11 +163,15 @@ def computeloads(z):
     D = D * fac_20G
     M = M * fac_20G
 
+    L_moment *= Q_('N*m')
+    D_moment *= Q_('N*m')
+
+
     return L, D, M, L_moment, D_moment, dL, dD, dM
 
 zs = b-3*Q_('m')
 
-L, D, M, L_moment, D_moment, dL, dD, dM = computeloads(zs)
+L, D, M, L_moment, D_moment, dL, dD, dM = computeloads(z)
 # print('L', L)
 # print('D', D)
 # print('M', M)
@@ -191,13 +195,20 @@ def Normal_stress_due_to_bending(x, y): # Normal stress due to bending
     inertia_term_1 = (Inertia.Iyy_wb*y*Wing.Chordlength-Inertia.Ixy_wb*x*Wing.Chordlength)/denominator_inertia_term
     inertia_term_2 = (Inertia.Ixx_wb*x*Wing.Chordlength-Inertia.Ixy_wb*y*Wing.Chordlength)/denominator_inertia_term
     sigma_zs = D_moment*inertia_term_1 + L_moment*inertia_term_2
+    print('L_moment:', L_moment)
+    print('D_moment:', D_moment)
     #print(D_moment)
     #print(L_moment)
     strain = sigma_zs /youngs_modulus
+    print('sigma_zs:', sigma_zs)
     return sigma_zs, strain #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
 
 NS = Normal_stress_due_to_bending(0.18, Wing.airfoilordinate(0.18))[0]
+print('L_moment:', L_moment)
+print('NS:', NS)
+print('z:', z)
+print('Wing.z:', Wing.z)
 # print('sigma_zs', Normal_stress_due_to_bending(0.15, Wing.airfoilordinate(Wing.c)))
 
 
@@ -448,4 +459,6 @@ data[18] = 'youngs_modulus = Q_(\"' + str(youngs_modulus) + '\")\n'
 # and write everything back
 with open('StrucVal.py', 'w') as file:
     file.writelines(data)
+
+print('L:', L)
 

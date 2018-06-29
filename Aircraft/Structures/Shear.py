@@ -91,6 +91,12 @@ def Calc_base_shear_flow(boom_areas, n):
         s1 = np.append(s1, s)
         # Lift
         q_loc_L += -(S_y/Ixx)*Wing.ThSpar1*y*ds
+        print('S_y:', S_y)
+        print('Ixx:', Ixx)
+        print('ThSpar1:', Wing.ThSpar1)
+        print('y:', y)
+        print('ds:', ds)
+        print('q_loc_L:', q_loc_L)
         qs12L = np.append(qs12L, q_loc_L.to(ureg("N/m")))
         # Drag
         q_loc_D += -(S_x/Iyy)*Wing.ThSpar1*x*ds
@@ -528,8 +534,8 @@ def Tsia_Wu(sigma_zs, tau_x, tau_y):
     tau23 = 0
     tau13 = tau_x
     F = F11 *sigma1**2#+F22*(sigma2**2+sigma3**2)+sigma2*sigma3*(2*F22-F44)
-    F = F.magnitude + F1.magnitude*sigma1.magnitude #+ 2*F12*sigma1*(sigma3+sigma2) + F2*sigma3
-    F = F + F66.magnitude*(tau13.magnitude**2+tau12.magnitude**2) #F44*tau23**2
+    F = F + F1*sigma1 #+ 2*F12*sigma1*(sigma3+sigma2) + F2*sigma3
+    F = F + F66*(tau13**2+tau12**2) #F44*tau23**2
     if F < 1:
         print("No failure occurs")
     else:
