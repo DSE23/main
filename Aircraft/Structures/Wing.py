@@ -341,15 +341,16 @@ def lookup_xy_from_perim(norm_interp_x, norm_interp_y, inv_interp_x, inv_interp_
         return (x_coor, y_coor)
 
 # start_x_perim = get_perim_from_x(0.9, inverse=True)
-# x_cs = np.array([])
-# y_cs = np.array([])
-# for per in np.arange(0.1, 0.89, 0.001):
-#     x_coord, y_coord = lookup_xy_from_perim(perim_interpolant_x, perim_interpolant_y, perim_interpolant_inv_x, perim_interpolant_inv_y, per, start_x_perim=start_x_perim, inverse=True)
-#     x_cs = np.append(x_cs, x_coord)
-#     y_cs = np.append(y_cs, y_coord)
-#
-# plt.plot(x_cs, y_cs)
-# plt.show()
+# # x_cs = np.array([])
+# # y_cs = np.array([])
+# # for per in np.arange(0.1, 0.89, 0.001):
+# #     x_coord, y_coord = lookup_xy_from_perim(perim_interpolant_x, perim_interpolant_y, perim_interpolant_inv_x, perim_interpolant_inv_y, per, start_x_perim=start_x_perim, inverse=True)
+# #     x_cs = np.append(x_cs, x_coord)
+# #     y_cs = np.append(y_cs, y_coord)
+# #
+# # plt.plot(x_cs, y_cs)
+# # plt.show()
+
 def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../Airfoil.dat"):
     """
     This function returns list of coordinate values where a stiffener is placed
