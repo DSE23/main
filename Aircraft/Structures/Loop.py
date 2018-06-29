@@ -161,23 +161,17 @@ print('debug:', len(zarray), len(Iyylist))
 fig = plt.figure()
 
 # linear
-plt.subplot(2, 3, 1)
+plt.subplot(2, 2, 1)
 plt.plot(zarray, Ixxlist)
 
-plt.subplot(2, 3, 2)
+plt.subplot(2, 2, 2)
 plt.plot(zarray, Farray)
 
-plt.subplot(2, 3, 3)
+plt.subplot(2, 2, 3)
 plt.plot(zarray, Lmomentlist)
 
-plt.subplot(2, 3, 4)
+plt.subplot(2, 2, 4)
 plt.plot(zarray, Normalstress)
-
-plt.subplot(2, 3, 5)
-plt.plot(zarray, Dmomentlist)
-
-plt.plot(2, 3, 6)
-plt.plot(zarray, Iyylist)
 
 plt.show()
 
