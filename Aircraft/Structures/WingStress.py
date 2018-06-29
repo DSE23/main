@@ -190,10 +190,9 @@ L, D, M, L_moment, D_moment, dL, dD, dM = computeloads(z)
 # plt.show()
 
 
-def Normal_stress_due_to_bending(x, y): # Normal stress due to bending
-    denominator_inertia_term = Inertia.Ixx_wb*Inertia.Iyy_wb-Inertia.Ixy_wb**2
-    inertia_term_1 = (Inertia.Iyy_wb*y*Wing.Chordlength-Inertia.Ixy_wb*x*Wing.Chordlength)/denominator_inertia_term
-    inertia_term_2 = (Inertia.Ixx_wb*x*Wing.Chordlength-Inertia.Ixy_wb*y*Wing.Chordlength)/denominator_inertia_term
+def Normal_stress_due_to_bending(x, y): #Enter relative position # Normal stress due to bending
+    inertia_term_1 = (y*Wing.Chordlength)/Inertia.Ixx_wb
+    inertia_term_2 = (x*Wing.Chordlength)/Inertia.Iyy_wb
     sigma_zs = D_moment*inertia_term_1 + L_moment*inertia_term_2
     print('L_moment:', L_moment)
     print('D_moment:', D_moment)
