@@ -33,78 +33,86 @@ Vol_mat_wing = Q_('0 m**3')
 Old_N_stringers = Wing.N_stringers
 
 Lmomentlist = np.array([])
+Dmomentlist = np.array([])
 Ixxlist = np.array([])
 Iyylist = np.array([])
 zarray = np.array([])
 Farray = np.array([])
+clist = np.array([])
+hlist = np.array([])
+c = 0
+while c < 1:
+    z = 0
+    while z <= b.magnitude:
+        NS, strain, inertia_term_1, inertia_term_2 = WingStress.Normal_stress_due_to_bending(0.18, Wing.airfoilordinate(0.18))
+        Normalstress = np.append(Normalstress, NS.magnitude)
+        zarray = np.append(zarray, z)
+        F = Shear.F
+        Farray = np.append(Farray, F)
+        z *= Q_('m')
+        L, D, M, L_moment, D_moment, dL, dD, dM = WingStress.computeloads(z)
+        print('L_moment', L_moment)
+        z = z.magnitude
+        '''Calculate all the subweights of the wing '''
+        Vol_mat_spar1 = Vol_mat_spar1 + Wing.AreaSpar1*(b/n)
+        Vol_mat_spar2 = Vol_mat_spar2 + Wing.AreaSpar2 * (b / n)
+        Vol_mat_skin = Vol_mat_skin + Wing.Area_Skin(Wing.ChSpar1, Wing.ChSpar2) * (b / n)
+        Vol_mat_string = Vol_mat_string + Wing.AreaStringers * (b / n)
+        Vol_mat_wing = Vol_mat_wing + Wing.Area * (b / n)
+        Lmomentlist = np.append(Lmomentlist, L_moment)
+        Dmomentlist = np.append(Dmomentlist, D_moment)
+        Ixxlist = np.append(Ixxlist, inertia_term_1)  #inertia_term_1
+        Iyylist = np.append(Iyylist, inertia_term_2)
+        Dist_between_spars = Wing.ChSpar2*Wing.Chordlength - Wing.ChSpar1*Wing.Chordlength
+        clist = np.append(clist, c*Wing.Chordlength)
+        hlist = np.append(hlist, Wing.airfoilordinate(c)*Wing.Chordlength)
+        print(L_moment, Dist_between_spars)
+        print(Wing.z, NS, Wing.N_stringers)
 
-z = 0
-while z <= b.magnitude:
-    NS = WingStress.Normal_stress_due_to_bending(0.18, Wing.airfoilordinate(0.18))[0]
-    Normalstress = np.append(Normalstress, NS.magnitude)
-    zarray = np.append(zarray, z)
-    F = Shear.F
-    Farray = np.append(Farray, F)
-    z *= Q_('m')
-    L_moment = WingStress.computeloads(z)[3]
-    print('L_moment', L_moment)
-    z = z.magnitude
-    '''Calculate all the subweights of the wing '''
-    Vol_mat_spar1 = Vol_mat_spar1 + Wing.AreaSpar1*(b/n)
-    Vol_mat_spar2 = Vol_mat_spar2 + Wing.AreaSpar2 * (b / n)
-    Vol_mat_skin = Vol_mat_skin + Wing.Area_Skin(Wing.ChSpar1, Wing.ChSpar2) * (b / n)
-    Vol_mat_string = Vol_mat_string + Wing.AreaStringers * (b / n)
-    Vol_mat_wing = Vol_mat_wing + Wing.Area * (b / n)
-    Lmomentlist = np.append(Lmomentlist, L_moment)
-    Ixxlist = np.append(Ixxlist, Inertia.Ixx_wb)
-    Iyylist = np.append(Iyylist, Inertia.Iyy_wb)
-    Dist_between_spars = Wing.ChSpar2*Wing.Chordlength - Wing.ChSpar1*Wing.Chordlength
-
-    print(L_moment, Dist_between_spars)
-    print(Wing.z, NS, Wing.N_stringers)
-
-    text_to_search = 'z = ' + str(z)
-    z = z + b.magnitude/n
-    replacement_text = 'z = ' + str(z)
-    with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
-        for line in file:
-            print(line.replace(text_to_search, replacement_text), end='')
-
-    if Geometry.Fuselage.b_f.magnitude < z < 1.4:
-        text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
-        New_N_stringers = 2
-        replacement_text = 'N_stringers = ' + str(New_N_stringers)
+        text_to_search = 'z = ' + str(z)
+        z = z + b.magnitude/n
+        replacement_text = 'z = ' + str(z)
         with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
             for line in file:
                 print(line.replace(text_to_search, replacement_text), end='')
 
-    if 1.4 < z < 3.0:
-        text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
-        New_N_stringers = 20
-        replacement_text = 'N_stringers = ' + str(New_N_stringers)
-        with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
-            for line in file:
-                print(line.replace(text_to_search, replacement_text), end='')
+        if Geometry.Fuselage.b_f.magnitude < z < 1.4:
+            text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
+            New_N_stringers = 2
+            replacement_text = 'N_stringers = ' + str(New_N_stringers)
+            with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
+                for line in file:
+                    print(line.replace(text_to_search, replacement_text), end='')
 
-    if 3.0 < z < 3.5:
-        text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
-        New_N_stringers = 2
-        replacement_text = 'N_stringers = ' + str(New_N_stringers)
-        with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
-            for line in file:
-                print(line.replace(text_to_search, replacement_text), end='')
+        if 1.4 < z < 3.0:
+            text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
+            New_N_stringers = 2
+            replacement_text = 'N_stringers = ' + str(New_N_stringers)
+            with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
+                for line in file:
+                    print(line.replace(text_to_search, replacement_text), end='')
 
-    if z > 3.5:
-        text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
-        New_N_stringers = 2
-        replacement_text = 'N_stringers = ' + str(New_N_stringers)
-        with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
-            for line in file:
-                print(line.replace(text_to_search, replacement_text), end='')
+        if 3.0 < z < 3.5:
+            text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
+            New_N_stringers = 2
+            replacement_text = 'N_stringers = ' + str(New_N_stringers)
+            with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
+                for line in file:
+                    print(line.replace(text_to_search, replacement_text), end='')
 
-    importlib.reload(Wing)
-    importlib.reload(Inertia)
-    importlib.reload(WingStress)
+        if z > 3.5:
+            text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
+            New_N_stringers = 2
+            replacement_text = 'N_stringers = ' + str(New_N_stringers)
+            with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
+                for line in file:
+                    print(line.replace(text_to_search, replacement_text), end='')
+
+        importlib.reload(Wing)
+        importlib.reload(Inertia)
+        importlib.reload(WingStress)
+        importlib.reload(Shear)
+    c = c + 0.1
 
 text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
 replacement_text = 'N_stringers = ' + str(Old_N_stringers)
@@ -153,17 +161,23 @@ print('debug:', len(zarray), len(Iyylist))
 fig = plt.figure()
 
 # linear
-plt.subplot(2, 2, 1)
+plt.subplot(2, 3, 1)
 plt.plot(zarray, Ixxlist)
 
-plt.subplot(2, 2, 2)
+plt.subplot(2, 3, 2)
 plt.plot(zarray, Farray)
 
-plt.subplot(2, 2, 3)
+plt.subplot(2, 3, 3)
 plt.plot(zarray, Lmomentlist)
 
-plt.subplot(2, 2, 4)
+plt.subplot(2, 3, 4)
 plt.plot(zarray, Normalstress)
+
+plt.subplot(2, 3, 5)
+plt.plot(zarray, Dmomentlist)
+
+plt.plot(2, 3, 6)
+plt.plot(zarray, Iyylist)
 
 plt.show()
 
