@@ -7,8 +7,8 @@ from Misc import ureg, Q_ # Imports the unit registry fron the Misc folder
 Weightspar1 = Q_("3.0474860824744816 kilogram")
 Weightspar2 = Q_("1.343239364463247 kilogram")
 Weightskin = Q_("18.734948285251978 kilogram")
-Weightstring = Q_("2.474498186657555 kilogram")
-Weightwing = Q_("38.01026920755535 kilogram")
+Weightstring = Q_("1.9442485752309355 kilogram")
+Weightwing = Q_("37.480019596128734 kilogram")
 
 
 
