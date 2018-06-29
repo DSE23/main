@@ -122,10 +122,11 @@ def Calc_base_shear_flow(boom_areas, n):
     s2 = np.array([])
     s2 = np.append(s2, s)
     str_counter = 0
+    start_x_perim = Wing.get_perim_from_x(Wing.ChSpar1)
     for _ in range(n):
         s = np.add(ds, s)
         s2 = np.append(s2, s)
-        x_coor, y_coor = Wing.get_xy_from_perim(s/Wing.Chordlength, Wing.ChSpar1) # RELATIVE!!
+        x_coor, y_coor = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s / Wing.Chordlength, start_x_perim=start_x_perim) # RELATIVE!!
         # Lift
         q_loc_L += -(S_y/Ixx)*(Wing.ThSkin*y_coor*Wing.Chordlength*ds)
 
@@ -171,10 +172,11 @@ def Calc_base_shear_flow(boom_areas, n):
     qs56D = np.append(qs56D, qs35D[-1])
     s4 = np.array([])
     s4 = np.append(s4, s)
+    start_x_perim = Wing.get_perim_from_x(Wing.ChSpar2, inverse=True)
     for _ in range(n):
         s = np.add(ds, s)
         s4 = np.append(s4, s)
-        x_coor, y_coor = Wing.get_xy_from_perim(s / Wing.Chordlength, Wing.ChSpar2, reverse=True)  # RELATIVE!!
+        x_coor, y_coor = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s / Wing.Chordlength, start_x_perim=start_x_perim, inverse=True)  # RELATIVE!!
         # Lift
         q_loc_L += -(S_y / Ixx) * (Wing.ThSkin * y_coor * Wing.Chordlength * ds)
 
@@ -309,13 +311,13 @@ def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs6
         Moment_L += F_y * x_loc
 
     # Moments from section 2 -> 3
-
+    start_x_perim = Wing.get_perim_from_x(Wing.ChSpar1)
     for i in range(0, len(qs23L)-1):
         q_loc = (qs23L[i] + qs23L[i + 1]) / 2
         s_loc = (s2[i] + s2[i + 1]) / 2
         ds = s2[i + 1] - s2[i]
-        x_loc_1, y_loc_1 = Wing.get_xy_from_perim(s2[i]/Wing.Chordlength, Wing.ChSpar1)
-        x_loc_2, y_loc_2 = Wing.get_xy_from_perim(s2[i+1]/Wing.Chordlength, Wing.ChSpar1)
+        x_loc_1, y_loc_1 = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s2[i] / Wing.Chordlength, start_x_perim=start_x_perim)
+        x_loc_2, y_loc_2 = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s2[i+1] / Wing.Chordlength, start_x_perim=start_x_perim)
         x_loc_1 *= Wing.Chordlength
 
         x_loc_2 *= Wing.Chordlength
@@ -345,12 +347,13 @@ def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs6
 
     # Moments from section 5 -> 6
 
+    start_x_perim = Wing.get_perim_from_x(Wing.ChSpar2, inverse=True)
     for i in range(0, len(qs56L)-1):
         q_loc = (qs56L[i] + qs56L[i + 1]) / 2
         s_loc = (s4[i] + s4[i + 1]) / 2
         ds = s4[i + 1] - s4[i]
-        x_loc_1, y_loc_1 = Wing.get_xy_from_perim(s4[i] / Wing.Chordlength, Wing.ChSpar2, reverse=True)
-        x_loc_2, y_loc_2 = Wing.get_xy_from_perim(s4[i + 1] / Wing.Chordlength, Wing.ChSpar2, reverse=True)
+        x_loc_1, y_loc_1 = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s4[i] / Wing.Chordlength, start_x_perim=start_x_perim, inverse=True)
+        x_loc_2, y_loc_2 = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s4[i+1] / Wing.Chordlength, start_x_perim=start_x_perim, inverse=True)
         x_loc_1 *= Wing.Chordlength
         x_loc_1 -= x_coor_AC
         x_loc_2 *= Wing.Chordlength
@@ -377,10 +380,6 @@ def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs6
 
         F_y = q_loc * ds
         Moment_L += F_y * x_loc
-
-
-
-
     return Moment_L
 
 
@@ -440,9 +439,10 @@ def Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61):
     # Moments from section 2 -> 3
     t_xs23 = np.array([])
     t_ys23 = np.array([])
+    start_x_perim = Wing.get_perim_from_x(Wing.ChSpar1)
     for i in range(0, len(qs23)-1):
-        x_loc_1, y_loc_1 = Wing.get_xy_from_perim(s2[i]/Wing.Chordlength, Wing.ChSpar1)
-        x_loc_2, y_loc_2 = Wing.get_xy_from_perim(s2[i+1]/Wing.Chordlength, Wing.ChSpar1)
+        x_loc_1, y_loc_1 = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s2[i] / Wing.Chordlength, start_x_perim=start_x_perim)
+        x_loc_2, y_loc_2 = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s2[i+1] / Wing.Chordlength, start_x_perim=start_x_perim)
         x_loc_1 *= Wing.Chordlength
         x_loc_2 *= Wing.Chordlength
         y_loc_1 *= Wing.Chordlength
@@ -470,9 +470,10 @@ def Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61):
     # Moments from section 5 -> 6
     t_xs56 = np.array([])
     t_ys56 = np.array([])
+    start_x_perim = Wing.get_perim_from_x(Wing.ChSpar2, inverse=True)
     for i in range(0, len(qs56)-1):
-        x_loc_1, y_loc_1 = Wing.get_xy_from_perim(s4[i] / Wing.Chordlength, Wing.ChSpar2, reverse=True)
-        x_loc_2, y_loc_2 = Wing.get_xy_from_perim(s4[i + 1] / Wing.Chordlength, Wing.ChSpar2, reverse=True)
+        x_loc_1, y_loc_1 = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s4[i] / Wing.Chordlength, start_x_perim=start_x_perim, inverse=True)
+        x_loc_2, y_loc_2 = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s4[i+1] / Wing.Chordlength, start_x_perim=start_x_perim, inverse=True)
         x_loc_1 *= Wing.Chordlength
         x_loc_1 -= x_coor_AC
         x_loc_2 *= Wing.Chordlength
