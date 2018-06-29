@@ -112,6 +112,21 @@ airfoilinterpolant = sp.interpolate.interp1d(
     airfoilcoordinates[0:int(numberofcoordinates/2)+1,0],
     airfoilcoordinates[0:int(numberofcoordinates/2)+1,1],kind = 'cubic') #Interpolate
 
+perim_coords = np.genfromtxt("get_xy_from_perim.dat", skip_header=1)
+perims = perim_coords[:,0]
+x_cs = perim_coords[:,1]
+y_cs = perim_coords[:,2]
+perim_interpolant_x = sp.interpolate.interp1d(perims, x_cs, kind='cubic')
+perim_interpolant_y = sp.interpolate.interp1d(perims, y_cs, kind='cubic')
+
+perim_coords = np.genfromtxt("get_xy_from_perim_inv.dat", skip_header=1)
+perims = perim_coords[:,0]
+x_cs = perim_coords[:,1]
+y_cs = perim_coords[:,2]
+perim_interpolant_inv_x = sp.interpolate.interp1d(perims, x_cs, kind='cubic')
+perim_interpolant_inv_y = sp.interpolate.interp1d(perims, y_cs, kind='cubic')
+#print("xc=", perim_interpolant_inv_x(0.31415926535897932384626), perim_interpolant_inv_y(0.31415926535897932384626))
+
 # Find the ordinate of the airfoil at an arbitrary position x, with 0 =< x =< 1
 def airfoilordinate(x):
     return airfoilinterpolant(x)
@@ -275,7 +290,15 @@ def get_xy_from_perim(perim_val, start_x=0, reverse=False):
 
         return (x_coord, -y_coord)
 
-def get_perim_from_x(x_coor, dat_file_name="../Airfoil.dat"):
+#tot_coords = np.array([0,0,0])
+#for perim in np.arange(0,1,0.001):
+#    x_coord, y_coord = get_xy_from_perim(perim, start_x=1, reverse=True)
+#    coords = np.array([perim, x_coord, y_coord])
+#    print(coords)
+#    tot_coords = np.vstack((tot_coords, coords))
+#np.savetxt("get_xy_from_perim_inv.dat", tot_coords, header="# XY coordinates calculated for a certain perimeters [dimensionless perim, dimensionless x_c, dimesnionless y_c]")
+
+def get_perim_from_x(x_coor, inverse=False, dat_file_name="../Airfoil.dat"):
     """
     This function returns the perimeter value from the LE until the specified x-coordinate
 
@@ -296,12 +319,37 @@ def get_perim_from_x(x_coor, dat_file_name="../Airfoil.dat"):
     step = 0.0001  # Step size for algorithm: increase will lead to faster computing times
     # but lower accuracy
     # This for loop calculates the perimiter until the specified x-coordinate
-    for x_c in np.arange(0.0, x_coor, step):
-        perim += np.sqrt((step) ** 2 + (p(x_c + step) - p(x_c)) ** 2)
+    if inverse == False:
+        for x_c in np.arange(0.0, x_coor, step):
+            perim += np.sqrt((step) ** 2 + (p(x_c + step) - p(x_c)) ** 2)
+    else:
+        step *= -1
+        for x_c in np.arange(1, x_coor, step):
+            perim += np.sqrt((step) ** 2 + (p(x_c + step) - p(x_c)) ** 2)
 
     return perim
 
+def lookup_xy_from_perim(norm_interp_x, norm_interp_y, inv_interp_x, inv_interp_y, perim, start_x_perim=0, inverse=False):
+    if inverse == False:
+        x_coor = norm_interp_x(perim+start_x_perim)
+        y_coor = norm_interp_y(perim+start_x_perim)
+        return (x_coor, y_coor)
 
+    else:
+        x_coor = inv_interp_x(perim+start_x_perim)
+        y_coor = inv_interp_y(perim+start_x_perim)
+        return (x_coor, y_coor)
+
+# start_x_perim = get_perim_from_x(0.9, inverse=True)
+# x_cs = np.array([])
+# y_cs = np.array([])
+# for per in np.arange(0.1, 0.89, 0.001):
+#     x_coord, y_coord = lookup_xy_from_perim(perim_interpolant_x, perim_interpolant_y, perim_interpolant_inv_x, perim_interpolant_inv_y, per, start_x_perim=start_x_perim, inverse=True)
+#     x_cs = np.append(x_cs, x_coord)
+#     y_cs = np.append(y_cs, y_coord)
+#
+# plt.plot(x_cs, y_cs)
+# plt.show()
 def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../Airfoil.dat"):
     """
     This function returns list of coordinate values where a stiffener is placed
