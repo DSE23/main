@@ -47,6 +47,7 @@ while z <= b.magnitude:
     Farray = np.append(Farray, F)
     z *= Q_('m')
     L_moment = WingStress.computeloads(z)[3]
+    print('L_moment', L_moment)
     z = z.magnitude
     '''Calculate all the subweights of the wing '''
     Vol_mat_spar1 = Vol_mat_spar1 + Wing.AreaSpar1*(b/n)
@@ -156,7 +157,7 @@ plt.subplot(2, 2, 1)
 plt.plot(zarray, Ixxlist)
 
 plt.subplot(2, 2, 2)
-plt.plot(zarray, Iyylist)
+plt.plot(zarray, Farray)
 
 plt.subplot(2, 2, 3)
 plt.plot(zarray, Lmomentlist)

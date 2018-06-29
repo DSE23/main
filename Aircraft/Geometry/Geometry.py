@@ -144,6 +144,7 @@ class Masses(object):                    # !!!Structures should watch this!!!
     W_fuel = Q_("57 kg")                # [kg] Mass of fuel
     W_MTOW = W_OEW + W_pilot + W_fuel
 
+
 class CG(object):
     # Locations in here are referencd to the nose in x and the crankshaft of the
     # engine in z, unless stated otherwise, For Z downward == positive, for x

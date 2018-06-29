@@ -120,7 +120,7 @@ def fuselage_calc(x):
     My_sec2.ito(ureg('N * m'))
     Mx_sec2 = (b_VT * 0.33) * L_VT
     Mx_sec2.ito(ureg('N * m'))
-    Mz_sec2 = (l_fus - x) * L_HT - (b_VT * 0.33) * D_VT
+    Mz_sec2 = -(l_fus - x) * L_HT - (b_VT * 0.33) * D_VT
     Mz_sec2.ito(ureg('N * m'))
 
     #Bending Loading section 3
@@ -181,7 +181,7 @@ def fuselage_calc(x):
     q_34_cor = (b_f80 * q_12) / b_f80
     q_23_cor = (b_f80 * q_34_cor) / b_f80
     q_14_cor = (b_f80 * q_23_cor) / b_f80
-
+    print(q_34_cor, q_23_cor, q_14_cor)
     q_34 = q_12 + -q_34_cor
     q_23 = q_12 + q_23_cor
     q_14 = q_12 + q_14_cor

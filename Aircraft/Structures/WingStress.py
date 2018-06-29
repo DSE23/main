@@ -167,7 +167,7 @@ def computeloads(z):
 
 zs = b-3*Q_('m')
 
-#L, D, M, L_moment, D_moment, dL, dD, dM = computeloads(zs)
+L, D, M, L_moment, D_moment, dL, dD, dM = computeloads(zs)
 # print('L', L)
 # print('D', D)
 # print('M', M)
