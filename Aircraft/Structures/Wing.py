@@ -34,8 +34,8 @@ ThSpar1 = Q_('0.002 m')         #Thickness of Spar 1
 ThSpar2 = Q_('0.002 m')        #Thickness of Spar 2
 ThSkin = Q_('0.0018 m')         #Thickness of the skin
 N_stringers = 2                 #Number of stringers
-ClampH = Q_('0.03 m')           #height of the clamps at the top of the spars
-ClampW = Q_('0.03 m')           #width of the clamps at the top of the spars
+ClampH = Q_('0.01 m')           #height of the clamps at the top of the spars
+ClampW = Q_('0.01 m')           #width of the clamps at the top of the spars
 
 
 ##Stringers                     # C stringer dimentions

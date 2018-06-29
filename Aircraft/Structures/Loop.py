@@ -80,7 +80,7 @@ while z <= b.magnitude:
 
     if 1.4 < z < 3.0:
         text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
-        New_N_stringers = 2
+        New_N_stringers = 20
         replacement_text = 'N_stringers = ' + str(New_N_stringers)
         with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
             for line in file:

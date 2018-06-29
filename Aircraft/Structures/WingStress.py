@@ -148,6 +148,7 @@ def computeloads(z):
 
     '''For the 20G manoeuver'''
     MTOW = Geometry.Masses.W_MTOW
+    print('MTOW', MTOW)
     Max_20G_N = MTOW * 9.81 * 20
     Tot_L = 2 * totallift
     if Tot_L.magnitude > 0.:
@@ -158,11 +159,12 @@ def computeloads(z):
 
     L_moment = L_moment * fac_20G
     D_moment = D_moment * fac_20G
-
+    print('L', L)
+    print('fac20', fac_20G)
     L = L * fac_20G
     D = D * fac_20G
     M = M * fac_20G
-
+    print('L', L)
     L_moment *= Q_('N*m')
     D_moment *= Q_('N*m')
 
@@ -194,7 +196,9 @@ def Normal_stress_due_to_bending(x, y): # Normal stress due to bending
     denominator_inertia_term = Inertia.Ixx_wb*Inertia.Iyy_wb-Inertia.Ixy_wb**2
     inertia_term_1 = (Inertia.Iyy_wb*y*Wing.Chordlength-Inertia.Ixy_wb*x*Wing.Chordlength)/denominator_inertia_term
     inertia_term_2 = (Inertia.Ixx_wb*x*Wing.Chordlength-Inertia.Ixy_wb*y*Wing.Chordlength)/denominator_inertia_term
+    print('inertia')
     sigma_zs = D_moment*inertia_term_1 + L_moment*inertia_term_2
+    print('')
     print('L_moment:', L_moment)
     print('D_moment:', D_moment)
     #print(D_moment)
