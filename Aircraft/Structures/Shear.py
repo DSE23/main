@@ -513,7 +513,8 @@ def Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61):
 
 tau23X, tau56X, tau12Y, tau23Y, tau35Y, tau56Y, tau61Y = Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61)
 
-
+tauxat2 = tau23X[0]
+tauyat2 = tau23Y[0]
 
 #Tsia-Wu Failure criterion
 def Tsia_Wu(sigma_zs, tau_x, tau_y):
@@ -543,7 +544,7 @@ def Tsia_Wu(sigma_zs, tau_x, tau_y):
         print("Failure occurs")
     return F
 
-F = Tsia_Wu(WingStress.NS, tau23X[0], tau23Y[0])
+F = Tsia_Wu(WingStress.NS, tauxat2, tauyat2)
 print("F =", F)
 
 #plt.plot(s3, qs3)
