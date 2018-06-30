@@ -32,10 +32,10 @@ Spar1T = 0.18                   #Chordwise location of first spar at the tip
 ChordR = Geometry.Wing.c_r      #Length of root (m)
 ThSpar1 = Q_('0.002 m')         #Thickness of Spar 1
 ThSpar2 = Q_('0.002 m')        #Thickness of Spar 2
-ThSkin = Q_('0.0018 m')         #Thickness of the skin
+ThSkin = Q_('0.0045 m')         #Thickness of the skin
 N_stringers = 2                 #Number of stringers
-ClampH = Q_('0.03 m')           #height of the clamps at the top of the spars
-ClampW = Q_('0.03 m')           #width of the clamps at the top of the spars
+ClampH = Q_('0.01 m')           #height of the clamps at the top of the spars
+ClampW = Q_('0.01 m')           #width of the clamps at the top of the spars
 
 
 ##Stringers                     # C stringer dimentions
@@ -46,7 +46,7 @@ t_str = Q_('0.003 m')            #thickness of the stringer
 
 z = 4.017773014992261                        #spanwise posotion in meters
 z *= Q_('meter')
-c = 0                                               #Chord wise postion in ratio
+c = 0.18                                              #Chord wise postion in ratio
 
 # ## VERTICAL TAIL
 # 
