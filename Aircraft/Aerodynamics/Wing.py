@@ -127,7 +127,7 @@ def computeloadsht():
     M = 0.3128
     flapchordlength = 0.5
     maximumdeflectionangle = 25
-    command_file = open("commands.in", "w")
+    command_file = open("commands2.in", "w")
     command_file.write('load ' + "../" + Datafile + ".dat\n\
     panel\n\
     panel\n\
@@ -157,7 +157,7 @@ def computeloadsht():
     quit\n")
     command_file.close()
 
-    run_xfoil_command = '..\\xfoil < ' + 'commands.in'
+    run_xfoil_command = '..\\xfoil < ' + 'commands2.in'
     subprocess.call(run_xfoil_command, stdout=FNULL, shell = True)
 
     data = np.genfromtxt(Datafile+'_results.dat',skip_header=12)
@@ -234,7 +234,7 @@ def computeloadsvt():
     M = 0.3128
     flapchordlength = 0.5
     maximumdeflectionangle = 25
-    command_file = open("commands.in", "w")
+    command_file = open("commands1.in", "w")
     command_file.write('load ' + "../" + Datafile + ".dat\n\
     panel\n\
     panel\n\
@@ -264,7 +264,7 @@ def computeloadsvt():
     quit\n")
     command_file.close()
 
-    run_xfoil_command = '..\\xfoil < ' + 'commands.in'
+    run_xfoil_command = '..\\xfoil < ' + 'commands1.in'
     subprocess.call(run_xfoil_command, stdout=FNULL, shell = True)
 
     data = np.genfromtxt(Datafile+'_results.dat',skip_header=12)

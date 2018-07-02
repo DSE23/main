@@ -24,7 +24,7 @@ from Misc import ureg, Q_ # Imports the unit registry from the Misc folder
 b_f = Geometry.Fuselage.b_f                   #diameter of fuselage at the fire wall
 b_f80 = b_f*0.8                               #design radius
 print('b_f80', b_f80)
-t = Q_('0.002 m')                             #thickness of fuselage skin
+t = Q_('0.0025 m')                             #thickness of fuselage skin
 t_ribs = Q_('0.002 m')                          #thickness of the ribs
 h_ribs = Q_('0.05 m')                           #the height of the ribs
 s_ribs = Q_('0.5 m')                            #rib spacing
@@ -32,7 +32,7 @@ moter_w = Q_('180 kg')                          #Resultant weight of the motor
 g = Q_('9.81 m / s**2')                         #The gravity acceleration
 l_fus = Geometry.Fuselage.l_f                   #length of the fuselage in m
 print('l_fus', l_fus)
-l_sec1 = Q_('1.0 m')                          #length of section 1 (normal)
+l_sec1 = Q_('1.5 m')                          #length of section 1 (normal)
 l_sec2 = Q_('1.0 m')                          #length of section 2 (cut out)
 l_sec3 = l_fus - l_sec1 - l_sec2               #length of section 3 (taper)
 print('l_sec3', l_sec3)
@@ -64,11 +64,11 @@ B_sec2 = t * (b_f80 / 2) / 2 + t * (b_f80 / 2) / 2
 
 
 def B_calc(x):
-    if Q_('0 m') <= x <= l_sec1 + l_sec2:
+    if x <= l_sec1 + l_sec2:
         b_f_taper = b_f80
         B_sec3 = B_sec1
 
-    if l_sec1 + l_sec2 < x <= l_fus:
+    if x > l_sec1 + l_sec2:
         b_f_taper = b_f80 - ((b_f80 / (l_sec3 + l_sec2)) * (x - l_sec2 - l_sec1))
         B_sec3 = t * (b_f_taper / 2) / 2 + t * (b_f_taper / 2) / 2
 
@@ -320,7 +320,8 @@ def Tsai_Wu(sigma_x, shear_x):
 '''-----------------------------Loop calcualtions----------------------------------'''
 
 x = 0
-n = 10                  #number of sections
+n = 20                  #number of sections
+ns = 4
 x *= Q_('m')
 sigmalist = np.array([])
 shearlist = np.array([])
@@ -331,28 +332,114 @@ z_pos = np.array([])
 Vol = Q_('0 m**3')
 y = -B_calc(x)[1]
 z = -B_calc(x)[1]
+print('--------------', l_fus)
 
-while x < l_fus:
-    while -B_calc(x)[1] <= y <= B_calc(x)[1]:
-        while -B_calc(x)[1] <= z <= B_calc(x)[1]:
-            sigma_x, shear_x, Area, Area_ribs = fuselage_calc(x, y, z)
-            F = Tsai_Wu(sigma_x, shear_x)
-            sigmalist = np.append(sigmalist, sigma_x)
-            shearlist = np.append(shearlist, shear_x)
-            print('F', F)
-            Flist = np.append(Flist, F.magnitude)
-            x_pos = np.append(x_pos, x)
-            y_pos = np.append(y_pos, y)
-            z_pos = np.append(z_pos, z)
-            Vol = Vol + Area * (l_fus/n)
-            print(sigma_x, shear_x)
-            print('x, y, z', x, y, z)
-            Vol_rib = Area_ribs * t_ribs
-            N_ribs = float(int(l_fus / s_ribs))
-            Vol_ribs = Vol_rib * N_ribs
+while x <= l_fus:
+    print('next loop')
+    print('x = ', x, 'l_fus =', l_fus)
+    print('y = ', y)
+    print('B_calc = ', B_calc(x)[1])
+    y = - B_calc(x)[1]
+    z = - B_calc(x)[1]
+    while z <= B_calc(x)[1] - (B_calc(x)[1]/ns):
+        print('1 x, y, z:', x, y, z)
+        sigma_x, shear_x, Area, Area_ribs = fuselage_calc(x, y, z)
+        F = Tsai_Wu(sigma_x, shear_x)
+        sigmalist = np.append(sigmalist, sigma_x)
+        shearlist = np.append(shearlist, shear_x)
+        print('F', F)
+        Flist = np.append(Flist, F.magnitude)
+        x_pos = np.append(x_pos, x)
+        y_pos = np.append(y_pos, y)
+        z_pos = np.append(z_pos, z)
+        # Vol = Vol + Area * (l_fus/n)
+        print(sigma_x, shear_x)
+        print('x, y, z', x, y, z)
+        # Vol_rib = Area_ribs * t_ribs
+        # N_ribs = float(int(l_fus / s_ribs))
+        # Vol_ribs = Vol_rib * N_ribs
+        z = z + (B_calc(x)[1] / ns)
+    while y <= B_calc(x)[1] - (B_calc(x)[1]/ns):
+        print('2 x, y, z:', x, y, z)
+        sigma_x, shear_x, Area, Area_ribs = fuselage_calc(x, y, z)
+        F = Tsai_Wu(sigma_x, shear_x)
+        if l_sec1 < x < l_sec1 + l_sec2:
+            if -B_calc(x)[1]+Q_('0.05 m') < y < B_calc(x)[1] - Q_('0.05 m'):
+                sigma_x = Q_('0 Pa')
+                F = Q_('0 dimensionless')
+        sigmalist = np.append(sigmalist, sigma_x)
+        shearlist = np.append(shearlist, shear_x)
+        print('F', F)
+        Flist = np.append(Flist, F.magnitude)
+        x_pos = np.append(x_pos, x)
+        y_pos = np.append(y_pos, y)
+        z_pos = np.append(z_pos, z)
+        # Vol = Vol + Area * (l_fus/n)
+        print(sigma_x, shear_x)
+        print('x, y, z', x, y, z)
+        # Vol_rib = Area_ribs * t_ribs
+        # N_ribs = float(int(l_fus / s_ribs))
+        # Vol_ribs = Vol_rib * N_ribs
+        y = y + (B_calc(x)[1] / ns)
+    while z >= -B_calc(x)[1] + (B_calc(x)[1]/ns):
+        print('3 x, y, z:', x, y, z)
+        sigma_x, shear_x, Area, Area_ribs = fuselage_calc(x, y, z)
+        F = Tsai_Wu(sigma_x, shear_x)
+        sigmalist = np.append(sigmalist, sigma_x)
+        shearlist = np.append(shearlist, shear_x)
+        print('F', F)
+        Flist = np.append(Flist, F.magnitude)
+        x_pos = np.append(x_pos, x)
+        y_pos = np.append(y_pos, y)
+        z_pos = np.append(z_pos, z)
+        # Vol = Vol + Area * (l_fus/n)
+        print(sigma_x, shear_x)
+        print('x, y, z', x, y, z)
+        # Vol_rib = Area_ribs * t_ribs
+        # N_ribs = float(int(l_fus / s_ribs))
+        # Vol_ribs = Vol_rib * N_ribs
+        z = z - (B_calc(x)[1] / ns)
+    while y >= -B_calc(x)[1] + (B_calc(x)[1]/ns):
+        print('4 x,y,z:', x, y, z)
+        sigma_x, shear_x, Area, Area_ribs = fuselage_calc(x, y, z)
+        F = Tsai_Wu(sigma_x, shear_x)
+        sigmalist = np.append(sigmalist, sigma_x)
+        shearlist = np.append(shearlist, shear_x)
+        print('F', F)
+        Flist = np.append(Flist, F.magnitude)
+        x_pos = np.append(x_pos, x)
+        y_pos = np.append(y_pos, y)
+        z_pos = np.append(z_pos, z)
+        # Vol = Vol + Area * (l_fus/n)
+        print(sigma_x, shear_x)
+        print('x, y, z', x, y, z)
+        # Vol_rib = Area_ribs * t_ribs
+        # N_ribs = float(int(l_fus / s_ribs))
+        # Vol_ribs = Vol_rib * N_ribs
+        y = y - (B_calc(x)[1] / ns)
 
-            z = z + (B_calc(x)[1] / 4)
-        y = y + (B_calc(x)[1] / 4)
+    # while -B_calc(x - (l_fus/n))[1] <= y <= B_calc(x - +(l_fus/n))[1]:
+    #     print('next loop')
+    #     while -B_calc(x-(l_fus/n))[1] <= z <= B_calc(x-(l_fus/n))[1]:
+    #         sigma_x, shear_x, Area, Area_ribs = fuselage_calc(x, y, z)
+    #         F = Tsai_Wu(sigma_x, shear_x)
+    #         sigmalist = np.append(sigmalist, sigma_x)
+    #         shearlist = np.append(shearlist, shear_x)
+    #         print('F', F)
+    #         Flist = np.append(Flist, F.magnitude)
+    #         x_pos = np.append(x_pos, x)
+    #         y_pos = np.append(y_pos, y)
+    #         z_pos = np.append(z_pos, z)
+    #         # Vol = Vol + Area * (l_fus/n)
+    #         print(sigma_x, shear_x)
+    #         print('x, y, z', x, y, z)
+    #         # Vol_rib = Area_ribs * t_ribs
+    #         # N_ribs = float(int(l_fus / s_ribs))
+    #         # Vol_ribs = Vol_rib * N_ribs
+    #         z = z + (B_calc(x)[1] / 1)
+    #     z = -B_calc(x)[1]
+    #     y = y + (B_calc(x)[1] / 1)
+    # y = -B_calc(x+(l_fus/n))[1]
     x = x + (l_fus / n)
 
 Mass = Vol * density
@@ -363,8 +450,9 @@ F = Flist
 x = x_pos
 y = y_pos
 z = z_pos
+s = sigmalist
 
-cm = plt.get_cmap('plasma_r')
+cm = plt.get_cmap('rainbow')
 if min(F) >= max(F):
     cNorm = matplotlib.colors.Normalize(vmin=min(F), vmax=max(F))
 if min(F) < max(F):
@@ -377,6 +465,18 @@ scalarMap.set_array(F)
 fig.colorbar(scalarMap)
 plt.show()
 
+cm = plt.get_cmap('rainbow')
+if min(s) >= max(s):
+    cNorm = matplotlib.colors.Normalize(vmin=min(s), vmax=max(s))
+if min(s) < max(s):
+    cNorm = matplotlib.colors.Normalize(vmin=min(s), vmax=max(s))
+scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cm)
+fig = plt.figure()
+ax = Axes3D(fig)
+ax.scatter(x, y, z, c=scalarMap.to_rgba(s))
+scalarMap.set_array(s)
+fig.colorbar(scalarMap)
+plt.show()
 
 plt.plot(x_pos, Flist)
 plt.show()
