@@ -467,7 +467,7 @@ def Area_cell(ChSpar2, ChSpar1):
         area_cell = area_cell*2
     return area_cell
 
-area_cell = Area_cell(ChSpar2, ChSpar1)
+
 skin_length = length_Skin_x_c(ChSpar1, ChSpar2) # skin length of top part of airfoil (dimensionless)
 
 x_y_angle_coords, perim_spacing = get_coord_from_perim(N_stringers/2, ChSpar1, ChSpar2, Chordlength)
@@ -492,7 +492,7 @@ print(centroid)
 # ''''Calculate volume of the '''
 #
 def Vol_wingbox(Spar1, Spar2, Chordlength):                            #Input deminsionless chordwise location of spar 1 and spar 2
-    n = 100 #number of sections
+    n = 100 #number ofa sections
     dx = ((Spar2-Spar1)/n)
     x = Spar1
     Area = 0
@@ -501,6 +501,8 @@ def Vol_wingbox(Spar1, Spar2, Chordlength):                            #Input de
         Area = Area + y*dx*(Chordlength**2)
         x = x + dx                                 # Area of both sides of the airfoil
     return Area
+
+area_cell = Vol_wingbox(ChSpar1, ChSpar2, Chordlength)
 #
 # nx = 30
 # tankstop = Q_('1 m')

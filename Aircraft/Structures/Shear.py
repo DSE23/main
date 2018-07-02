@@ -286,7 +286,7 @@ qs0_L, qs0_D = Correcting_shearflow_array(n, qs0L, qs0D)
 # Add Moment shear flow to base shear flows
 
 def Moment_shearflow(n):
-    qmoment = WingStress.M/(2*Wing.Area_cell())
+    qmoment = WingStress.M/(2*Wing.area_cell)
     q_moment = np.array([])
     for _ in range(n+1):
         q_moment = np.append(q_moment, qmoment)
