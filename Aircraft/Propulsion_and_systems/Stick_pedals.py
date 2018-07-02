@@ -56,7 +56,7 @@ l_s_b = l_s_t - l_s  # DUMMY
 d_p = Q_("20 cm")  # DUMMY
 
 # Stick deflection in handle (pitch)
-d_e = Q_("0.1205 m")
+d_e = Q_("0.1868 m")
 
 # Stick deflection in handle (roll)
-d_r = Q_("0.129 m")
+d_r = Q_("0.393 m")
