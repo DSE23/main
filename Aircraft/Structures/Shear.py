@@ -11,6 +11,7 @@ from Structures import Wing
 from Structures import Inertia
 import numpy as np
 from matplotlib import pyplot as plt
+from scipy import interpolate
 
 
 
@@ -91,6 +92,12 @@ def Calc_base_shear_flow(boom_areas, n):
         s1 = np.append(s1, s)
         # Lift
         q_loc_L += -(S_y/Ixx)*Wing.ThSpar1*y*ds
+        print('S_y:', S_y)
+        print('Ixx:', Ixx)
+        print('ThSpar1:', Wing.ThSpar1)
+        print('y:', y)
+        print('ds:', ds)
+        print('q_loc_L:', q_loc_L)
         qs12L = np.append(qs12L, q_loc_L.to(ureg("N/m")))
         # Drag
         q_loc_D += -(S_x/Iyy)*Wing.ThSpar1*x*ds
@@ -116,10 +123,11 @@ def Calc_base_shear_flow(boom_areas, n):
     s2 = np.array([])
     s2 = np.append(s2, s)
     str_counter = 0
+    start_x_perim = Wing.get_perim_from_x(Wing.ChSpar1)
     for _ in range(n):
         s = np.add(ds, s)
         s2 = np.append(s2, s)
-        x_coor, y_coor = Wing.get_xy_from_perim(s/Wing.Chordlength, Wing.ChSpar1) # RELATIVE!!
+        x_coor, y_coor = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s / Wing.Chordlength, start_x_perim=start_x_perim) # RELATIVE!!
         # Lift
         q_loc_L += -(S_y/Ixx)*(Wing.ThSkin*y_coor*Wing.Chordlength*ds)
 
@@ -165,10 +173,11 @@ def Calc_base_shear_flow(boom_areas, n):
     qs56D = np.append(qs56D, qs35D[-1])
     s4 = np.array([])
     s4 = np.append(s4, s)
+    start_x_perim = Wing.get_perim_from_x(Wing.ChSpar2, inverse=True)
     for _ in range(n):
         s = np.add(ds, s)
         s4 = np.append(s4, s)
-        x_coor, y_coor = Wing.get_xy_from_perim(s / Wing.Chordlength, Wing.ChSpar2, reverse=True)  # RELATIVE!!
+        x_coor, y_coor = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s / Wing.Chordlength, start_x_perim=start_x_perim, inverse=True)  # RELATIVE!!
         # Lift
         q_loc_L += -(S_y / Ixx) * (Wing.ThSkin * y_coor * Wing.Chordlength * ds)
 
@@ -278,7 +287,7 @@ qs0_L, qs0_D = Correcting_shearflow_array(n, qs0L, qs0D)
 # Add Moment shear flow to base shear flows
 
 def Moment_shearflow(n):
-    qmoment = WingStress.M/(2*Wing.Area_cell())
+    qmoment = WingStress.M/(2*Wing.area_cell)
     q_moment = np.array([])
     for _ in range(n+1):
         q_moment = np.append(q_moment, qmoment)
@@ -303,13 +312,13 @@ def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs6
         Moment_L += F_y * x_loc
 
     # Moments from section 2 -> 3
-
+    start_x_perim = Wing.get_perim_from_x(Wing.ChSpar1)
     for i in range(0, len(qs23L)-1):
         q_loc = (qs23L[i] + qs23L[i + 1]) / 2
         s_loc = (s2[i] + s2[i + 1]) / 2
         ds = s2[i + 1] - s2[i]
-        x_loc_1, y_loc_1 = Wing.get_xy_from_perim(s2[i]/Wing.Chordlength, Wing.ChSpar1)
-        x_loc_2, y_loc_2 = Wing.get_xy_from_perim(s2[i+1]/Wing.Chordlength, Wing.ChSpar1)
+        x_loc_1, y_loc_1 = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s2[i] / Wing.Chordlength, start_x_perim=start_x_perim)
+        x_loc_2, y_loc_2 = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s2[i+1] / Wing.Chordlength, start_x_perim=start_x_perim)
         x_loc_1 *= Wing.Chordlength
 
         x_loc_2 *= Wing.Chordlength
@@ -339,12 +348,13 @@ def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs6
 
     # Moments from section 5 -> 6
 
+    start_x_perim = Wing.get_perim_from_x(Wing.ChSpar2, inverse=True)
     for i in range(0, len(qs56L)-1):
         q_loc = (qs56L[i] + qs56L[i + 1]) / 2
         s_loc = (s4[i] + s4[i + 1]) / 2
         ds = s4[i + 1] - s4[i]
-        x_loc_1, y_loc_1 = Wing.get_xy_from_perim(s4[i] / Wing.Chordlength, Wing.ChSpar2, reverse=True)
-        x_loc_2, y_loc_2 = Wing.get_xy_from_perim(s4[i + 1] / Wing.Chordlength, Wing.ChSpar2, reverse=True)
+        x_loc_1, y_loc_1 = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s4[i] / Wing.Chordlength, start_x_perim=start_x_perim, inverse=True)
+        x_loc_2, y_loc_2 = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s4[i+1] / Wing.Chordlength, start_x_perim=start_x_perim, inverse=True)
         x_loc_1 *= Wing.Chordlength
         x_loc_1 -= x_coor_AC
         x_loc_2 *= Wing.Chordlength
@@ -371,10 +381,6 @@ def Calc_moment_due_to_shear(s1, s2, s3, s4, s5, qs12L, qs23L, qs35L, qs56L, qs6
 
         F_y = q_loc * ds
         Moment_L += F_y * x_loc
-
-
-
-
     return Moment_L
 
 
@@ -399,7 +405,7 @@ T = Torque_for_twist(shear_center)
 # Calculate Rate of Twist          #Tobias
 #units checked and correct
 def Rate_of_twist(T):
-    constant = T/(4*Wing.Area_cell()**2*WingStress.shear_modulus)
+    constant = T/(4*Wing.area_cell**2*WingStress.shear_modulus)
     integral = Wing.HSpar1/Wing.ThSpar1
     integral += 2*Wing.length_Skin_x_c(Wing.ChSpar1, Wing.ChSpar2)/Wing.ThSkin
     integral += Wing.HSpar2/Wing.ThSpar2
@@ -434,9 +440,10 @@ def Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61):
     # Moments from section 2 -> 3
     t_xs23 = np.array([])
     t_ys23 = np.array([])
+    start_x_perim = Wing.get_perim_from_x(Wing.ChSpar1)
     for i in range(0, len(qs23)-1):
-        x_loc_1, y_loc_1 = Wing.get_xy_from_perim(s2[i]/Wing.Chordlength, Wing.ChSpar1)
-        x_loc_2, y_loc_2 = Wing.get_xy_from_perim(s2[i+1]/Wing.Chordlength, Wing.ChSpar1)
+        x_loc_1, y_loc_1 = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s2[i] / Wing.Chordlength, start_x_perim=start_x_perim)
+        x_loc_2, y_loc_2 = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s2[i+1] / Wing.Chordlength, start_x_perim=start_x_perim)
         x_loc_1 *= Wing.Chordlength
         x_loc_2 *= Wing.Chordlength
         y_loc_1 *= Wing.Chordlength
@@ -464,9 +471,10 @@ def Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61):
     # Moments from section 5 -> 6
     t_xs56 = np.array([])
     t_ys56 = np.array([])
+    start_x_perim = Wing.get_perim_from_x(Wing.ChSpar2, inverse=True)
     for i in range(0, len(qs56)-1):
-        x_loc_1, y_loc_1 = Wing.get_xy_from_perim(s4[i] / Wing.Chordlength, Wing.ChSpar2, reverse=True)
-        x_loc_2, y_loc_2 = Wing.get_xy_from_perim(s4[i + 1] / Wing.Chordlength, Wing.ChSpar2, reverse=True)
+        x_loc_1, y_loc_1 = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s4[i] / Wing.Chordlength, start_x_perim=start_x_perim, inverse=True)
+        x_loc_2, y_loc_2 = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x, Wing.perim_interpolant_inv_y, s4[i+1] / Wing.Chordlength, start_x_perim=start_x_perim, inverse=True)
         x_loc_1 *= Wing.Chordlength
         x_loc_1 -= x_coor_AC
         x_loc_2 *= Wing.Chordlength
@@ -506,7 +514,65 @@ def Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61):
 
 tau23X, tau56X, tau12Y, tau23Y, tau35Y, tau56Y, tau61Y = Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61)
 
+def transform_to_xy(s2, s4, tau23X, tau56X, tau23Y, tau56Y):
+    start_x_perim = Wing.get_perim_from_x(Wing.ChSpar1)
+    xs2 = np.array([])
+    ys2 = np.array([])
+    for s in s2:
+        print("s=", s)
+        x_coor, y_coor = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x,
+                              Wing.perim_interpolant_inv_y, s / Wing.Chordlength, start_x_perim=start_x_perim)
+        x_coor *= Wing.Chordlength.to(ureg("m"))
+        y_coor *= Wing.Chordlength.to(ureg("m"))
+        xs2 = np.append(xs2, x_coor)
+        ys2 = np.append(ys2, y_coor)
 
+    start_x_perim = Wing.get_perim_from_x(Wing.ChSpar2, inverse=True)
+    xs2 *= ureg("m")
+    ys2 *= ureg("m")
+    xs4 = np.array([])
+    ys4 = np.array([])
+    for s in s4:
+        print("s=",s)
+        x_coor, y_coor = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y,
+                                                   Wing.perim_interpolant_inv_x,
+                                                   Wing.perim_interpolant_inv_y, s / Wing.Chordlength,
+                                                   start_x_perim=start_x_perim, inverse=True)
+        x_coor *= Wing.Chordlength.to(ureg("m"))
+        y_coor *= Wing.Chordlength.to(ureg("m"))
+
+        xs4 = np.append(xs4, x_coor)
+        ys4 = np.append(ys4, y_coor)
+
+    xs4 *= ureg("m")
+    ys4 *= ureg("m")
+
+    tau23Xinterp = interpolate.interp1d(xs2, tau23X)
+    tau23Yinterp = interpolate.interp1d(xs2, tau23Y)
+    tau56Xinterp = interpolate.interp1d(xs4, tau56X)
+    tau56Yinterp = interpolate.interp1d(xs4, tau56Y)
+
+    return tau23Xinterp, tau23Yinterp, tau56Xinterp, tau56Yinterp
+
+tau23Xinterp, tau23Yinterp, tau56Xinterp, tau56Yinterp = transform_to_xy(s2, s4, tau23X, tau56X, tau23Y, tau56Y)
+
+
+tauxat2 = tau23X[80]
+tauyat2 = tau23Y[80]
+
+def GetShearX(c, bottom_side=False, inter1=tau23Xinterp,  inter2=tau56Xinterp):
+    x_coor = c * Wing.Chordlength
+    if bottom_side == False:
+        return inter1(x_coor)
+    else:
+        return inter2(x_coor)
+
+def GetShearY(c, bottom_side=False, inter1=tau23Yinterp,  inter2=tau56Yinterp):
+    x_coor = c * Wing.Chordlength
+    if bottom_side == False:
+        return inter1(x_coor)
+    else:
+        return inter2(x_coor)
 
 #Tsia-Wu Failure criterion
 def Tsia_Wu(sigma_zs, tau_x, tau_y):
@@ -528,15 +594,15 @@ def Tsia_Wu(sigma_zs, tau_x, tau_y):
     tau23 = 0
     tau13 = tau_x
     F = F11 *sigma1**2#+F22*(sigma2**2+sigma3**2)+sigma2*sigma3*(2*F22-F44)
-    F += F1*(sigma1+sigma2) #+ 2*F12*sigma1*(sigma3+sigma2) + F2*sigma3
-    F += F66*(tau13**2+tau12**2) #F44*tau23**2
+    F = F + F1*sigma1 #+ 2*F12*sigma1*(sigma3+sigma2) + F2*sigma3
+    F = F + F66*(tau13**2+tau12**2) #F44*tau23**2
     if F < 1:
         print("No failure occurs")
     else:
         print("Failure occurs")
     return F
 
-F = Tsia_Wu(WingStress.NS, tau23X[0], tau23Y[0])
+F = Tsia_Wu(WingStress.NS, tauxat2, tauyat2)
 print("F =", F)
 
 #plt.plot(s3, qs3)
