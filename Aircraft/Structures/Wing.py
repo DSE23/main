@@ -33,7 +33,7 @@ ChordR = Geometry.Wing.c_r      #Length of root (m)
 ThSpar1 = Q_('0.002 m')         #Thickness of Spar 1
 ThSpar2 = Q_('0.002 m')        #Thickness of Spar 2
 ThSkin = Q_('0.003 m')         #Thickness of the skin
-N_stringers = 2                 #Number of stringers
+N_stringers = 8                 #Number of stringers
 ClampH = Q_('0.01 m')           #height of the clamps at the top of the spars
 ClampW = Q_('0.01 m')           #width of the clamps at the top of the spars
 
@@ -44,7 +44,7 @@ w_str = Q_('0.025 m')            #width of the stringer
 t_str = Q_('0.003 m')            #thickness of the stringer
 
 
-z = 4.017773014992261                       #spanwise posotion in meters
+z = 0                       #spanwise posotion in meters
 z *= Q_('meter')
 c = 0.18                                               #Chord wise postion in ratio
 
@@ -64,7 +64,7 @@ c = 0.18                                               #Chord wise postion in ra
 #VTThSpar1 = Q_('0.002 m')         #Thickness of Spar 1
 #VTThSpar2 = Q_('0.002 m')        #Thickness of Spar 2
 #VTThSkin = Q_('0.0018 m')         #Thickness of the skin
-#VTN_stringers = 2                 #Number of stringers
+#VTN_stringers = 8                 #Number of stringers
 #VTClampH = Q_('0.03 m')           #height of the clamps at the top of the spars
 #VTClampW = Q_('0.03 m')           #width of the clamps at the top of the spars
 #
@@ -91,7 +91,7 @@ c = 0.18                                               #Chord wise postion in ra
 #HTThSpar1 = Q_('0.002 m')         #Thickness of Spar 1
 #HTThSpar2 = Q_('0.002 m')        #Thickness of Spar 2
 #HTThSkin = Q_('0.0018 m')         #Thickness of the skin
-#HTN_stringers = 2                 #Number of stringers
+#HTN_stringers = 8                 #Number of stringers
 #HTClampH = Q_('0.03 m')           #height of the clamps at the top of the spars
 #HTClampW = Q_('0.03 m')           #width of the clamps at the top of the spars
 #
@@ -102,7 +102,7 @@ c = 0.18                                               #Chord wise postion in ra
 #HTt_str = Q_('0.003 m')            #thickness of the stringer
 #
 #
-# z = 4.017773014992261.6696288358320435.4017773014992261                        #spanwise posotion in meters
+# z = 0.6696288358320435.4017773014992261                        #spanwise posotion in meters
 # z *= Q_('meter')
 # c = 0.0.0.0.0 dimensionless.0 dimensionless.1.1
 
