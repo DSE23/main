@@ -561,6 +561,9 @@ tauxat2 = tau23X[80]
 tauyat2 = tau23Y[80]
 
 def GetShearX(c, bottom_side=False, inter1=tau23Xinterp,  inter2=tau56Xinterp):
+    if c > Wing.ChSpar2-(1e-2):
+        print("⚠ c is out of range!! ⚠")
+        c = Wing.ChSpar2-(1e-2)
     x_coor = c * Wing.Chordlength
     if bottom_side == False:
         return_val = inter1(x_coor)
@@ -572,6 +575,10 @@ def GetShearX(c, bottom_side=False, inter1=tau23Xinterp,  inter2=tau56Xinterp):
         return  return_val
 
 def GetShearY(c, bottom_side=False, inter1=tau23Yinterp,  inter2=tau56Yinterp):
+
+    if c > Wing.ChSpar2-(1e-2):
+        print("⚠ c is out of range!! ⚠")
+        c = Wing.ChSpar2-(1e-2)
     x_coor = c * Wing.Chordlength
     if bottom_side == False:
         return_val = inter1(x_coor)
