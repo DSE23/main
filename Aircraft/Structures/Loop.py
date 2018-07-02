@@ -147,6 +147,11 @@ with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
         print(line.replace(text_to_search, replacement_text), end='')
 
 
+    importlib.reload(Wing)
+    importlib.reload(Inertia)
+    importlib.reload(WingStress)
+    importlib.reload(Shear)
+
 text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
 replacement_text = 'N_stringers = ' + str(Old_N_stringers)
 with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
