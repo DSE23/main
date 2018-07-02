@@ -46,7 +46,7 @@ t_str = Q_('0.003 m')            #thickness of the stringer
 
 z = 0                       #spanwise posotion in meters
 z *= Q_('meter')
-c = 0                                              #Chord wise postion in ratio
+c = 0                                               #Chord wise postion in ratio
 
 # ## VERTICAL TAIL
 # 
@@ -101,9 +101,9 @@ c = 0                                              #Chord wise postion in ratio
 #HTt_str = Q_('0.003 m')            #thickness of the stringer
 #
 #
-# z = 0.4017773014992261.4017773014992261                        #spanwise posotion in meters
+# z = 0.6696288358320435.4017773014992261                        #spanwise posotion in meters
 # z *= Q_('meter')
-# c = 0.1.1
+# c = 0.0.0.0.0 dimensionless.0 dimensionless.1.1
 
 ##Ratio of height with respect to chord, airfoil coordinates
 airfoilcoordinates = np.genfromtxt("../Airfoil.dat")    #Load coordinates

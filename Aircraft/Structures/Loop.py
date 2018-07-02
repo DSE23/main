@@ -21,7 +21,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 
 
-n = 10                      #number of the devided sections
+n = 3                      #number of the devided sections
 b = Wing.s         #Wing span
 b = b.magnitude * ureg.meter
 Normalstress = np.array([])
@@ -34,6 +34,7 @@ Vol_mat_clamp = Q_('0 m**3')
 Vol_mat_wing = Q_('0 m**3')
 
 Old_N_stringers = Wing.N_stringers
+Old_c = Wing.c
 
 Lmomentlist = np.array([])
 Dmomentlist = np.array([])
@@ -44,9 +45,16 @@ Farray = np.array([])
 clist = np.array([])
 hlist = np.array([])
 c = 0
-while c < 1:
-    z = 0
-    while z <= b.magnitude:
+z = 0
+while z <= b.magnitude:
+    c1 = Wing.ChSpar1
+    print('c1 ========', c1)
+    c2 = Wing.ChSpar2
+    print('c2 ========', c2)
+    c_space = (c2 - c1)/3
+    print('c_space ===', c_space)
+    c = c1 # - c_space
+    while c <= c2:
         NS, strain, inertia_term_1, inertia_term_2 = WingStress.Normal_stress_due_to_bending(c, Wing.airfoilordinate(c))
         Normalstress = np.append(Normalstress, NS.magnitude)
         zarray = np.append(zarray, z)
@@ -71,10 +79,11 @@ while c < 1:
         hlist = np.append(hlist, Wing.airfoilordinate(c)*Wing.Chordlength)
         print(L_moment, Dist_between_spars)
         print(Wing.z, NS, Wing.N_stringers)
-
-        text_to_search = 'z = ' + str(z)
-        z = z + b.magnitude/n
-        replacement_text = 'z = ' + str(z)
+        print('c2 ========', c2)
+        print('c ============', c)
+        text_to_search = 'c = ' + str(c)
+        c = c + c_space.magnitude
+        replacement_text = 'c = ' + str(c)
         with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
             for line in file:
                 print(line.replace(text_to_search, replacement_text), end='')
@@ -116,18 +125,26 @@ while c < 1:
         importlib.reload(WingStress)
         importlib.reload(Shear)
 
+    print('z =========', z)
     text_to_search = 'z = ' + str(z)
-    replacement_text = 'z = ' + str(0)
+    z = z + b.magnitude / n
+    replacement_text = 'z = ' + str(z)
     with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
         for line in file:
             print(line.replace(text_to_search, replacement_text), end='')
 
-    text_to_search = 'c = ' + str(c)
-    c = c + 0.1
-    replacement_text = 'c = ' + str(c)
-    with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
-        for line in file:
-            print(line.replace(text_to_search, replacement_text), end='')
+    importlib.reload(Wing)
+    importlib.reload(Inertia)
+    importlib.reload(WingStress)
+    importlib.reload(Shear)
+
+
+
+text_to_search = 'z = ' + str(z)
+replacement_text = 'z = ' + str(0)
+with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
+    for line in file:
+        print(line.replace(text_to_search, replacement_text), end='')
 
 
 text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
@@ -138,7 +155,7 @@ with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
 
 
 text_to_search = 'c = ' + str(c)
-replacement_text = 'c = ' + str(0)
+replacement_text = 'c = ' + str(Old_c)
 with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
     for line in file:
         print(line.replace(text_to_search, replacement_text), end='')
@@ -180,8 +197,11 @@ z = hlist
 cs = Normalstress
 
 
-cm = plt.get_cmap('jet')
-cNorm = matplotlib.colors.Normalize(vmin=min(cs), vmax=max(cs))
+cm = plt.get_cmap('RdBu')
+if min(cs) >= max(cs):
+    cNorm = matplotlib.colors.Normalize(vmin=-min(cs), vmax=min(cs))
+if min(cs) < max(cs):
+    cNorm = matplotlib.colors.Normalize(vmin=-max(cs), vmax=max(cs))
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cm)
 fig = plt.figure()
 ax = Axes3D(fig)

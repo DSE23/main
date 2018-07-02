@@ -198,6 +198,7 @@ print('D=', D)
 
 
 def Normal_stress_due_to_bending(x, y): #Enter relative position # Normal stress due to bending
+    x = x - Wing.centroid
     inertia_term_1 = (y*Wing.Chordlength)/Inertia.Ixx_wb
     inertia_term_2 = (x*Wing.Chordlength)/Inertia.Iyy_wb
     sigma_zs = - D_moment*inertia_term_1 + L_moment*inertia_term_2
@@ -467,4 +468,6 @@ with open('StrucVal.py', 'w') as file:
     file.writelines(data)
 
 print('L:', L)
+print('ChSpar1:', Wing.ChSpar1)
+print('ChSpar2:', Wing.ChSpar2)
 
