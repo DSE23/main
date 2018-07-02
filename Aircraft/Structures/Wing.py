@@ -34,8 +34,8 @@ ThSpar1 = Q_('0.002 m')         #Thickness of Spar 1
 ThSpar2 = Q_('0.002 m')        #Thickness of Spar 2
 ThSkin = Q_('0.0045 m')         #Thickness of the skin
 N_stringers = 2                 #Number of stringers
-ClampH = Q_('0.03 m')           #height of the clamps at the top of the spars
-ClampW = Q_('0.03 m')           #width of the clamps at the top of the spars
+ClampH = Q_('0.01 m')           #height of the clamps at the top of the spars
+ClampW = Q_('0.01 m')           #width of the clamps at the top of the spars
 
 
 ##Stringers                     # C stringer dimentions
@@ -44,9 +44,9 @@ w_str = Q_('0.025 m')            #width of the stringer
 t_str = Q_('0.003 m')            #thickness of the stringer
 
 
-z = 4.017773014992261                        #spanwise posotion in meters
+z = 0                       #spanwise posotion in meters
 z *= Q_('meter')
-c = 0                                               #Chord wise postion in ratio
+c = 0                                              #Chord wise postion in ratio
 
 # ## VERTICAL TAIL
 # 
@@ -101,9 +101,13 @@ c = 0                                               #Chord wise postion in ratio
 #HTt_str = Q_('0.003 m')            #thickness of the stringer
 #
 #
+<<<<<<< HEAD
 # z = 4.017773014992261                        #spanwise posotion in meters
+=======
+# z = 0.4017773014992261.4017773014992261                        #spanwise posotion in meters
+>>>>>>> cbb0039bdf7095e3c4f32c77ce13babb8f9ec97a
 # z *= Q_('meter')
-# c = 0
+# c = 0.1.1
 
 ##Ratio of height with respect to chord, airfoil coordinates
 airfoilcoordinates = np.genfromtxt("../Airfoil.dat")    #Load coordinates
@@ -150,7 +154,6 @@ TT = TR*t                                   #max thickness tip in m
 def Chord_loc_Spar(zs,SparR,SparT):             #input spanwise location in m and
     ChSpar = SparR + (SparT-SparR)*(zs/s)  #Chord position of spar 1 with respect to leading edge
     return ChSpar
-
 
 ChSpar1 = Chord_loc_Spar(z, Spar1R, Spar1T)
 ChSpar2 = Chord_loc_Spar(z, Spar2R, Spar2T)
@@ -341,15 +344,15 @@ def lookup_xy_from_perim(norm_interp_x, norm_interp_y, inv_interp_x, inv_interp_
         return (x_coor, y_coor)
 
 # start_x_perim = get_perim_from_x(0.9, inverse=True)
-# # x_cs = np.array([])
-# # y_cs = np.array([])
-# # for per in np.arange(0.1, 0.89, 0.001):
-# #     x_coord, y_coord = lookup_xy_from_perim(perim_interpolant_x, perim_interpolant_y, perim_interpolant_inv_x, perim_interpolant_inv_y, per, start_x_perim=start_x_perim, inverse=True)
-# #     x_cs = np.append(x_cs, x_coord)
-# #     y_cs = np.append(y_cs, y_coord)
-# #
-# # plt.plot(x_cs, y_cs)
-# # plt.show()
+# x_cs = np.array([])
+# y_cs = np.array([])
+# for per in np.arange(0.1, 0.89, 0.001):
+#     x_coord, y_coord = lookup_xy_from_perim(perim_interpolant_x, perim_interpolant_y, perim_interpolant_inv_x, perim_interpolant_inv_y, per, start_x_perim=start_x_perim, inverse=True)
+#     x_cs = np.append(x_cs, x_coord)
+#     y_cs = np.append(y_cs, y_coord)
+#
+# plt.plot(x_cs, y_cs)
+# plt.show()
 
 def get_coord_from_perim(n_st, start_x, end_x, chord_l, dat_file_name="../Airfoil.dat"):
     """
@@ -428,7 +431,7 @@ def Area_Skin_x_c(Spar1, Spar2): #Input deminsionless chordwise location of spar
     n = 100 #number of sections
     dx = ((Spar2-Spar1)/n)
     x = Spar1
-    Areaxc = 0
+    Areaxc = Q_('0 m**3')
     arclength = 0
     for i in range(n):
         x = x + dx
@@ -446,7 +449,6 @@ def length_Skin_x_c(Spar1, Spar2):                            #Input deminsionle
     n = 100 #number of sections
     dx = ((Spar2-Spar1)/n)
     x = Spar1
-    Areaxc = 0
     arclength = 0
     for _ in range(n):
         x = x + dx

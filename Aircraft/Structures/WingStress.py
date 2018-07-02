@@ -148,6 +148,7 @@ def computeloads(z):
 
     '''For the 20G manoeuver'''
     MTOW = Geometry.Masses.W_MTOW
+    print('MTOW', MTOW)
     Max_20G_N = MTOW * 9.81 * 20
     Tot_L = 2 * totallift
     if Tot_L.magnitude > 0.:
@@ -158,20 +159,26 @@ def computeloads(z):
 
     L_moment = L_moment * fac_20G
     D_moment = D_moment * fac_20G
-
+    print('L', L)
+    print('fac20', fac_20G)
     L = L * fac_20G
     D = D * fac_20G
     M = M * fac_20G
-
+    print('L', L)
     L_moment *= Q_('N*m')
     D_moment *= Q_('N*m')
 
+    if L.is_integer() == True:
+        L = Q_('0 N')
+    if D.is_integer() == True:
+        D = Q_('0 N')
 
     return L, D, M, L_moment, D_moment, dL, dD, dM
 
 zs = b-3*Q_('m')
 
 L, D, M, L_moment, D_moment, dL, dD, dM = computeloads(z)
+print('D=', D)
 # print('L', L)
 # print('D', D)
 # print('M', M)
@@ -193,17 +200,17 @@ L, D, M, L_moment, D_moment, dL, dD, dM = computeloads(z)
 def Normal_stress_due_to_bending(x, y): #Enter relative position # Normal stress due to bending
     inertia_term_1 = (y*Wing.Chordlength)/Inertia.Ixx_wb
     inertia_term_2 = (x*Wing.Chordlength)/Inertia.Iyy_wb
-    sigma_zs = D_moment*inertia_term_1 + L_moment*inertia_term_2
+    sigma_zs = - D_moment*inertia_term_1 + L_moment*inertia_term_2
     print('L_moment:', L_moment)
     print('D_moment:', D_moment)
     #print(D_moment)
     #print(L_moment)
     strain = sigma_zs /youngs_modulus
     print('sigma_zs:', sigma_zs)
-    return sigma_zs, strain #Gives the normal stress function for a given span zs, and x- and y- coordinate
+    return sigma_zs, strain, inertia_term_1, inertia_term_2 #Gives the normal stress function for a given span zs, and x- and y- coordinate
 
 
-NS = Normal_stress_due_to_bending(0.18, Wing.airfoilordinate(0.18))[0]
+NS = Normal_stress_due_to_bending(Wing.c, Wing.airfoilordinate(Wing.c))[0]
 print('L_moment:', L_moment)
 print('NS:', NS)
 print('z:', z)
