@@ -320,7 +320,7 @@ def Tsai_Wu(sigma_x, shear_x):
 '''-----------------------------Loop calcualtions----------------------------------'''
 
 x = 0
-n = 15                  #number of sections
+n = 10                  #number of sections
 x *= Q_('m')
 sigmalist = np.array([])
 shearlist = np.array([])
@@ -346,13 +346,13 @@ while x < l_fus:
             z_pos = np.append(z_pos, z)
             Vol = Vol + Area * (l_fus/n)
             print(sigma_x, shear_x)
-
+            print('x, y, z', x, y, z)
             Vol_rib = Area_ribs * t_ribs
             N_ribs = float(int(l_fus / s_ribs))
             Vol_ribs = Vol_rib * N_ribs
 
-            z = z + (B_calc(x)[1] / 10)
-        y = y + (B_calc(x)[1] / 10)
+            z = z + (B_calc(x)[1] / 4)
+        y = y + (B_calc(x)[1] / 4)
     x = x + (l_fus / n)
 
 Mass = Vol * density
@@ -360,6 +360,9 @@ Mass = Vol * density
 print('Mass = ', Mass)
 
 F = Flist
+x = x_pos
+y = y_pos
+z = z_pos
 
 cm = plt.get_cmap('plasma_r')
 if min(F) >= max(F):
