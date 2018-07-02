@@ -21,7 +21,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 
 
-n = 2                      #number of the devided sections
+n = 20                      #number of the devided sections
 b = Wing.s         #Wing span
 b = b.magnitude * ureg.meter
 Normalstress = np.array([])
@@ -51,11 +51,11 @@ while z <= b.magnitude:
     print('c1 ========', c1)
     c2 = Wing.ChSpar2
     print('c2 ========', c2)
-    c_space = (c2 - c1)/4.001
+    c_space = (c2 - c1)/12.001
     print('c_space ===', c_space)
     c = c1.magnitude  #- c_space
     while c <= c2:
-        NS, strain, inertia_term_1, inertia_term_2 = WingStress.Normal_stress_due_to_bending(c, -Wing.airfoilordinate(c))
+        NS, strain, inertia_term_1, inertia_term_2 = WingStress.Normal_stress_due_to_bending(c, Wing.airfoilordinate(c))
         Normalstress = np.append(Normalstress, NS.magnitude)
         zarray = np.append(zarray, z)
         F = Shear.F.to(ureg("dimensionless"))
@@ -76,7 +76,7 @@ while z <= b.magnitude:
         Iyylist = np.append(Iyylist, inertia_term_2)
         Dist_between_spars = Wing.ChSpar2*Wing.Chordlength - Wing.ChSpar1*Wing.Chordlength
         clist = np.append(clist, c*Wing.Chordlength)
-        hlist = np.append(hlist, -Wing.airfoilordinate(c)*Wing.Chordlength)
+        hlist = np.append(hlist, Wing.airfoilordinate(c)*Wing.Chordlength)
         print(L_moment, Dist_between_spars)
         print(Wing.z, NS, Wing.N_stringers)
         print('c2 ========', c2)
