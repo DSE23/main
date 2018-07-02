@@ -11,6 +11,7 @@ from Structures import Wing
 from Structures import Inertia
 import numpy as np
 from matplotlib import pyplot as plt
+from scipy import interpolate
 
 
 
@@ -513,8 +514,65 @@ def Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61):
 
 tau23X, tau56X, tau12Y, tau23Y, tau35Y, tau56Y, tau61Y = Get_xy_components(s1, s2, s3, s4, s5, qs12, qs23, qs35, qs56, qs61)
 
-tauxat2 = tau23X[0]
-tauyat2 = tau23Y[0]
+def transform_to_xy(s2, s4, tau23X, tau56X, tau23Y, tau56Y):
+    start_x_perim = Wing.get_perim_from_x(Wing.ChSpar1)
+    xs2 = np.array([])
+    ys2 = np.array([])
+    for s in s2:
+        print("s=", s)
+        x_coor, y_coor = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y, Wing.perim_interpolant_inv_x,
+                              Wing.perim_interpolant_inv_y, s / Wing.Chordlength, start_x_perim=start_x_perim)
+        x_coor *= Wing.Chordlength.to(ureg("m"))
+        y_coor *= Wing.Chordlength.to(ureg("m"))
+        xs2 = np.append(xs2, x_coor)
+        ys2 = np.append(ys2, y_coor)
+
+    start_x_perim = Wing.get_perim_from_x(Wing.ChSpar2, inverse=True)
+    xs2 *= ureg("m")
+    ys2 *= ureg("m")
+    xs4 = np.array([])
+    ys4 = np.array([])
+    for s in s4:
+        print("s=",s)
+        x_coor, y_coor = Wing.lookup_xy_from_perim(Wing.perim_interpolant_x, Wing.perim_interpolant_y,
+                                                   Wing.perim_interpolant_inv_x,
+                                                   Wing.perim_interpolant_inv_y, s / Wing.Chordlength,
+                                                   start_x_perim=start_x_perim, inverse=True)
+        x_coor *= Wing.Chordlength.to(ureg("m"))
+        y_coor *= Wing.Chordlength.to(ureg("m"))
+
+        xs4 = np.append(xs4, x_coor)
+        ys4 = np.append(ys4, y_coor)
+
+    xs4 *= ureg("m")
+    ys4 *= ureg("m")
+
+    tau23Xinterp = interpolate.interp1d(xs2, tau23X)
+    tau23Yinterp = interpolate.interp1d(xs2, tau23Y)
+    tau56Xinterp = interpolate.interp1d(xs4, tau56X)
+    tau56Yinterp = interpolate.interp1d(xs4, tau56Y)
+
+    return tau23Xinterp, tau23Yinterp, tau56Xinterp, tau56Yinterp
+
+tau23Xinterp, tau23Yinterp, tau56Xinterp, tau56Yinterp = transform_to_xy(s2, s4, tau23X, tau56X, tau23Y, tau56Y)
+
+
+tauxat2 = tau23X[80]
+tauyat2 = tau23Y[80]
+
+def GetShearX(c, bottom_side=False, inter1=tau23Xinterp,  inter2=tau56Xinterp):
+    x_coor = c * Wing.Chordlength
+    if bottom_side == False:
+        return inter1(x_coor)
+    else:
+        return inter2(x_coor)
+
+def GetShearY(c, bottom_side=False, inter1=tau23Yinterp,  inter2=tau56Yinterp):
+    x_coor = c * Wing.Chordlength
+    if bottom_side == False:
+        return inter1(x_coor)
+    else:
+        return inter2(x_coor)
 
 #Tsia-Wu Failure criterion
 def Tsia_Wu(sigma_zs, tau_x, tau_y):
