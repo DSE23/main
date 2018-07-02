@@ -6,7 +6,7 @@ Model gyro
         I_z = 1862.9
         omega_x_p = 282.7
         M_x = 0
-        M_y = 5000
+        M_y = -5000
         M_z = 00
     End Constants
 

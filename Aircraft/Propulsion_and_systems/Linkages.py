@@ -115,7 +115,7 @@ d_pushrod_e = Q_("30 mm")
 l_pushrod_e = Q_("3 m")  # DUMMY
 
 # Calculate critical moment of inertia for buckling
-i_xx_e = (f_p_b_max*5*l_pushrod_e**2)/(np.pi**2*StrucVal.youngs_modulus)
+i_xx_e = (f_r_b_max*5*l_pushrod_e**2)/(np.pi**2*StrucVal.youngs_modulus)
 i_xx_e.ito(ureg("mm**4"))
 #print(i_xx_e)
 
