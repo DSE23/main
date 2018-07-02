@@ -563,16 +563,27 @@ tauyat2 = tau23Y[80]
 def GetShearX(c, bottom_side=False, inter1=tau23Xinterp,  inter2=tau56Xinterp):
     x_coor = c * Wing.Chordlength
     if bottom_side == False:
-        return inter1(x_coor)
+        return_val = inter1(x_coor)
+        return_val *= ureg("Pa")
+        return return_val
     else:
-        return inter2(x_coor)
+        return_val = inter2(x_coor)
+        return_val *= ureg("Pa")
+        return  return_val
 
 def GetShearY(c, bottom_side=False, inter1=tau23Yinterp,  inter2=tau56Yinterp):
     x_coor = c * Wing.Chordlength
     if bottom_side == False:
-        return inter1(x_coor)
+        return_val = inter1(x_coor)
+        return_val *= ureg("Pa")
+        return return_val
     else:
-        return inter2(x_coor)
+        return_val = inter2(x_coor)
+        return_val *= ureg("Pa")
+        return return_val
+
+tauxat2 = GetShearX(Wing.c, bottom_side=False)
+tauyat2 = GetShearY(Wing.c, bottom_side=False)
 
 #Tsia-Wu Failure criterion
 def Tsia_Wu(sigma_zs, tau_x, tau_y):

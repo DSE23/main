@@ -80,7 +80,9 @@ while z <= b.magnitude:
         print(L_moment, Dist_between_spars)
         print(Wing.z, NS, Wing.N_stringers)
         print('c2 ========', c2)
-        print('c ============', c)
+        print('c ============', Wing.c)
+        print('c_file =======', c)
+        print('z ============', Wing.z)
         print('F ============', F)
         text_to_search = 'c = ' + str(c)
         c = c + c_space.magnitude
@@ -88,6 +90,11 @@ while z <= b.magnitude:
         with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
             for line in file:
                 print(line.replace(text_to_search, replacement_text), end='')
+
+        importlib.reload(Wing)
+        importlib.reload(Inertia)
+        importlib.reload(WingStress)
+        importlib.reload(Shear)
 
         if Geometry.Fuselage.b_f.magnitude < z < 1.4:
             text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
@@ -147,11 +154,6 @@ with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
     for line in file:
         print(line.replace(text_to_search, replacement_text), end='')
 
-
-    importlib.reload(Wing)
-    importlib.reload(Inertia)
-    importlib.reload(WingStress)
-    importlib.reload(Shear)
 
 text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
 replacement_text = 'N_stringers = ' + str(Old_N_stringers)
