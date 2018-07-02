@@ -51,7 +51,7 @@ while z <= b.magnitude:
     print('c1 ========', c1)
     c2 = Wing.ChSpar2
     print('c2 ========', c2)
-    c_space = (c2 - c1)/3.001
+    c_space = (c2 - c1)/4.001
     print('c_space ===', c_space)
     c = c1.magnitude  #- c_space
     # while c <= c2:
