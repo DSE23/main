@@ -57,24 +57,33 @@ def initialise_elevator_pushrod_length(inp):
 f_r_max = Q_("20 lbf")  # From MIL-F-8785c
 
 # Maximum stick force in pitch
-f_p_max = f_r_max*2  # From 1:2:3 ratio for control forces
+f_p_max = f_r_max/2  # From 1:2:3 ratio for control forces
 
 # Maximum yaw force on pedals
-f_y_max = f_r_max*3  # From 1:2:3 ratio for control forces
+f_y_max = f_r_max*1.5  # From 1:2:3 ratio for control forces
 
 # End assigning values
 
 # Hinge moments calculation
 
-# Calculate maximum hinge moment in roll
-m_r_max = f_r_max * Stick_pedals.l_s
-m_r_max.ito(ureg("newton * meter"))
-print("Maximum roll hinge moment: {}".format(m_r_max))
+# Calculate Angular stick deflections in deg
 
-# Calculate maximum hinge moment in pitch
-m_p_max = f_p_max * Stick_pedals.l_s
+stick_angle_e = np.rad2deg(np.arcsin(Stick_pedals.d_e/Stick_pedals.l_s))
+stick_angle_r = np.rad2deg(np.arcsin(Stick_pedals.d_r/Stick_pedals.l_s))
+
+# Calculate hinge moment factor between stick hinge and control surface hinge
+hinge_fac_e = stick_angle_e/Geometry.H_tail.delta_e
+hinge_fac_r = stick_angle_r/Geometry.Wing.delta_a
+
+# Calculate maximum aileron hinge moment
+m_r_max = f_r_max * Stick_pedals.l_s * hinge_fac_r
+m_r_max.ito(ureg("newton * meter"))
+print("Maximum aileron hinge moment: {}".format(m_r_max))
+
+# Calculate maximum elevator hinge moment
+m_p_max = f_p_max * Stick_pedals.l_s * hinge_fac_e
 m_p_max.ito(ureg("newton * meter"))
-print("Maximum pitch hinge moment: {}".format(m_p_max))
+print("Maximum elevator  hinge moment: {}".format(m_p_max))
 
 # Arm between rudder and cable/pushrod attachment
 r_rudder = Stick_pedals.d_p/np.tan(Geometry.V_tail.delta_r)
@@ -106,7 +115,7 @@ d_pushrod_e = Q_("30 mm")
 l_pushrod_e = Q_("3 m")  # DUMMY
 
 # Calculate critical moment of inertia for buckling
-i_xx_e = (f_p_b_max*3*l_pushrod_e**2)/(np.pi**2*StrucVal.youngs_modulus)
+i_xx_e = (f_p_b_max*5*l_pushrod_e**2)/(np.pi**2*StrucVal.youngs_modulus)
 i_xx_e.ito(ureg("mm**4"))
 #print(i_xx_e)
 

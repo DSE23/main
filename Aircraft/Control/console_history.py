@@ -285,7 +285,7 @@ disc_wing_w = np.zeros((len(kwlst)-1, 10))
 #for t_current in tlst:
 #    disc_wing_w[(range(n_chords_w)), 0] = da  
 #    disc_wing_w[(range(int(n_of_disc_w + 2 - n_chords_w), n_of_disc_w + 2)), 0] = -da
-#    if t_current >2:
+#    if t_current >1:
 #        da = 29.5
 #    #Wing
 #    for i in range(0, len(kwlst)-1):
@@ -351,17 +351,16 @@ disc_wing_w = np.zeros((len(kwlst)-1, 10))
 #    Mzlst.append(Mz.magnitude)
 #    
 #plt.plot(tlst,plst,label='roll rate',c='black')
-#plt.plot(tlst,Mzlst,label='moment due to roll')
+##plt.plot(tlst,Mzlst,label='moment due to roll')
 ##plt.plot(tlst,pdotlst,label='p dot')
-#plt.xlabel("time [s]")
-#plt.ylabel("roll rate [deg/s]")
+#plt.xlabel("Time [s]")
+#plt.ylabel("Roll rate ["r'$^\circ$'"/s]")
 #plt.legend()
 #plt.show()
-#print("Fz:",Fn_w+Fn_h+W)
 "============================================================================="
-## Pitch
-##alpha_nose, de, Thrust = trim()
-#
+#### Pitch
+####alpha_nose, de, Thrust = trim()
+##
 #V_local = V_inf
 #de = -1.862
 #Thrust = Q_("542 N")
@@ -381,7 +380,7 @@ disc_wing_w = np.zeros((len(kwlst)-1, 10))
 #Vlst = []
 ##de_dot = Q_("-25/0.1 deg/s")
 #for t_current in tlst:
-#    if t_current >2:
+#    if t_current >1:
 #        de = -25
 #        
 #    #Main Wing
@@ -428,16 +427,19 @@ disc_wing_w = np.zeros((len(kwlst)-1, 10))
 #    Vlst.append(V_local.magnitude)
 #    
 #print('finished')
+#fig, ax1 = plt.subplots()
+#ax2 = ax1.twinx()
 #
+#ax1.plot(tlst,qlst,color='black')
+#ax2.plot(np.nan,label='pitch rate',color='black')
+#ax2.plot(tlst,thetalst,label=r'$\theta$',color='black',ls='--')
+#ax2.plot(tlst,alst,label=r'$\alpha$',color='black',ls='-.')
+#ax1.set_xlabel("Time [s]")
+#ax1.set_ylabel("Pitch rate ["r'$^\circ$'"/s]")
+#ax2.set_ylabel("Angle ["r'$^\circ$]', color='black')
 #
-#plt.figure()
-#plt.plot(tlst,qlst,label='pitch rate',color='black')
-#plt.plot(tlst,thetalst,label='theta [deg]',color='black',ls='--')
-#plt.plot(tlst,alst,label='alpha [deg]',color='black',ls='-.')
-#plt.xlabel("time [s]")
-#plt.ylabel("pitch rate [deg/s]")
 ##plt.plot(tlst,qdotlst,label='q dot')
-#plt.legend()
+#ax2.legend()
 ##plt.figure()
 ##plt.plot(tlst,Vlst,label='velocity')
 ##plt.legend()

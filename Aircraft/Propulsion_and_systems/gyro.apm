@@ -1,0 +1,24 @@
+Model gyro
+    Constants
+        I_x_p = 0.9
+        I_x_a = 682.9
+        I_y = 1232
+        I_z = 1862.9
+        omega_x_p = 282.7
+        M_x = 0
+        M_y = 5000
+        M_z = 00
+    End Constants
+
+    Variables
+        omega_x_a = 0
+        omega_y = 0
+        omega_z = 0
+    End Variables
+
+    Equations
+        M_x = I_x_a * $omega_x_a + (I_z - I_y)*omega_z*omega_y
+        M_y = I_y * $omega_y + (I_x_a - I_z)*omega_x_a*omega_z + I_x_p*omega_z*omega_x_p
+        M_z = I_z * $omega_z + (I_y - I_x_a)*omega_x_a*omega_y - I_x_p*omega_y*omega_x_p
+    End Equations
+End Model

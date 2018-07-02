@@ -20,6 +20,7 @@ from Misc import ureg, Q_ # Imports the unit registry from the Misc folder
 
 b_f = Geometry.Fuselage.b_f                   #diameter of fuselage at the fire wall
 b_f80 = b_f*0.8                               #design radius
+print('b_f80', b_f80)
 t = Q_('0.002 m')                             #thickness of fuselage skin
 t_ribs = Q_('0.002 m')                          #thickness of the ribs
 h_ribs = Q_('0.05 m')                           #the height of the ribs
@@ -27,9 +28,11 @@ s_ribs = Q_('0.5 m')                            #rib spacing
 moter_w = Q_('180 kg')                          #Resultant weight of the motor
 g = Q_('9.81 m / s**2')                         #The gravity acceleration
 l_fus = Geometry.Fuselage.l_f                   #length of the fuselage in m
+print('l_fus', l_fus)
 l_sec1 = Q_('1.0 m')                          #length of section 1 (normal)
 l_sec2 = Q_('1.0 m')                          #length of section 2 (cut out)
 l_sec3 = l_fus - l_sec1 - l_sec2               #length of section 3 (taper)
+print('l_sec3', l_sec3)
 rho = Performance.rho_c.magnitude * ureg("kg/(m**3)") #rho at cruise altitude
 V = Performance.V_cruise.magnitude * ureg("m/s")        #cruise speed
 S_VT = Geometry.V_tail.S                    #area of vertical tail
