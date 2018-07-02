@@ -168,12 +168,17 @@ def computeloads(z):
     L_moment *= Q_('N*m')
     D_moment *= Q_('N*m')
 
+    if L.is_integer() == True:
+        L = Q_('0 N')
+    if D.is_integer() == True:
+        D = Q_('0 N')
 
     return L, D, M, L_moment, D_moment, dL, dD, dM
 
 zs = b-3*Q_('m')
 
 L, D, M, L_moment, D_moment, dL, dD, dM = computeloads(z)
+print('D=', D)
 # print('L', L)
 # print('D', D)
 # print('M', M)

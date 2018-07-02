@@ -44,9 +44,9 @@ w_str = Q_('0.025 m')            #width of the stringer
 t_str = Q_('0.003 m')            #thickness of the stringer
 
 
-z = 4.017773014992261                        #spanwise posotion in meters
+z = 0                       #spanwise posotion in meters
 z *= Q_('meter')
-c = 0.18                                              #Chord wise postion in ratio
+c = 0                                              #Chord wise postion in ratio
 
 # ## VERTICAL TAIL
 # 
@@ -101,9 +101,9 @@ c = 0.18                                              #Chord wise postion in rat
 #HTt_str = Q_('0.003 m')            #thickness of the stringer
 #
 #
-# z = 4.017773014992261                        #spanwise posotion in meters
+# z = 0.4017773014992261.4017773014992261                        #spanwise posotion in meters
 # z *= Q_('meter')
-# c = 0
+# c = 0.1.1
 
 ##Ratio of height with respect to chord, airfoil coordinates
 airfoilcoordinates = np.genfromtxt("../Airfoil.dat")    #Load coordinates
@@ -427,7 +427,7 @@ def Area_Skin_x_c(Spar1, Spar2): #Input deminsionless chordwise location of spar
     n = 100 #number of sections
     dx = ((Spar2-Spar1)/n)
     x = Spar1
-    Areaxc = 0
+    Areaxc = Q_('0 m**3')
     arclength = 0
     for i in range(n):
         x = x + dx
@@ -445,7 +445,6 @@ def length_Skin_x_c(Spar1, Spar2):                            #Input deminsionle
     n = 100 #number of sections
     dx = ((Spar2-Spar1)/n)
     x = Spar1
-    Areaxc = 0
     arclength = 0
     for _ in range(n):
         x = x + dx

@@ -15,6 +15,9 @@ from Structures import Wing
 from Structures import WingStress
 from Structures import Shear
 from matplotlib import pyplot as plt
+import matplotlib
+import matplotlib.cm as cmx
+from mpl_toolkits.mplot3d import Axes3D
 
 
 
@@ -44,7 +47,7 @@ c = 0
 while c < 1:
     z = 0
     while z <= b.magnitude:
-        NS, strain, inertia_term_1, inertia_term_2 = WingStress.Normal_stress_due_to_bending(0.18, Wing.airfoilordinate(0.18))
+        NS, strain, inertia_term_1, inertia_term_2 = WingStress.Normal_stress_due_to_bending(c, Wing.airfoilordinate(c))
         Normalstress = np.append(Normalstress, NS.magnitude)
         zarray = np.append(zarray, z)
         F = Shear.F
@@ -112,7 +115,20 @@ while c < 1:
         importlib.reload(Inertia)
         importlib.reload(WingStress)
         importlib.reload(Shear)
+
+    text_to_search = 'z = ' + str(z)
+    replacement_text = 'z = ' + str(0)
+    with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
+        for line in file:
+            print(line.replace(text_to_search, replacement_text), end='')
+
+    text_to_search = 'c = ' + str(c)
     c = c + 0.1
+    replacement_text = 'c = ' + str(c)
+    with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
+        for line in file:
+            print(line.replace(text_to_search, replacement_text), end='')
+
 
 text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
 replacement_text = 'N_stringers = ' + str(Old_N_stringers)
@@ -120,8 +136,9 @@ with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
     for line in file:
         print(line.replace(text_to_search, replacement_text), end='')
 
-text_to_search = 'z = ' + str(z)
-replacement_text = 'z = ' + str(0)
+
+text_to_search = 'c = ' + str(c)
+replacement_text = 'c = ' + str(0)
 with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
     for line in file:
         print(line.replace(text_to_search, replacement_text), end='')
@@ -156,6 +173,23 @@ with open('StrucVal.py', 'w') as file:
     file.writelines(data)
 
 print('debug:', len(zarray), len(Iyylist))
+
+x = zarray
+y = clist
+z = hlist
+cs = Normalstress
+
+
+cm = plt.get_cmap('jet')
+cNorm = matplotlib.colors.Normalize(vmin=min(cs), vmax=max(cs))
+scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cm)
+fig = plt.figure()
+ax = Axes3D(fig)
+ax.scatter(x, y, z, c=scalarMap.to_rgba(cs))
+scalarMap.set_array(cs)
+fig.colorbar(scalarMap)
+plt.show()
+
 
 # plot with various axes scales
 fig = plt.figure()
