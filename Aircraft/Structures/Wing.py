@@ -454,19 +454,6 @@ def length_Skin_x_c(Spar1, Spar2):                            #Input deminsionle
         arclength += dlength
     return arclength
 
-## Area of cell enclosed by the wing skin and the stringers
-def Area_cell(ChSpar2, ChSpar1):
-    n = 100 #number of sections
-    dx = ((ChSpar2-ChSpar1)/n)
-    area_cell = 0
-    x = ChSpar1
-    for i in range(n):
-        x = x + dx
-        dxlength = dx * Chordlength
-        area_cell = dxlength*airfoilordinate(x)*Chordlength
-        area_cell = area_cell*2
-    return area_cell
-
 
 skin_length = length_Skin_x_c(ChSpar1, ChSpar2) # skin length of top part of airfoil (dimensionless)
 
