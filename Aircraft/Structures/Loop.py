@@ -21,7 +21,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 
 
-n = 20                      #number of the devided sections
+n = 5                      #number of the devided sections
 b = Wing.s         #Wing span
 b = b.magnitude * ureg.meter
 Normalstress = np.array([])
@@ -44,6 +44,7 @@ zarray = np.array([])
 Farray = np.array([])
 clist = np.array([])
 hlist = np.array([])
+twist = 0
 c = 0.18
 z = 0
 while z <= b.magnitude:
@@ -51,13 +52,14 @@ while z <= b.magnitude:
     print('c1 ========', c1)
     c2 = Wing.ChSpar2
     print('c2 ========', c2)
-    c_space = (c2 - c1)/12.001
+    c_space = (c2 - c1)/2.001
     print('c_space ===', c_space)
     c = c1.magnitude  #- c_space
     while c <= c2:
         NS, strain, inertia_term_1, inertia_term_2 = WingStress.Normal_stress_due_to_bending(c, Wing.airfoilordinate(c))
         Normalstress = np.append(Normalstress, NS.magnitude)
         zarray = np.append(zarray, z)
+        twist += Shear.Rate_of_twist(Q_('1 N*m'))*(b / n)
         F = Shear.F.to(ureg("dimensionless"))
         Farray = np.append(Farray, F)
         z *= Q_('m')
@@ -258,87 +260,92 @@ with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
     for line in file:
         print(line.replace(text_to_search, replacement_text), end='')
 
-'''Random Density variable here'''
+# =============================================================================
+# '''Random Density variable here'''
+# 
+# Density = Q_('1560 kg / m**3')
+# 
+# 
+# Weightspar1 = Density *Vol_mat_spar1
+# Weightspar2 = Density * Vol_mat_spar2
+# Weightskin = Density * Vol_mat_skin
+# Weightstring = Density * Vol_mat_string
+# Weightwing = Density * Vol_mat_wing
+# 
+# print("Wingweight half span main wing", Weightwing)
+# 
+# # with is like your try .. finally block in this case
+# with open('StrucVal.py', 'r') as file:
+#     # read a list of lines into data
+#     data = file.readlines()
+# 
+# data[6] = 'Weightspar1 = Q_(\"' + str(Weightspar1) + '\")\n'
+# data[7] = 'Weightspar2 = Q_(\"' + str(Weightspar2) + '\")\n'
+# data[8] = 'Weightskin = Q_(\"' + str(Weightskin) + '\")\n'
+# data[9] = 'Weightstring = Q_(\"' + str(Weightstring) + '\")\n'
+# data[10] = 'Weightwing = Q_(\"' + str(Weightwing) + '\")\n'
+# data[17] = 'Density = Q_(\"' + str(Density) + '\")\n'
+# 
+# # and write everything back
+# with open('StrucVal.py', 'w') as file:
+#     file.writelines(data)
+# 
+# print('debug:', len(zarray), len(Iyylist))
+# 
+# x = zarray
+# y = clist
+# z = hlist
+# cs = Normalstress
+# 
+# 
+# cm = plt.get_cmap('rainbow')
+# if min(cs) >= max(cs):
+#     cNorm = matplotlib.colors.Normalize(vmin=-min(cs), vmax=min(cs))
+# if min(cs) < max(cs):
+#     cNorm = matplotlib.colors.Normalize(vmin=-max(cs), vmax=max(cs))
+# scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cm)
+# fig = plt.figure()
+# ax = Axes3D(fig)
+# ax.scatter(x, y, z, c=scalarMap.to_rgba(cs))
+# scalarMap.set_array(cs)
+# fig.colorbar(scalarMap)
+# plt.show()
+# 
+# F = Farray
+# 
+# cm = plt.get_cmap('plasma_r')
+# if min(F) >= max(F):
+#     cNorm = matplotlib.colors.Normalize(vmin=min(F), vmax=max(F))
+# if min(F) < max(F):
+#     cNorm = matplotlib.colors.Normalize(vmin=min(F), vmax=max(F))
+# scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cm)
+# fig = plt.figure()
+# ax = Axes3D(fig)
+# ax.scatter(x, y, z, c=scalarMap.to_rgba(F))
+# scalarMap.set_array(F)
+# fig.colorbar(scalarMap)
+# plt.show()
+# 
+# 
+# # plot with various axes scales
+# fig = plt.figure()
+# 
+# # linear
+# plt.subplot(2, 2, 1)
+# plt.plot(zarray, Ixxlist)
+# 
+# plt.subplot(2, 2, 2)
+# plt.plot(zarray, Farray)
+# 
+# plt.subplot(2, 2, 3)
+# plt.plot(zarray, Lmomentlist)
+# 
+# plt.subplot(2, 2, 4)
+# plt.plot(zarray, Normalstress)
+# 
+# plt.show()
+# =============================================================================
 
-Density = Q_('1560 kg / m**3')
 
-
-Weightspar1 = Density *Vol_mat_spar1
-Weightspar2 = Density * Vol_mat_spar2
-Weightskin = Density * Vol_mat_skin
-Weightstring = Density * Vol_mat_string
-Weightwing = Density * Vol_mat_wing
-
-print("Wingweight half span main wing", Weightwing)
-
-# with is like your try .. finally block in this case
-with open('StrucVal.py', 'r') as file:
-    # read a list of lines into data
-    data = file.readlines()
-
-data[6] = 'Weightspar1 = Q_(\"' + str(Weightspar1) + '\")\n'
-data[7] = 'Weightspar2 = Q_(\"' + str(Weightspar2) + '\")\n'
-data[8] = 'Weightskin = Q_(\"' + str(Weightskin) + '\")\n'
-data[9] = 'Weightstring = Q_(\"' + str(Weightstring) + '\")\n'
-data[10] = 'Weightwing = Q_(\"' + str(Weightwing) + '\")\n'
-data[17] = 'Density = Q_(\"' + str(Density) + '\")\n'
-
-# and write everything back
-with open('StrucVal.py', 'w') as file:
-    file.writelines(data)
-
-print('debug:', len(zarray), len(Iyylist))
-
-x = zarray
-y = clist
-z = hlist
-cs = Normalstress
-
-
-cm = plt.get_cmap('rainbow')
-if min(cs) >= max(cs):
-    cNorm = matplotlib.colors.Normalize(vmin=-min(cs), vmax=min(cs))
-if min(cs) < max(cs):
-    cNorm = matplotlib.colors.Normalize(vmin=-max(cs), vmax=max(cs))
-scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cm)
-fig = plt.figure()
-ax = Axes3D(fig)
-ax.scatter(x, y, z, c=scalarMap.to_rgba(cs))
-scalarMap.set_array(cs)
-fig.colorbar(scalarMap)
-plt.show()
-
-F = Farray
-
-cm = plt.get_cmap('plasma_r')
-if min(F) >= max(F):
-    cNorm = matplotlib.colors.Normalize(vmin=min(F), vmax=max(F))
-if min(F) < max(F):
-    cNorm = matplotlib.colors.Normalize(vmin=min(F), vmax=max(F))
-scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cm)
-fig = plt.figure()
-ax = Axes3D(fig)
-ax.scatter(x, y, z, c=scalarMap.to_rgba(F))
-scalarMap.set_array(F)
-fig.colorbar(scalarMap)
-plt.show()
-
-
-# plot with various axes scales
-fig = plt.figure()
-
-# linear
-plt.subplot(2, 2, 1)
-plt.plot(zarray, Ixxlist)
-
-plt.subplot(2, 2, 2)
-plt.plot(zarray, Farray)
-
-plt.subplot(2, 2, 3)
-plt.plot(zarray, Lmomentlist)
-
-plt.subplot(2, 2, 4)
-plt.plot(zarray, Normalstress)
-
-plt.show()
-
+J = Shear.J_calculator(twist)
+print("J = ", J)
