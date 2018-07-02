@@ -30,6 +30,16 @@ def initialise_pedal_travel(inp):
     d_p = inp
 
 
+def initialise_stick_defl_e(inp):
+    global d_e
+    d_e = inp
+
+
+def initialise_stick_defl_r(inp):
+    global d_r
+    d_r = inp
+
+
 # End defining global variables
 
 # Start assigning values to variables
@@ -44,3 +54,9 @@ l_s_b = l_s_t - l_s  # DUMMY
 
 # Pedal travel
 d_p = Q_("20 cm")  # DUMMY
+
+# Stick deflection in handle (pitch)
+d_e = Q_("0.1205 m")
+
+# Stick deflection in handle (roll)
+d_r = Q_("0.129 m")
