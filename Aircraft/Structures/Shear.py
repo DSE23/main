@@ -404,7 +404,7 @@ T = Torque_for_twist(shear_center)
 # Calculate Rate of Twist          #Tobias
 #units checked and correct
 def Rate_of_twist(T):
-    constant = T/(4*Wing.Area_cell()**2*WingStress.shear_modulus)
+    constant = T/(4*Wing.area_cell**2*WingStress.shear_modulus)
     integral = Wing.HSpar1/Wing.ThSpar1
     integral += 2*Wing.length_Skin_x_c(Wing.ChSpar1, Wing.ChSpar2)/Wing.ThSkin
     integral += Wing.HSpar2/Wing.ThSpar2
