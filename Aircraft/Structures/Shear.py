@@ -625,3 +625,15 @@ print("F =", F)
 
 #plt.plot(s3, qs3)
 #plt.show()
+
+
+
+######### For Sam
+
+Unitrateoftwist = Rate_of_twist(Q_("1 N*m"))
+
+def J_calculator(twistoftotalwing):
+    T =Q_("1 N*m")
+    G = WingStress.shear_modulus
+    J = T / (G*twistoftotalwing)
+    return J
