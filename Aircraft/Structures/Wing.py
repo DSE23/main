@@ -32,8 +32,8 @@ Spar1T = 0.18                   #Chordwise location of first spar at the tip
 ChordR = Geometry.Wing.c_r      #Length of root (m)
 ThSpar1 = Q_('0.002 m')         #Thickness of Spar 1
 ThSpar2 = Q_('0.002 m')        #Thickness of Spar 2
-ThSkin = Q_('0.0045 m')         #Thickness of the skin
-N_stringers = 2                 #Number of stringers
+ThSkin = Q_('0.003 m')         #Thickness of the skin
+N_stringers = 8                 #Number of stringers
 ClampH = Q_('0.01 m')           #height of the clamps at the top of the spars
 ClampW = Q_('0.01 m')           #width of the clamps at the top of the spars
 
@@ -46,7 +46,8 @@ t_str = Q_('0.003 m')            #thickness of the stringer
 
 z = 0                       #spanwise posotion in meters
 z *= Q_('meter')
-c = 0                                              #Chord wise postion in ratio
+c = 0.18                                               #Chord wise postion in ratio
+
 
 # ## VERTICAL TAIL
 # 
@@ -63,7 +64,7 @@ c = 0                                              #Chord wise postion in ratio
 #VTThSpar1 = Q_('0.002 m')         #Thickness of Spar 1
 #VTThSpar2 = Q_('0.002 m')        #Thickness of Spar 2
 #VTThSkin = Q_('0.0018 m')         #Thickness of the skin
-#VTN_stringers = 2                 #Number of stringers
+#VTN_stringers = 8                 #Number of stringers
 #VTClampH = Q_('0.03 m')           #height of the clamps at the top of the spars
 #VTClampW = Q_('0.03 m')           #width of the clamps at the top of the spars
 #
@@ -90,7 +91,7 @@ c = 0                                              #Chord wise postion in ratio
 #HTThSpar1 = Q_('0.002 m')         #Thickness of Spar 1
 #HTThSpar2 = Q_('0.002 m')        #Thickness of Spar 2
 #HTThSkin = Q_('0.0018 m')         #Thickness of the skin
-#HTN_stringers = 2                 #Number of stringers
+#HTN_stringers = 8                 #Number of stringers
 #HTClampH = Q_('0.03 m')           #height of the clamps at the top of the spars
 #HTClampW = Q_('0.03 m')           #width of the clamps at the top of the spars
 #
@@ -101,9 +102,9 @@ c = 0                                              #Chord wise postion in ratio
 #HTt_str = Q_('0.003 m')            #thickness of the stringer
 #
 #
-# z = 0.4017773014992261.4017773014992261                        #spanwise posotion in meters
+# z = 2.0088865074961304.6696288358320435.4017773014992261                        #spanwise posotion in meters
 # z *= Q_('meter')
-# c = 0.1.1
+# c = 0.0.0.0.0 dimensionless.0 dimensionless.1.1
 
 ##Ratio of height with respect to chord, airfoil coordinates
 airfoilcoordinates = np.genfromtxt("../Airfoil.dat")    #Load coordinates
@@ -454,18 +455,6 @@ def length_Skin_x_c(Spar1, Spar2):                            #Input deminsionle
         arclength += dlength
     return arclength
 
-## Area of cell enclosed by the wing skin and the stringers
-def Area_cell():
-    n = 100 #number of sections
-    dx = ((ChSpar2-ChSpar1)/n)
-    area_cell = 0
-    x = ChSpar1
-    for i in range(n):
-        x = x + dx
-        dxlength = dx * Chordlength
-        area_cell = dxlength*airfoilordinate(x)*Chordlength
-        area_cell = area_cell*2
-    return area_cell
 
 skin_length = length_Skin_x_c(ChSpar1, ChSpar2) # skin length of top part of airfoil (dimensionless)
 
@@ -490,17 +479,18 @@ print(centroid)
 #
 # ''''Calculate volume of the '''
 #
-# def Vol_wingbox(Spar1, Spar2, Chordlength):                            #Input deminsionless chordwise location of spar 1 and spar 2
-#     n = 100 #number of sections
-#     dx = ((Spar2-Spar1)/n)
-#     x = Spar1
-#     Area = 0
-#     for i in range(n):
-#         y = airfoilordinate(x)
-#         Area = Area + y*dx*(Chordlength**2)
-#         x = x + dx
-#     Area = Area * 2                                 # Area of both sides of the airfoil
-#     return Area
+def Vol_wingbox(Spar1, Spar2, Chordlength):                            #Input deminsionless chordwise location of spar 1 and spar 2
+    n = 100 #number ofa sections
+    dx = ((Spar2-Spar1)/n)
+    x = Spar1
+    Area = 0
+    for i in range(n):
+        y = airfoilordinate(x)
+        Area = Area + y*dx*(Chordlength**2)
+        x = x + dx                                 # Area of both sides of the airfoil
+    return Area
+
+area_cell = Vol_wingbox(ChSpar1, ChSpar2, Chordlength)
 #
 # nx = 30
 # tankstop = Q_('1 m')
