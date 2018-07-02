@@ -21,7 +21,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 
 
-n = 3                      #number of the devided sections
+n = 6                      #number of the devided sections
 b = Wing.s         #Wing span
 b = b.magnitude * ureg.meter
 Normalstress = np.array([])
@@ -51,11 +51,11 @@ while z <= b.magnitude:
     print('c1 ========', c1)
     c2 = Wing.ChSpar2
     print('c2 ========', c2)
-    c_space = (c2 - c1)/3
+    c_space = (c2 - c1)/6
     print('c_space ===', c_space)
-    c = c1 # - c_space
+    c = c1  - c_space
     while c <= c2:
-        NS, strain, inertia_term_1, inertia_term_2 = WingStress.Normal_stress_due_to_bending(c, Wing.airfoilordinate(c))
+        NS, strain, inertia_term_1, inertia_term_2 = WingStress.Normal_stress_due_to_bending(c, -Wing.airfoilordinate(c))
         Normalstress = np.append(Normalstress, NS.magnitude)
         zarray = np.append(zarray, z)
         F = Shear.F
@@ -90,7 +90,7 @@ while z <= b.magnitude:
 
         if Geometry.Fuselage.b_f.magnitude < z < 1.4:
             text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
-            New_N_stringers = 2
+            New_N_stringers = 4
             replacement_text = 'N_stringers = ' + str(New_N_stringers)
             with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
                 for line in file:

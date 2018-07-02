@@ -32,8 +32,8 @@ Spar1T = 0.18                   #Chordwise location of first spar at the tip
 ChordR = Geometry.Wing.c_r      #Length of root (m)
 ThSpar1 = Q_('0.002 m')         #Thickness of Spar 1
 ThSpar2 = Q_('0.002 m')        #Thickness of Spar 2
-ThSkin = Q_('0.0045 m')         #Thickness of the skin
-N_stringers = 2                 #Number of stringers
+ThSkin = Q_('0.003 m')         #Thickness of the skin
+N_stringers = 8                 #Number of stringers
 ClampH = Q_('0.01 m')           #height of the clamps at the top of the spars
 ClampW = Q_('0.01 m')           #width of the clamps at the top of the spars
 
