@@ -46,7 +46,7 @@ t_str = Q_('0.003 m')            #thickness of the stringer
 
 z = 4.017773014992261                       #spanwise posotion in meters
 z *= Q_('meter')
-c = 0.7988011771096981                                               #Chord wise postion in ratio
+c = 0.7988527309859881                                              #Chord wise postion in ratio
 
 
 # ## VERTICAL TAIL
