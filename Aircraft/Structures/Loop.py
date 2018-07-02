@@ -21,7 +21,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 
 
-n = 6                      #number of the devided sections
+n = 3                      #number of the devided sections
 b = Wing.s         #Wing span
 b = b.magnitude * ureg.meter
 Normalstress = np.array([])
@@ -51,7 +51,7 @@ while z <= b.magnitude:
     print('c1 ========', c1)
     c2 = Wing.ChSpar2
     print('c2 ========', c2)
-    c_space = (c2 - c1)/6
+    c_space = (c2 - c1)/3
     print('c_space ===', c_space)
     c = c1  - c_space
     while c <= c2:
@@ -76,7 +76,7 @@ while z <= b.magnitude:
         Iyylist = np.append(Iyylist, inertia_term_2)
         Dist_between_spars = Wing.ChSpar2*Wing.Chordlength - Wing.ChSpar1*Wing.Chordlength
         clist = np.append(clist, c*Wing.Chordlength)
-        hlist = np.append(hlist, Wing.airfoilordinate(c)*Wing.Chordlength)
+        hlist = np.append(hlist, -Wing.airfoilordinate(c)*Wing.Chordlength)
         print(L_moment, Dist_between_spars)
         print(Wing.z, NS, Wing.N_stringers)
         print('c2 ========', c2)
@@ -202,7 +202,7 @@ z = hlist
 cs = Normalstress
 
 
-cm = plt.get_cmap('RdBu')
+cm = plt.get_cmap('rainbow')
 if min(cs) >= max(cs):
     cNorm = matplotlib.colors.Normalize(vmin=-min(cs), vmax=min(cs))
 if min(cs) < max(cs):
@@ -212,6 +212,21 @@ fig = plt.figure()
 ax = Axes3D(fig)
 ax.scatter(x, y, z, c=scalarMap.to_rgba(cs))
 scalarMap.set_array(cs)
+fig.colorbar(scalarMap)
+plt.show()
+
+F = -Farray
+
+F = plt.get_cmap('hot')
+if min(F) >= max(F):
+    cNorm = matplotlib.colors.Normalize(vmin=-min(F), vmax=min(F))
+if min(F) < max(F):
+    cNorm = matplotlib.colors.Normalize(vmin=-max(F), vmax=max(F))
+scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cm)
+fig = plt.figure()
+ax = Axes3D(fig)
+ax.scatter(x, y, z, c=scalarMap.to_rgba(F))
+scalarMap.set_array(F)
 fig.colorbar(scalarMap)
 plt.show()
 
