@@ -136,6 +136,90 @@ while z <= b.magnitude:
         importlib.reload(WingStress)
         importlib.reload(Shear)
 
+    # while c <= c2:
+    #     NS, strain, inertia_term_1, inertia_term_2 = WingStress.Normal_stress_due_to_bending(c, -Wing.airfoilordinate(c))
+    #     Normalstress = np.append(Normalstress, NS.magnitude)
+    #     zarray = np.append(zarray, z)
+    #     F = Shear.F.to(ureg("dimensionless"))
+    #     Farray = np.append(Farray, F)
+    #     z *= Q_('m')
+    #     L, D, M, L_moment, D_moment, dL, dD, dM = WingStress.computeloads(z)
+    #     print('L_moment', L_moment)
+    #     z = z.magnitude
+    #     '''Calculate all the subweights of the wing '''
+    #     Vol_mat_spar1 = Vol_mat_spar1 + Wing.AreaSpar1*(b/n)
+    #     Vol_mat_spar2 = Vol_mat_spar2 + Wing.AreaSpar2 * (b / n)
+    #     Vol_mat_skin = Vol_mat_skin + Wing.Area_Skin(Wing.ChSpar1, Wing.ChSpar2) * (b / n)
+    #     Vol_mat_string = Vol_mat_string + Wing.AreaStringers * (b / n)
+    #     Vol_mat_wing = Vol_mat_wing + Wing.Area * (b / n)
+    #     Lmomentlist = np.append(Lmomentlist, L_moment)
+    #     Dmomentlist = np.append(Dmomentlist, D_moment)
+    #     Ixxlist = np.append(Ixxlist, inertia_term_1)  #inertia_term_1
+    #     Iyylist = np.append(Iyylist, inertia_term_2)
+    #     Dist_between_spars = Wing.ChSpar2*Wing.Chordlength - Wing.ChSpar1*Wing.Chordlength
+    #     clist = np.append(clist, c*Wing.Chordlength)
+    #     hlist = np.append(hlist, -Wing.airfoilordinate(c)*Wing.Chordlength)
+    #     print(L_moment, Dist_between_spars)
+    #     print(Wing.z, NS, Wing.N_stringers)
+    #     print('c2 ========', c2)
+    #     print('c ============', Wing.c)
+    #     print('c_file =======', c)
+    #     print('z ============', Wing.z)
+    #     print('F ============', F)
+    #     text_to_search = 'c = ' + str(c)
+    #     c = c + c_space.magnitude
+    #     if c <= Wing.ChSpar2:
+    #         replacement_text = 'c = ' + str(c)
+    #         with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
+    #             for line in file:
+    #                 print(line.replace(text_to_search, replacement_text), end='')
+    #     if c > Wing.ChSpar2:
+    #         break
+    #
+    #     importlib.reload(Wing)
+    #     importlib.reload(Inertia)
+    #     importlib.reload(WingStress)
+    #     importlib.reload(Shear)
+    #
+    #     if Geometry.Fuselage.b_f.magnitude < z < 1.4:
+    #         text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
+    #         New_N_stringers = 4
+    #         replacement_text = 'N_stringers = ' + str(New_N_stringers)
+    #         with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
+    #             for line in file:
+    #                 print(line.replace(text_to_search, replacement_text), end='')
+    #
+    #     if 1.4 < z < 3.0:
+    #         text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
+    #         New_N_stringers = 2
+    #         replacement_text = 'N_stringers = ' + str(New_N_stringers)
+    #         with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
+    #             for line in file:
+    #                 print(line.replace(text_to_search, replacement_text), end='')
+    #
+    #     if 3.0 < z < 3.5:
+    #         text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
+    #         New_N_stringers = 2
+    #         replacement_text = 'N_stringers = ' + str(New_N_stringers)
+    #         with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
+    #             for line in file:
+    #                 print(line.replace(text_to_search, replacement_text), end='')
+    #
+    #     if z > 3.5:
+    #         text_to_search = 'N_stringers = ' + str(Wing.N_stringers)
+    #         New_N_stringers = 2
+    #         replacement_text = 'N_stringers = ' + str(New_N_stringers)
+    #         with fileinput.FileInput('Wing.py', inplace=True, backup='.bak') as file:
+    #             for line in file:
+    #                 print(line.replace(text_to_search, replacement_text), end='')
+    #
+    #     importlib.reload(Wing)
+    #     importlib.reload(Inertia)
+    #     importlib.reload(WingStress)
+    #     importlib.reload(Shear)
+
+
+
     print('z =========', z)
     text_to_search = 'z = ' + str(z)
     z = z + b.magnitude / n
