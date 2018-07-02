@@ -15,6 +15,9 @@ from Geometry import Geometry
 from Propulsion_and_systems import Engine_mounts
 from Aerodynamics import Wing as AWing
 from Performance import Performance
+import matplotlib
+import matplotlib.cm as cmx
+from mpl_toolkits.mplot3d import Axes3D
 
 from Misc import ureg, Q_ # Imports the unit registry from the Misc folder
 
@@ -52,10 +55,30 @@ poisson = 0.31                 # maximum 0.33
 tau_max = Q_("40 MPa")
 density = Q_("1560 kg/m**3")
 
+'''Not very elegant solution for problem'''
+# Boom areas section 1 (normal)
+B_sec1 = t * (b_f80 / 2) / 2 + t * (b_f80 / 2) / 2  # area for all booms
+
+# Boom areas section 2 (cut out)
+B_sec2 = t * (b_f80 / 2) / 2 + t * (b_f80 / 2) / 2
+
+
+def B_calc(x):
+    if Q_('0 m') <= x <= l_sec1 + l_sec2:
+        b_f_taper = b_f80
+        B_sec3 = B_sec1
+
+    if l_sec1 + l_sec2 < x <= l_fus:
+        b_f_taper = b_f80 - ((b_f80 / (l_sec3 + l_sec2)) * (x - l_sec2 - l_sec1))
+        B_sec3 = t * (b_f_taper / 2) / 2 + t * (b_f_taper / 2) / 2
+
+    return B_sec3, b_f_taper
+
+
 
 '''The definition that caclulates certain normal and shear stresses at specific points in the fuselage'''
 
-def fuselage_calc(x):
+def fuselage_calc(x, y, z):
 
     #Boom areas section 1 (normal)
     B_sec1 = t * (b_f80 / 2) / 2 + t * (b_f80 / 2) / 2          #area for all booms
@@ -77,8 +100,8 @@ def fuselage_calc(x):
 
         return B_sec3, b_f_taper
 
-    y = B_calc(x)[1]
-    z = B_calc(x)[1]                                         #the dreadful z
+    # y = B_calc(x)[1]
+    # z = B_calc(x)[1]                                         #the dreadful z
 
 
     B_sec3, b_f_taper = B_calc(x)
@@ -303,28 +326,54 @@ sigmalist = np.array([])
 shearlist = np.array([])
 Flist = np.array([])
 x_pos = np.array([])
+y_pos = np.array([])
+z_pos = np.array([])
 Vol = Q_('0 m**3')
-
+y = -B_calc(x)[1]
+z = -B_calc(x)[1]
 
 while x < l_fus:
-    sigma_x, shear_x, Area, Area_ribs = fuselage_calc(x)
-    F = Tsai_Wu(sigma_x, shear_x)
-    sigmalist = np.append(sigmalist, sigma_x)
-    shearlist = np.append(shearlist, shear_x)
-    print('F', F)
-    Flist = np.append(Flist, F.magnitude)
-    x_pos = np.append(x_pos, x)
-    Vol = Vol + Area * (l_fus/n)
-    print(sigma_x, shear_x)
+    while -B_calc(x)[1] <= y <= B_calc(x)[1]:
+        while -B_calc(x)[1] <= z <= B_calc(x)[1]:
+            sigma_x, shear_x, Area, Area_ribs = fuselage_calc(x, y, z)
+            F = Tsai_Wu(sigma_x, shear_x)
+            sigmalist = np.append(sigmalist, sigma_x)
+            shearlist = np.append(shearlist, shear_x)
+            print('F', F)
+            Flist = np.append(Flist, F.magnitude)
+            x_pos = np.append(x_pos, x)
+            y_pos = np.append(y_pos, y)
+            z_pos = np.append(z_pos, z)
+            Vol = Vol + Area * (l_fus/n)
+            print(sigma_x, shear_x)
 
-    Vol_rib = Area_ribs * t_ribs
-    N_ribs = float(int(l_fus / s_ribs))
-    Vol_ribs = Vol_rib * N_ribs
+            Vol_rib = Area_ribs * t_ribs
+            N_ribs = float(int(l_fus / s_ribs))
+            Vol_ribs = Vol_rib * N_ribs
 
-    x = x + (l_fus/n)
+            z = z + (B_calc(x)[1] / 10)
+        y = y + (B_calc(x)[1] / 10)
+    x = x + (l_fus / n)
+
 Mass = Vol * density
 
 print('Mass = ', Mass)
+
+F = Flist
+
+cm = plt.get_cmap('plasma_r')
+if min(F) >= max(F):
+    cNorm = matplotlib.colors.Normalize(vmin=min(F), vmax=max(F))
+if min(F) < max(F):
+    cNorm = matplotlib.colors.Normalize(vmin=min(F), vmax=max(F))
+scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cm)
+fig = plt.figure()
+ax = Axes3D(fig)
+ax.scatter(x, y, z, c=scalarMap.to_rgba(F))
+scalarMap.set_array(F)
+fig.colorbar(scalarMap)
+plt.show()
+
 
 plt.plot(x_pos, Flist)
 plt.show()

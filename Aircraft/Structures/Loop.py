@@ -58,7 +58,7 @@ while z <= b.magnitude:
         NS, strain, inertia_term_1, inertia_term_2 = WingStress.Normal_stress_due_to_bending(c, -Wing.airfoilordinate(c))
         Normalstress = np.append(Normalstress, NS.magnitude)
         zarray = np.append(zarray, z)
-        F = Shear.F
+        F = Shear.F.to(ureg("dimensionless"))
         Farray = np.append(Farray, F)
         z *= Q_('m')
         L, D, M, L_moment, D_moment, dL, dD, dM = WingStress.computeloads(z)
@@ -218,7 +218,7 @@ plt.show()
 
 F = Farray
 
-cm = plt.get_cmap('hot_r')
+cm = plt.get_cmap('plasma_r')
 if min(F) >= max(F):
     cNorm = matplotlib.colors.Normalize(vmin=min(F), vmax=max(F))
 if min(F) < max(F):
