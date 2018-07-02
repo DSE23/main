@@ -21,7 +21,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 
 
-n = 3                      #number of the devided sections
+n = 2                      #number of the devided sections
 b = Wing.s         #Wing span
 b = b.magnitude * ureg.meter
 Normalstress = np.array([])
@@ -53,7 +53,7 @@ while z <= b.magnitude:
     print('c2 ========', c2)
     c_space = (c2 - c1)/3
     print('c_space ===', c_space)
-    c = c1  - c_space
+    c = c1  #- c_space
     while c <= c2:
         NS, strain, inertia_term_1, inertia_term_2 = WingStress.Normal_stress_due_to_bending(c, -Wing.airfoilordinate(c))
         Normalstress = np.append(Normalstress, NS.magnitude)
@@ -81,6 +81,7 @@ while z <= b.magnitude:
         print(Wing.z, NS, Wing.N_stringers)
         print('c2 ========', c2)
         print('c ============', c)
+        print('F ============', F)
         text_to_search = 'c = ' + str(c)
         c = c + c_space.magnitude
         replacement_text = 'c = ' + str(c)
@@ -215,13 +216,13 @@ scalarMap.set_array(cs)
 fig.colorbar(scalarMap)
 plt.show()
 
-F = -Farray
+F = Farray
 
-F = plt.get_cmap('hot')
+cm = plt.get_cmap('hot_r')
 if min(F) >= max(F):
-    cNorm = matplotlib.colors.Normalize(vmin=-min(F), vmax=min(F))
+    cNorm = matplotlib.colors.Normalize(vmin=min(F), vmax=max(F))
 if min(F) < max(F):
-    cNorm = matplotlib.colors.Normalize(vmin=-max(F), vmax=max(F))
+    cNorm = matplotlib.colors.Normalize(vmin=min(F), vmax=max(F))
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=cm)
 fig = plt.figure()
 ax = Axes3D(fig)

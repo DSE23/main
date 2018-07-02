@@ -63,7 +63,7 @@ c = 0                                               #Chord wise postion in ratio
 #VTThSpar1 = Q_('0.002 m')         #Thickness of Spar 1
 #VTThSpar2 = Q_('0.002 m')        #Thickness of Spar 2
 #VTThSkin = Q_('0.0018 m')         #Thickness of the skin
-#VTN_stringers = 2                 #Number of stringers
+#VTN_stringers = 8                 #Number of stringers
 #VTClampH = Q_('0.03 m')           #height of the clamps at the top of the spars
 #VTClampW = Q_('0.03 m')           #width of the clamps at the top of the spars
 #
@@ -90,7 +90,7 @@ c = 0                                               #Chord wise postion in ratio
 #HTThSpar1 = Q_('0.002 m')         #Thickness of Spar 1
 #HTThSpar2 = Q_('0.002 m')        #Thickness of Spar 2
 #HTThSkin = Q_('0.0018 m')         #Thickness of the skin
-#HTN_stringers = 2                 #Number of stringers
+#HTN_stringers = 8                 #Number of stringers
 #HTClampH = Q_('0.03 m')           #height of the clamps at the top of the spars
 #HTClampW = Q_('0.03 m')           #width of the clamps at the top of the spars
 #
